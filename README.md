@@ -9,8 +9,8 @@
     <a href='https://openreview.net/profile?id=~Ruiyuan_Lyu1' target='_blank'>Ruiyuan Lyu</a>&emsp;
     <a href='https://openreview.net/profile?id=~Peisen_Li1' target='_blank'>Peisen Li</a>&emsp;
     <a href='https://xiao-chen.info/' target='_blank'>Xiao Chen</a>&emsp;
-    <a href='http://zhangwenwei.cn/' target='_blank'>Wenwei Zhang</a>&emsp;
     <br>
+    <a href='http://zhangwenwei.cn/' target='_blank'>Wenwei Zhang</a>&emsp;
     <a href='https://chenkai.site/' target='_blank'>Kai Chen</a>&emsp;
     <a href='https://tianfan.info/' target='_blank'>Tianfan Xue</a>&emsp;
     <a href='https://xh-liu.github.io/' target='_blank'>Xihui Liu</a>&emsp;
