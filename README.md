@@ -18,7 +18,7 @@
     <a href='http://dahua.site/' target='_blank'>Dahua Lin</a>&emsp;
     <a href='https://oceanpang.github.io/' target='_blank'>Jiangmiao Pang</a>&emsp;
     <br>
-    Shanghai AI Laboratory&emsp;Shanghai Jiaotong University&emsp;The University of Hong Kong
+    Shanghai AI Laboratory&emsp;Shanghai Jiao Tong University&emsp;The University of Hong Kong
     <br>
     The Chinese University of Hong Kong&emsp;Tsinghua University
   </p>
