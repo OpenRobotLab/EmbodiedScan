@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 # yapf:disable
 from .box_np_ops import (box2d_to_corner_jit, box3d_to_bbox,
                          box_camera_to_lidar, boxes3d_to_corners3d_lidar,

@@ -5,13 +5,40 @@ from typing import Callable, List, Optional, Union
 import mmengine
 import numpy as np
 from mmdet3d.registry import DATASETS
-from mmdet3d.structures import get_box_type
 from mmengine.dataset import BaseDataset
 from mmengine.fileio import load
+
+from embodiedscan.structures import get_box_type
 
 
 @DATASETS.register_module()
 class EmbodiedScanDataset(BaseDataset):
+    r"""EmbodiedScan Dataset.
+
+    This class serves as the API for experiments on the EmbodiedScan Dataset.
+
+    Please refer to `EmbodiedScan Dataset
+    <https://github.com/OpenRobotLab/EmbodiedScan>`_  for data downloading.
+
+    Args:
+        data_root (str): Path of dataset root.
+        ann_file (str): Path of annotation file.
+        metainfo (dict, optional): Meta information for dataset, such as class
+            information. Defaults to None.
+        pipeline (List[dict]): Pipeline used for data processing.
+            Defaults to [].
+        test_mode (bool): Whether the dataset is in test mode.
+            Defaults to False.
+        load_eval_anns (bool): Whether to load evaluation annotations.
+            Defaults to True. Only take effect when test_mode is True.
+        filter_empty_gt (bool): Whether to filter the data with empty GT.
+            If it's set to be True, the example with empty annotations after
+            data pipeline will be dropped and a random example will be chosen
+            in `__getitem__`. Defaults to True.
+        remove_dontcare (bool): Whether to remove objects that we do not care.
+            Defaults to False.
+        box_type_3d (str): To be deprecated?
+    """
 
     def __init__(self,
                  data_root: str,

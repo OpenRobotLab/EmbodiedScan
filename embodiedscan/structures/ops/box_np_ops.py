@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 # TODO: clean the functions in this file and move the APIs into box bbox_3d
 # in the future
 # NOTICE: All functions in this file are valid for LiDAR or depth boxes only
@@ -6,8 +6,9 @@
 
 import numba
 import numpy as np
-from mmdet3d.structures.bbox_3d import (limit_period, points_cam2img,
-                                        rotation_3d_in_axis)
+
+from embodiedscan.structures.bbox_3d import (limit_period, points_cam2img,
+                                             rotation_3d_in_axis)
 
 
 def camera_to_lidar(points, r_rect, velo2cam):

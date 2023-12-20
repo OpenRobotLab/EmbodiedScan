@@ -1,8 +1,9 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 import torch
 from mmdet3d.registry import TASK_UTILS
-from mmdet3d.structures.bbox_3d import get_box_type
 from mmdet.structures.bbox import bbox_overlaps
+
+from embodiedscan.structures.bbox_3d import get_box_type
 
 
 @TASK_UTILS.register_module()

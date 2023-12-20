@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 import numpy as np
 import torch
 from mmengine.logging import print_log

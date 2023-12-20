@@ -1,12 +1,13 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 from enum import IntEnum, unique
 from typing import Optional, Sequence, Union
 
 import numpy as np
 import torch
-from mmdet3d.structures.points import (BasePoints, CameraPoints, DepthPoints,
-                                       LiDARPoints)
 from torch import Tensor
+
+from embodiedscan.structures.points import (BasePoints, CameraPoints,
+                                            DepthPoints, LiDARPoints)
 
 from .base_box3d import BaseInstance3DBoxes
 from .box_3d_mode import Box3DMode

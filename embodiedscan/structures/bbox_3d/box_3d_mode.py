@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 from enum import IntEnum, unique
 from typing import Optional, Sequence, Union
 

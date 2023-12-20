@@ -1,0 +1,4 @@
+mmengine
+opencv-python
+torch
+tqdm

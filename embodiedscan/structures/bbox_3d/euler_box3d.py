@@ -1,11 +1,11 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import numpy as np
 import torch
-from mmdet3d.structures.points import BasePoints
 from pytorch3d.ops import box3d_overlap
 from pytorch3d.transforms import euler_angles_to_matrix, matrix_to_euler_angles
 
 from .base_box3d import BaseInstance3DBoxes
+from .base_points import BasePoints
 from .utils import rotation_3d_in_euler
 
 

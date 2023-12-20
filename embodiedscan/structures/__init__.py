@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 from .bbox_3d import (BaseInstance3DBoxes, Box3DMode, CameraInstance3DBoxes,
                       Coord3DMode, DepthInstance3DBoxes,
                       EulerCameraInstance3DBoxes, EulerDepthInstance3DBoxes,

@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 from typing import Dict, List, Optional, Tuple, Union
 
 import torch
@@ -55,8 +55,8 @@ class Det3DDataSample(DetDataSample):
         >>> import torch
         >>> from mmengine.structures import InstanceData
 
-        >>> from mmdet3d.structures import Det3DDataSample
-        >>> from mmdet3d.structures.bbox_3d import BaseInstance3DBoxes
+        >>> from embodiedscan.structures import Det3DDataSample
+        >>> from embodiedscan.structures.bbox_3d import BaseInstance3DBoxes
 
         >>> data_sample = Det3DDataSample()
         >>> meta_info = dict(
@@ -115,7 +115,7 @@ class Det3DDataSample(DetDataSample):
         >>> assert 'gt_instances_3d' in data_sample
         >>> assert 'bboxes_3d' in data_sample.gt_instances_3d
 
-        >>> from mmdet3d.structures import PointData
+        >>> from embodiedscan.structures import PointData
         >>> data_sample = Det3DDataSample()
         >>> gt_pts_seg_data = dict(
         ...     pts_instance_mask=torch.rand(2),

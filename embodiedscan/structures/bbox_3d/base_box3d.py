@@ -1,14 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import warnings
 from abc import abstractmethod
 from typing import Iterator, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import torch
-from mmcv.ops import box_iou_rotated, points_in_boxes_all, points_in_boxes_part
-from mmdet3d.structures.points import BasePoints
 from torch import Tensor
 
+from .base_points import BasePoints
 from .utils import limit_period
 
 
@@ -523,71 +521,6 @@ class BaseInstance3DBoxes:
         overlaps_h = torch.clamp(lowest_of_top - heighest_of_bottom, min=0)
         return overlaps_h
 
-    @classmethod
-    def overlaps(cls,
-                 boxes1: 'BaseInstance3DBoxes',
-                 boxes2: 'BaseInstance3DBoxes',
-                 mode: str = 'iou') -> Tensor:
-        """Calculate 3D overlaps of two boxes.
-
-        Note:
-            This function calculates the overlaps between ``boxes1`` and
-            ``boxes2``, ``boxes1`` and ``boxes2`` should be in the same type.
-
-        Args:
-            boxes1 (:obj:`BaseInstance3DBoxes`): Boxes 1 contain N boxes.
-            boxes2 (:obj:`BaseInstance3DBoxes`): Boxes 2 contain M boxes.
-            mode (str): Mode of iou calculation. Defaults to 'iou'.
-
-        Returns:
-            Tensor: Calculated 3D overlap of the boxes.
-        """
-        raise NotImplementedError
-        assert isinstance(boxes1, BaseInstance3DBoxes)
-        assert isinstance(boxes2, BaseInstance3DBoxes)
-        assert type(boxes1) == type(boxes2), \
-            '"boxes1" and "boxes2" should be in the same type, ' \
-            f'but got {type(boxes1)} and {type(boxes2)}.'
-
-        assert mode in ['iou', 'iof']
-
-        rows = len(boxes1)
-        cols = len(boxes2)
-        if rows * cols == 0:
-            return boxes1.tensor.new(rows, cols)
-
-        # height overlap
-        overlaps_h = cls.height_overlaps(boxes1, boxes2)
-
-        # Restrict the min values of W and H to avoid memory overflow in
-        # ``box_iou_rotated``.
-        boxes1_bev, boxes2_bev = boxes1.bev, boxes2.bev
-        boxes1_bev[:, 2:4] = boxes1_bev[:, 2:4].clamp(min=1e-4)
-        boxes2_bev[:, 2:4] = boxes2_bev[:, 2:4].clamp(min=1e-4)
-
-        # bev overlap
-        iou2d = box_iou_rotated(boxes1_bev, boxes2_bev)
-        areas1 = (boxes1_bev[:, 2] * boxes1_bev[:, 3]).unsqueeze(1).expand(
-            rows, cols)
-        areas2 = (boxes2_bev[:, 2] * boxes2_bev[:, 3]).unsqueeze(0).expand(
-            rows, cols)
-        overlaps_bev = iou2d * (areas1 + areas2) / (1 + iou2d)
-
-        # 3d overlaps
-        overlaps_3d = overlaps_bev.to(boxes1.device) * overlaps_h
-
-        volume1 = boxes1.volume.view(-1, 1)
-        volume2 = boxes2.volume.view(1, -1)
-
-        if mode == 'iou':
-            # the clamp func is used to avoid division of 0
-            iou3d = overlaps_3d / torch.clamp(volume1 + volume2 - overlaps_3d,
-                                              min=1e-8)
-        else:
-            iou3d = overlaps_3d / torch.clamp(volume1, min=1e-8)
-
-        return iou3d
-
     def new_box(
         self, data: Union[Tensor, np.ndarray, Sequence[Sequence[float]]]
     ) -> 'BaseInstance3DBoxes':
@@ -610,89 +543,3 @@ class BaseInstance3DBoxes:
         return original_type(new_tensor,
                              box_dim=self.box_dim,
                              with_yaw=self.with_yaw)
-
-    def points_in_boxes_part(
-            self,
-            points: Tensor,
-            boxes_override: Optional[Tensor] = None) -> Tensor:
-        """Find the box in which each point is.
-
-        Args:
-            points (Tensor): Points in shape (1, M, 3) or (M, 3), 3 dimensions
-                are (x, y, z) in LiDAR or depth coordinate.
-            boxes_override (Tensor, optional): Boxes to override `self.tensor`.
-                Defaults to None.
-
-        Note:
-            If a point is enclosed by multiple boxes, the index of the first
-            box will be returned.
-
-        Returns:
-            Tensor: The index of the first box that each point is in with shape
-            (M, ). Default value is -1 (if the point is not enclosed by any
-            box).
-        """
-        if boxes_override is not None:
-            boxes = boxes_override
-        else:
-            boxes = self.tensor
-
-        points_clone = points.clone()[..., :3]
-        if points_clone.dim() == 2:
-            points_clone = points_clone.unsqueeze(0)
-        else:
-            assert points_clone.dim() == 3 and points_clone.shape[0] == 1
-
-        boxes = boxes.to(points_clone.device).unsqueeze(0)
-        box_idx = points_in_boxes_part(points_clone, boxes)
-
-        return box_idx.squeeze(0)
-
-    def points_in_boxes_all(self,
-                            points: Tensor,
-                            boxes_override: Optional[Tensor] = None) -> Tensor:
-        """Find all boxes in which each point is.
-
-        Args:
-            points (Tensor): Points in shape (1, M, 3) or (M, 3), 3 dimensions
-                are (x, y, z) in LiDAR or depth coordinate.
-            boxes_override (Tensor, optional): Boxes to override `self.tensor`.
-                Defaults to None.
-
-        Returns:
-            Tensor: A tensor indicating whether a point is in a box with shape
-            (M, T). T is the number of boxes. Denote this tensor as A, it the
-            m^th point is in the t^th box, then `A[m, t] == 1`, otherwise
-            `A[m, t] == 0`.
-        """
-        if boxes_override is not None:
-            boxes = boxes_override
-        else:
-            boxes = self.tensor
-
-        points_clone = points.clone()[..., :3]
-        if points_clone.dim() == 2:
-            points_clone = points_clone.unsqueeze(0)
-        else:
-            assert points_clone.dim() == 3 and points_clone.shape[0] == 1
-
-        boxes = boxes.to(points_clone.device).unsqueeze(0)
-        box_idxs_of_pts = points_in_boxes_all(points_clone, boxes)
-
-        return box_idxs_of_pts.squeeze(0)
-
-    def points_in_boxes(self,
-                        points: Tensor,
-                        boxes_override: Optional[Tensor] = None) -> Tensor:
-        warnings.warn('DeprecationWarning: points_in_boxes is a deprecated '
-                      'method, please consider using points_in_boxes_part.')
-        return self.points_in_boxes_part(points, boxes_override)
-
-    def points_in_boxes_batch(
-            self,
-            points: Tensor,
-            boxes_override: Optional[Tensor] = None) -> Tensor:
-        warnings.warn('DeprecationWarning: points_in_boxes_batch is a '
-                      'deprecated method, please consider using '
-                      'points_in_boxes_all.')
-        return self.points_in_boxes_all(points, boxes_override)

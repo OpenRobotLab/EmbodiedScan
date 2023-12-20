@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 import logging
 from collections import OrderedDict
 from typing import Dict, List, Optional, Sequence, Union
@@ -6,13 +6,14 @@ from typing import Dict, List, Optional, Sequence, Union
 import numpy as np
 from mmdet3d.evaluation import indoor_eval
 from mmdet3d.registry import METRICS
-from mmdet3d.structures import get_box_type
 from mmdet.evaluation import eval_map
 from mmengine.dist import (broadcast_object_list, collect_results,
                            is_main_process)
 from mmengine.evaluator import BaseMetric
 from mmengine.evaluator.metric import _to_cpu
 from mmengine.logging import MMLogger, print_log
+
+from embodiedscan.structures import get_box_type
 
 
 @METRICS.register_module()

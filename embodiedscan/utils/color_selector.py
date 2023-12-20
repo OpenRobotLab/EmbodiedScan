@@ -848,11 +848,18 @@ EMBODIED_CATE = [
 
 
 class ColorMap(object):
+    """ColorMap for visualization of EmbodiedScan data and results.
 
-    def __init__(self,
-                 classes=EMBODIED_CATE,
-                 init_file='./utils/full_color_map.txt'):
+    Args:
+        classes (list): Category list.
+        init_file (str, optional): The file for initializing the colormap.
+            Defaults to None.
+        verbose (bool): Whether to print related messages. Defaults to False.
+    """
+
+    def __init__(self, classes=EMBODIED_CATE, init_file=None, verbose=False):
         self.color_map = dict()
+        self.verbose = verbose
         if init_file is not None:
             with open(init_file, 'r') as f:
                 pre_data = f.readlines()
@@ -861,6 +868,9 @@ class ColorMap(object):
                 cate = s.split('[')[0].strip()
                 color = eval(s[len(cate):])
                 self.color_map[cate] = color
+        else:
+            from embodiedscan.utils.default_color_map import DEFAULT_COLOR_MAP
+            self.color_map = DEFAULT_COLOR_MAP
 
         self.classes = classes
         self.color_pool = COCO_COLOR
@@ -881,12 +891,27 @@ class ColorMap(object):
         self.visible_label = set()
 
     def save(self, out_file):
+        """Save the colormap to the output path.
+
+        Args:
+            out_file (str): Output path for saving the colormap.
+        """
         with open(out_file, 'w') as f:
             for key, value in self.color_map.items():
                 print(key, value, file=f)
 
     def get_color(self, label):
+        """Get the color of a given category label.
+
+        Args:
+            label (str): Category name.
+
+        Returns:
+            list: RGB value of the mapped color.
+        """
         color = self.color_map[label]
+        if not self.verbose:
+            return color
         if label in self.visible_label:
             return color
         color_idx = color[0] * 256 * 256 + color[1] * 256 + color[2]
@@ -905,6 +930,7 @@ class ColorMap(object):
         return color
 
     def clear_stat(self):
+        """Clear the statistics of visible labels."""
         self.visible_label.clear()
 
 

@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 from .base_points import BasePoints
 from .cam_points import CameraPoints
 from .depth_points import DepthPoints

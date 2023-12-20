@@ -4,17 +4,30 @@ from typing import List, Union
 import mmengine
 import numpy as np
 import open3d as o3d
-from utils.color_selector import ColorMap
-from utils.img_drawer import ImageDrawer
+
+from embodiedscan.utils.color_selector import ColorMap
+from embodiedscan.utils.img_drawer import ImageDrawer
 
 DATASETS = ['scannet', '3rscan', 'matterport3d']
 
 
 class EmbodiedScanExplorer:
+    """EmbodiedScan Explorer.
+
+    This class serves as the API for analyze and visualize EmbodiedScan
+    dataset with demo data.
+
+    Args:
+        data_root (str): Path of dataset root.
+        ann_file (str): Path of annotation file.
+        verbose (bool): Whether to print related messages. Defaults to False.
+        color_setting (str, optional): Color settings for visualization.
+            Defaults to None.
+    """
 
     def __init__(
         self,
-        dataroot: Union[dict, List],
+        data_root: Union[dict, List],
         ann_file: Union[dict, List, str],
         verbose: bool = False,
         color_setting: str = None,
@@ -26,26 +39,26 @@ class EmbodiedScanExplorer:
             ann_file = [ann_file]
         self.ann_files = ann_file
 
-        if isinstance(dataroot, str):
-            dataroot = [dataroot]
-        if isinstance(dataroot, list):
-            self.dataroot = dict()
+        if isinstance(data_root, str):
+            data_root = [data_root]
+        if isinstance(data_root, list):
+            self.data_root = dict()
             for dataset in DATASETS:
-                self.dataroot[dataset] = None
-            for root in dataroot:
+                self.data_root[dataset] = None
+            for root in data_root:
                 for dataset in DATASETS:
                     if dataset.lower() in root.lower():
-                        self.dataroot[dataset] = root
+                        self.data_root[dataset] = root
                         break
-        if isinstance(dataroot, dict):
-            self.dataroot = dataroot
+        if isinstance(data_root, dict):
+            self.data_root = data_root
 
         self.verbose = verbose
 
         if self.verbose:
             print('Dataset root')
             for dataset in DATASETS:
-                print(dataset, ':', self.dataroot[dataset])
+                print(dataset, ':', self.data_root[dataset])
 
         if self.verbose:
             print('Loading')
@@ -65,23 +78,109 @@ class EmbodiedScanExplorer:
         self.data = []
         for data in data_list:
             splits = data['sample_idx'].split('/')
-            data['dataset'] = splits[0]
-            if self.dataroot[splits[0]] is not None:
-                self.data.append(data)
+            dataset = splits[0]
+            data['dataset'] = dataset
+            if self.data_root[dataset] is not None:
+                if dataset == 'scannet':
+                    region = splits[1]
+                    dirpath = os.path.join(self.data_root['scannet'], 'scans',
+                                           region)
+                elif dataset == '3rscan':
+                    region = splits[1]
+                    dirpath = os.path.join(self.data_root['3rscan'], region)
+                elif dataset == 'matterport3d':
+                    building, region = splits[1], splits[2]
+                    dirpath = os.path.join(self.data_root['matterport3d'],
+                                           building)
+                else:
+                    raise NotImplementedError
+                if os.path.exists(dirpath):
+                    self.data.append(data)
 
         if self.verbose:
             print('Loading complete')
 
     def count_scenes(self):
+        """Count the number of scenes."""
         return len(self.data)
 
+    def list_categories(self):
+        """List the categories involved in the dataset."""
+        res = []
+        for cate, id in self.metainfo['categories'].items():
+            res.append({'category': cate, 'id': id})
+        return res
+
     def list_scenes(self):
+        """List all scenes in the dataset."""
         res = []
         for scene in self.data:
             res.append(scene['sample_idx'])
         return res
 
+    def list_cameras(self, scene):
+        """List all the camera frames in the scene.
+
+        Args:
+            scene (str): Scene name.
+
+        Returns:
+            list[str] or None: List of all the frame names. If there is no
+            frames, we will return None.
+        """
+        for sample in self.data:
+            if sample['sample_idx'] == scene:
+                res = []
+                dataset = sample['dataset']
+                for img in sample['images']:
+                    img_path = img['img_path']
+                    if dataset == 'scannet':
+                        cam_name = img_path.split('/')[-1][:-4]
+                    elif dataset == '3rscan':
+                        cam_name = img_path.split('/')[-1][:-10]
+                    elif dataset == 'matterport3d':
+                        cam_name = img_path.split(
+                            '/')[-1][:-8] + img_path.split('/')[-1][-7:-4]
+                    res.append(cam_name)
+                return res
+
+        print('No such scene')
+        return None
+
+    def list_instances(self, scene):
+        """List all the instance annotations in the scene.
+
+        Args:
+            scene (str): Scene name.
+
+        Returns:
+            list[dict] or None: List of all the instance annotations. If there
+            is no instances, we will return None.
+        """
+        for sample in self.data:
+            if sample['sample_idx'] == scene:
+                res = []
+                for instance in sample['instances']:
+                    label = self.classes[instance['bbox_label_3d'] - 1]
+                    res.append({
+                        '9dof_bbox': instance['bbox_3d'],
+                        'label': label
+                    })
+                return res
+
+        print('No such scene')
+        return None
+
     def scene_info(self, scene_name):
+        """Show the info of the given scene.
+
+        Args:
+            scene_name (str): Scene name.
+
+        Returns:
+            dict or None: Dict of scene info. If there is no such a scene, we
+            will return None.
+        """
         for scene in self.data:
             if scene['sample_idx'] == scene_name:
                 if self.verbose:
@@ -96,6 +195,13 @@ class EmbodiedScanExplorer:
         return None
 
     def render_scene(self, scene_name, render_box=False):
+        """Render a given scene with open3d.
+
+        Args:
+            scene_name (str): Scene name.
+            render_box (bool): Whether to render the box in the scene.
+                Defaults to False.
+        """
         s = scene_name.split('/')
         if len(s) == 2:
             dataset, region = s
@@ -108,29 +214,42 @@ class EmbodiedScanExplorer:
                 break
         axis_align_matrix = select['axis_align_matrix']
         if dataset == 'scannet':
-            filepath = os.path.join(self.dataroot['scannet'], 'scans', region,
+            filepath = os.path.join(self.data_root['scannet'], 'scans', region,
                                     f'{region}_vh_clean.ply')
         elif dataset == '3rscan':
-            filepath = os.path.join(self.dataroot['3rscan'], region,
+            filepath = os.path.join(self.data_root['3rscan'], region,
                                     'mesh.refined.v2.obj')
         elif dataset == 'matterport3d':
-            filepath = os.path.join(self.dataroot['matterport3d'], building,
+            filepath = os.path.join(self.data_root['matterport3d'], building,
                                     'region_segmentations', f'{region}.ply')
         else:
             raise NotImplementedError
 
+        if self.verbose:
+            print('Loading mesh')
         mesh = o3d.io.read_triangle_mesh(filepath, True)
         mesh.transform(axis_align_matrix)
         frame = o3d.geometry.TriangleMesh.create_coordinate_frame()
+        if self.verbose:
+            print('Loading complete')
         boxes = []
         if render_box:
+            if self.verbose:
+                print('Rendering box')
             for instance in select['instances']:
                 box = self._9dof_to_box(instance['bbox_3d'],
                                         instance['bbox_label_3d'])
                 boxes.append(box)
+            if self.verbose:
+                print('Rendering complete')
         o3d.visualization.draw_geometries([mesh, frame] + boxes)
 
     def render_occupancy(self, scene_name):
+        """Render the occupancy annotation of a given scene.
+
+        Args:
+            scene_name (str): Scene name.
+        """
         s = scene_name.split('/')
         if len(s) == 2:
             dataset, region = s
@@ -138,18 +257,22 @@ class EmbodiedScanExplorer:
             dataset, building, region = s
 
         if dataset == 'scannet':
-            filepath = os.path.join(self.dataroot['scannet'], 'scans', region,
+            filepath = os.path.join(self.data_root['scannet'], 'scans', region,
                                     'occupancy', 'occupancy.npy')
         elif dataset == '3rscan':
-            filepath = os.path.join(self.dataroot['3rscan'], region,
+            filepath = os.path.join(self.data_root['3rscan'], region,
                                     'occupancy', 'occupancy.npy')
         elif dataset == 'matterport3d':
-            filepath = os.path.join(self.dataroot['matterport3d'], building,
+            filepath = os.path.join(self.data_root['matterport3d'], building,
                                     'occupancy', f'occupancy_{region}.npy')
         else:
             raise NotImplementedError
 
+        if self.verbose:
+            print('Loading occupancy')
         gt_occ = np.load(filepath)
+        if self.verbose:
+            print('Loading complete')
         point_cloud_range = [-3.2, -3.2, -1.28 + 0.5, 3.2, 3.2, 1.28 + 0.5]
         # occ_size = [40, 40, 16]
         grid_size = [0.16, 0.16, 0.16]
@@ -178,7 +301,15 @@ class EmbodiedScanExplorer:
         frame = o3d.geometry.TriangleMesh.create_coordinate_frame()
         o3d.visualization.draw_geometries([frame, voxel_grid])
 
-    def render_image(self, scene_name, camera_name):
+    def show_image(self, scene_name, camera_name, render_box=False):
+        """Render an ego-centric image view with annotations.
+
+        Args:
+            scene_name (str): Scene name.
+            camera_name (str): The name of rendered camera frame.
+            render_box (bool): Whether to render box annotations in the image.
+                Defaults to False.
+        """
         dataset = scene_name.split('/')[0]
         select = None
         for scene in self.data:
@@ -186,7 +317,7 @@ class EmbodiedScanExplorer:
                 select = scene
         for camera in select['images']:
             img_path = camera['img_path']
-            img_path = os.path.join(self.dataroot[dataset],
+            img_path = os.path.join(self.data_root[dataset],
                                     img_path[img_path.find('/') + 1:])
             if dataset == 'scannet':
                 cam_name = img_path.split('/')[-1][:-4]
@@ -203,17 +334,22 @@ class EmbodiedScanExplorer:
                 else:
                     intrinsic = select['cam2img']
                 img_drawer = ImageDrawer(img_path, verbose=self.verbose)
-                for i in camera['visible_instance_ids']:
-                    instance = select['instances'][i]
-                    box = self._9dof_to_box(instance['bbox_3d'],
-                                            instance['bbox_label_3d'])
-                    label = self.classes[instance['bbox_label_3d'] - 1]
-                    color = self.color_selector.get_color(label)
-                    img_drawer.draw_box3d(box,
-                                          color,
-                                          label,
-                                          extrinsic=extrinsic,
-                                          intrinsic=intrinsic)
+                if render_box:
+                    if self.verbose:
+                        print('Rendering box')
+                    for i in camera['visible_instance_ids']:
+                        instance = select['instances'][i]
+                        box = self._9dof_to_box(instance['bbox_3d'],
+                                                instance['bbox_label_3d'])
+                        label = self.classes[instance['bbox_label_3d'] - 1]
+                        color = self.color_selector.get_color(label)
+                        img_drawer.draw_box3d(box,
+                                              color,
+                                              label,
+                                              extrinsic=extrinsic,
+                                              intrinsic=intrinsic)
+                    if self.verbose:
+                        print('Rendering complete')
 
                 img_drawer.show()
                 return
@@ -222,6 +358,16 @@ class EmbodiedScanExplorer:
         return
 
     def _9dof_to_box(self, box, label_id):
+        """Convert 9-DoF box annotations to open3d oriented boxes.
+
+        Args:
+            box (list | np.ndarray): Original box annotations.
+            label_id (int): Category ID.
+
+        Returns:
+            open3d.geometry.OrientedBoundingBox: Converted boxes for the
+            subsequent processing and visualization.
+        """
         if isinstance(box, list):
             box = np.array(box)
         center = box[:3].reshape(3, 1)
@@ -240,7 +386,7 @@ class EmbodiedScanExplorer:
 
 if __name__ == '__main__':
     a = EmbodiedScanExplorer(
-        dataroot=['data/scannet', 'data/3rscan/', 'data/matterport3d/'],
+        data_root=['data/scannet', 'data/3rscan/', 'data/matterport3d/'],
         ann_file=[
             'data/full_10_visible/embodiedscan_infos_train_full.pkl',
             'data/full_10_visible/embodiedscan_infos_val_full.pkl'
@@ -248,4 +394,4 @@ if __name__ == '__main__':
         verbose=True)
     print(a.list_scenes())
     print(a.count_scenes())
-    a.render_image('scannet/scene0000_00', '00000')
+    a.show_image('scannet/scene0000_00', '00000')

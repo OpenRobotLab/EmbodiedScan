@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 from typing import Optional, Sequence, Union
 
 import numpy as np
@@ -68,7 +68,7 @@ class DepthPoints(BasePoints):
             :obj:`BasePoints`: The converted point of the same type in the
             ``dst`` mode.
         """
-        from mmdet3d.structures.bbox_3d import Coord3DMode
+        from embodiedscan.structures.bbox_3d import Coord3DMode
         return Coord3DMode.convert_point(point=self,
                                          src=Coord3DMode.DEPTH,
                                          dst=dst,
