@@ -118,3 +118,6 @@ data
 *.obj
 *.ply
 demo/data/*
+
+# mac
+.DS_Store
