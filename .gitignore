@@ -117,3 +117,4 @@ data
 *.png
 *.obj
 *.ply
+demo/data/*

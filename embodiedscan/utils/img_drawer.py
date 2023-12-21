@@ -6,6 +6,14 @@ from matplotlib import path
 
 
 class ImageDrawer:
+    """Visualization tool for ego-centric images.
+
+    This class serves as the API for visualizing ego-centric images.
+
+    Args:
+        image (str): Path of image to be visualized.
+        verbose (bool): Whether to print related messages. Defaults to False.
+    """
 
     def __init__(self, image, verbose=False):
         self.verbose = verbose
@@ -29,6 +37,20 @@ class ImageDrawer:
                   font_thickness=2,
                   text_color=(0, 255, 0),
                   text_color_bg=(0, 0, 0)):
+        """Draw the category text on the image.
+
+        Args:
+            text (str): Text to be drawn.
+            font (cv2.FONT_TYPE): The font type to be used to plot.
+                Defaults to cv2.FONT_HERSHEY_SIMPLEX.
+            pos (tuple): The drawing position. Defaults to (0, 0).
+            size (tuple): Image size. Defaults to (0, 0).
+            font_scale (int): Font scale. Defaults to 1.
+            font_thickness (int): Font thickness. Defaults to 2.
+            text_color (tuple): Font color. Defaults to (0, 255, 0).
+            text_color_bg (tuple): Background color for drawing texts.
+                Defaults to (0, 0, 0).
+        """
 
         x, y = pos
         w, h = size
@@ -57,10 +79,15 @@ class ImageDrawer:
         self.occupied[y:y + text_h, x:x + text_w] = True
 
     def draw_box3d(self, box, color, label, extrinsic, intrinsic):
-        """
-            box : open3d box
-            color : 0-255
-            extrinsic : 4x4 CAM 2 WORLD
+        """Draw 3D boxes on the image.
+
+        Args:
+            box (open3d.geometry.OrientedBoundingBox): Box to be drawn.
+            color (tuple): Box color.
+            label (str): Box category label.
+            extrinsic (np.ndarray): 4x4 extrinsic matrix, camera to world
+                transformation.
+            intrinsic (np.ndarray): 4x4 camera intrinsic matrix.
         """
         extrinsic_w2c = np.linalg.inv(extrinsic)
         h, w, _ = self.img.shape
@@ -115,11 +142,21 @@ class ImageDrawer:
                            text_color_bg=color)
 
     def show(self):
+        """Show the image on the screen."""
         plt.imshow(self.img / 255.0)
         plt.show()
 
     @staticmethod
     def _inside_box(box, point):
+        """Check if any points are in the box.
+
+        Args:
+            box (open3d.geometry.OrientedBoundingBox): Oriented Box.
+            point (np.ndarray): N points represented by nx4 array (x, y, z, 1).
+
+        Returns:
+            bool: The result.
+        """
         point_vec = o3d.utility.Vector3dVector(point[:, :3])
         inside_idx = box.get_point_indices_within_bounding_box(point_vec)
         if len(inside_idx) > 0:

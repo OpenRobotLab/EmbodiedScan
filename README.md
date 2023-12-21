@@ -36,6 +36,14 @@
   </a>
 </p>
 
+## 🤖 [Demo](https://tai-wang.github.io/embodiedscan)
+
+<!-- <div style="text-align: center;">
+    <img src="assets/demo_fig.png" alt="Dialogue_Teaser" width=100% >
+</div> -->
+
+[![demo](assets/demo_fig.png "demo")](https://tai-wang.github.io/embodiedscan)
+
 ## 🏠 About
 
 <!-- ![Teaser](assets/teaser.jpg) -->
@@ -63,14 +71,6 @@ Building upon this database, we introduce a baseline framework named <b>Embodied
 </p>
 Embodied Perceptron accepts RGB-D sequence with any number of views along with texts as multi-modal input. It uses classical encoders to extract features for each modality and adopts dense and isomorphic sparse fusion with corresponding decoders for different predictions. The 3D features integrated with the text feature can be further used for language-grounded understanding.
 
-### [Demo](https://tai-wang.github.io/embodiedscan)
-
-<!-- <div style="text-align: center;">
-    <img src="assets/demo_fig.png" alt="Dialogue_Teaser" width=100% >
-</div> -->
-
-[![demo](assets/demo_fig.png "demo")](https://tai-wang.github.io/embodiedscan)
-
 <!-- #### Pipeline Flow
 <video src="assets/scannet_long_demo.mp4" controls>
 </video>
@@ -90,6 +90,15 @@ Embodied Perceptron accepts RGB-D sequence with any number of views along with t
 #### ''Multi-agent'' Interaction Planned by LLMs
 <video src="assets/scannet_two_bed_demo.mp4" controls>
 </video> -->
+
+## 📝 TODO List
+
+- \[x\] Paper and partial code release.
+- \[ \] Release EmbodiedScan annotation files.
+- \[ \] Polish dataset APIs and related codes.
+- \[ \] Release Embodied Perceptron pretrained models.
+- \[ \] Release codes for baselines and benchmarks.
+- \[ \] Full release and further updates.
 
 ## 🔗 Citation
 
