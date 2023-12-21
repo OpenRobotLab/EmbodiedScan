@@ -2,9 +2,9 @@
 <p align="center">
 <h1 align="center"><strong>EmbodiedScan: A Holistic Multi-Modal 3D Perception Suite Towards Embodied AI</strong></h1>
   <p align="center">
-    <a href='https://tai-wang.github.io/' target='_blank'>Tai Wang</a>&emsp;
-    <a href='https://scholar.google.com/citations?user=-zT1NKwAAAAJ&hl=zh-CN' target='_blank'>Xiaohan Mao</a>&emsp;
-    <a href='https://scholar.google.com/citations?user=QabwS_wAAAAJ&hl=zh-CN' target='_blank'>Chenming Zhu</a>&emsp;
+    <a href='https://tai-wang.github.io/' target='_blank'>Tai Wang*</a>&emsp;
+    <a href='https://scholar.google.com/citations?user=-zT1NKwAAAAJ&hl=zh-CN' target='_blank'>Xiaohan Mao*</a>&emsp;
+    <a href='https://scholar.google.com/citations?user=QabwS_wAAAAJ&hl=zh-CN' target='_blank'>Chenming Zhu*</a>&emsp;
     <a href='https://runsenxu.com/' target='_blank'>Runsen Xu</a>&emsp;
     <a href='https://openreview.net/profile?id=~Ruiyuan_Lyu1' target='_blank'>Ruiyuan Lyu</a>&emsp;
     <a href='https://openreview.net/profile?id=~Peisen_Li1' target='_blank'>Peisen Li</a>&emsp;
@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-  <a href="https://arxiv.org/abs/2309.07918" target='_blank'>
+  <a href="https://github.com/OpenRobotLab/EmbodiedScan" target='_blank'>
     <img src="https://img.shields.io/badge/arXiv-2308.16911-blue?">
   </a>
   <a href="./assets/EmbodiedScan.pdf" target='_blank'>
