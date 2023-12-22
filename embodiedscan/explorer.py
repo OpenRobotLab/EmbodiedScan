@@ -6,7 +6,8 @@ import numpy as np
 import open3d as o3d
 
 from embodiedscan.utils.color_selector import ColorMap
-from embodiedscan.utils.continuous_drawer import ContinuousDrawer
+from embodiedscan.utils.continuous_drawer import (ContinuousDrawer,
+                                                  ContinuousOccupancyDrawer)
 from embodiedscan.utils.img_drawer import ImageDrawer
 
 DATASETS = ['scannet', '3rscan', 'matterport3d']
@@ -297,6 +298,54 @@ class EmbodiedScanExplorer:
                                   selected_scene, self.classes,
                                   self.color_selector, start_idx,
                                   pcd_downsample)
+        drawer.begin()
+
+    def render_countinuous_occupancy(self, scene_name, start_cam=None):
+        """Render occupancy with continuous ego-centric observations.
+
+        Args:
+            scene_name (str): Scene name.
+            start_cam (str, optional): Camera frame from which the rendering
+                starts. Defaults to None, corresponding to the first frame.
+        """
+        s = scene_name.split('/')
+        if len(s) == 2:
+            dataset, region = s
+        else:
+            dataset, building, region = s
+
+        selected_scene = None
+        start_idx = -1
+        for scene in self.data:
+            if scene['sample_idx'] == scene_name:
+                selected_scene = scene
+                if start_cam is not None:
+                    start_idx = -1
+                    for i, img in enumerate(scene['images']):
+                        img_path = img['img_path']
+                        if dataset == 'scannet':
+                            cam_name = img_path.split('/')[-1][:-4]
+                        elif dataset == '3rscan':
+                            cam_name = img_path.split('/')[-1][:-10]
+                        elif dataset == 'matterport3d':
+                            cam_name = img_path.split(
+                                '/')[-1][:-8] + img_path.split('/')[-1][-7:-4]
+                        if cam_name == start_cam:
+                            start_idx = i
+                            break
+                    if start_idx == -1:
+                        print('No such camera')
+                        return
+                else:
+                    start_idx = 0
+
+        if selected_scene is None:
+            print('No such scene')
+            return
+
+        drawer = ContinuousOccupancyDrawer(dataset, self.dataroot[dataset],
+                                           selected_scene, self.classes,
+                                           self.color_selector, start_idx)
         drawer.begin()
 
     def render_occupancy(self, scene_name):
