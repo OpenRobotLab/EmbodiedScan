@@ -60,7 +60,7 @@ Building upon this database, we introduce a baseline framework named <b>Embodied
 
 ## 🔥 News
 
-- \[2023-12\] We release the [paper](https://arxiv.org/abs/2309.07918) of EmbodiedScan. Please check the [webpage](https://tai-wang.github.io/embodiedscan) and view our demos!
+- \[2023-12\] We release the [paper](./assets/EmbodiedScan.pdf) of EmbodiedScan. Please check the [webpage](https://tai-wang.github.io/embodiedscan) and view our demos!
 
 ## 🔍 Overview
 
