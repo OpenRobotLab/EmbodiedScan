@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import open3d as o3d
 
+from .line_mesh import LineMesh
+
 
 def from_depth_to_point(rgb, depth, mask, intrinsic, depth_intrinsic,
                         extrinsic):
@@ -25,6 +27,16 @@ def from_depth_to_point(rgb, depth, mask, intrinsic, depth_intrinsic,
     pc = pc[mask]
     color = color[mask]
     return pc[:, :3], color
+
+
+def _box_add_thickness(box, thickness):
+    bbox_lines = o3d.geometry.LineSet.create_from_oriented_bounding_box(box)
+    bbox_lines_width = LineMesh(points=bbox_lines.points,
+                                lines=bbox_lines.lines,
+                                colors=box.color,
+                                radius=thickness)
+    results = bbox_lines_width.cylinder_segments
+    return results
 
 
 def _9dof_to_box(box, label, color_selector):

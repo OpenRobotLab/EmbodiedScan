@@ -9,6 +9,7 @@ from embodiedscan.utils.color_selector import ColorMap
 from embodiedscan.utils.continuous_drawer import (ContinuousDrawer,
                                                   ContinuousOccupancyDrawer)
 from embodiedscan.utils.img_drawer import ImageDrawer
+from embodiedscan.utils.utils import _9dof_to_box, _box_add_thickness
 
 DATASETS = ['scannet', '3rscan', 'matterport3d']
 
@@ -27,13 +28,12 @@ class EmbodiedScanExplorer:
             Defaults to None.
     """
 
-    def __init__(
-        self,
-        data_root: Union[dict, List],
-        ann_file: Union[dict, List, str],
-        verbose: bool = False,
-        color_setting: str = None,
-    ):
+    def __init__(self,
+                 data_root: Union[dict, List],
+                 ann_file: Union[dict, List, str],
+                 verbose: bool = False,
+                 color_setting: str = None,
+                 thickness: float = 0.01):
 
         if isinstance(ann_file, dict):
             ann_file = list(ann_file.values())
@@ -56,6 +56,7 @@ class EmbodiedScanExplorer:
             self.data_root = data_root
 
         self.verbose = verbose
+        self.thickness = thickness
 
         if self.verbose:
             print('Dataset root')
@@ -239,9 +240,10 @@ class EmbodiedScanExplorer:
             if self.verbose:
                 print('Rendering box')
             for instance in select['instances']:
-                box = self._9dof_to_box(instance['bbox_3d'],
-                                        instance['bbox_label_3d'])
-                boxes.append(box)
+                box = _9dof_to_box(instance['bbox_3d'],
+                                   self.classes[instance['bbox_label_3d'] - 1],
+                                   self.color_selector)
+                boxes += _box_add_thickness(box, self.thickness)
             if self.verbose:
                 print('Rendering complete')
         o3d.visualization.draw_geometries([mesh, frame] + boxes)
@@ -297,7 +299,7 @@ class EmbodiedScanExplorer:
         drawer = ContinuousDrawer(dataset, self.data_root[dataset],
                                   selected_scene, self.classes,
                                   self.color_selector, start_idx,
-                                  pcd_downsample)
+                                  pcd_downsample, self.thickness)
         drawer.begin()
 
     def render_continuous_occupancy(self, scene_name, start_cam=None):
@@ -443,8 +445,10 @@ class EmbodiedScanExplorer:
                         print('Rendering box')
                     for i in camera['visible_instance_ids']:
                         instance = select['instances'][i]
-                        box = self._9dof_to_box(instance['bbox_3d'],
-                                                instance['bbox_label_3d'])
+                        box = _9dof_to_box(
+                            instance['bbox_3d'],
+                            self.classes[instance['bbox_label_3d'] - 1],
+                            self.color_selector)
                         label = self.classes[instance['bbox_label_3d'] - 1]
                         color = self.color_selector.get_color(label)
                         img_drawer.draw_box3d(box,
@@ -460,32 +464,6 @@ class EmbodiedScanExplorer:
 
         print('No such camera')
         return
-
-    def _9dof_to_box(self, box, label_id):
-        """Convert 9-DoF box annotations to open3d oriented boxes.
-
-        Args:
-            box (list | np.ndarray): Original box annotations.
-            label_id (int): Category ID.
-
-        Returns:
-            open3d.geometry.OrientedBoundingBox: Converted boxes for the
-            subsequent processing and visualization.
-        """
-        if isinstance(box, list):
-            box = np.array(box)
-        center = box[:3].reshape(3, 1)
-        scale = box[3:6].reshape(3, 1)
-        rot = box[6:].reshape(3, 1)
-        rot_mat = \
-            o3d.geometry.OrientedBoundingBox.get_rotation_matrix_from_zxy(rot)
-        geo = o3d.geometry.OrientedBoundingBox(center, rot_mat, scale)
-
-        label = self.classes[label_id - 1]
-        color = self.color_selector.get_color(label)
-        color = [x / 255.0 for x in color]
-        geo.color = color
-        return geo
 
 
 if __name__ == '__main__':
