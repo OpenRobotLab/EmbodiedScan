@@ -43,7 +43,7 @@ def _9dof_to_box(box, label, color_selector):
     return geo
 
 
-def draw_camera(camera_pose, camera_size=0.5):
+def draw_camera(camera_pose, camera_size=0.5, return_points=False):
     # camera_pose : 4*4 camera to world
     point = np.array([[0, 0, 0], [-camera_size, -camera_size, camera_size * 2],
                       [camera_size, -camera_size, camera_size * 2],
@@ -51,6 +51,8 @@ def draw_camera(camera_pose, camera_size=0.5):
                       [camera_size, camera_size, camera_size * 2]])
     pc = o3d.geometry.PointCloud(points=o3d.utility.Vector3dVector(point))
     pc.transform(camera_pose)
+    if return_points:
+        return pc.points
     color = (100 / 255.0, 149 / 255.0, 237 / 255.0)
     lines_pcd = o3d.geometry.LineSet()
     lines_pcd.lines = o3d.utility.Vector2iVector([[0, 1], [0, 2], [0,

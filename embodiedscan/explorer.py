@@ -246,10 +246,10 @@ class EmbodiedScanExplorer:
                 print('Rendering complete')
         o3d.visualization.draw_geometries([mesh, frame] + boxes)
 
-    def render_countinuous_scene(self,
-                                 scene_name,
-                                 start_cam=None,
-                                 pcd_downsample=100):
+    def render_continuous_scene(self,
+                                scene_name,
+                                start_cam=None,
+                                pcd_downsample=100):
         """Render a scene with continuous ego-centric observations.
 
         Args:
@@ -294,13 +294,13 @@ class EmbodiedScanExplorer:
             print('No such scene')
             return
 
-        drawer = ContinuousDrawer(dataset, self.dataroot[dataset],
+        drawer = ContinuousDrawer(dataset, self.data_root[dataset],
                                   selected_scene, self.classes,
                                   self.color_selector, start_idx,
                                   pcd_downsample)
         drawer.begin()
 
-    def render_countinuous_occupancy(self, scene_name, start_cam=None):
+    def render_continuous_occupancy(self, scene_name, start_cam=None):
         """Render occupancy with continuous ego-centric observations.
 
         Args:
@@ -343,7 +343,7 @@ class EmbodiedScanExplorer:
             print('No such scene')
             return
 
-        drawer = ContinuousOccupancyDrawer(dataset, self.dataroot[dataset],
+        drawer = ContinuousOccupancyDrawer(dataset, self.data_root[dataset],
                                            selected_scene, self.classes,
                                            self.color_selector, start_idx)
         drawer.begin()
@@ -496,4 +496,4 @@ if __name__ == '__main__':
             'data/full_10_visible/embodiedscan_infos_val_full.pkl'
         ],
         verbose=True)
-    explorer.render_countinuous_scene('scannet/scene0000_00')
+    explorer.render_continuous_scene('scannet/scene0000_00')
