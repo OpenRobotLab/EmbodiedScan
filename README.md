@@ -95,7 +95,7 @@ git clone https://github.com/OpenRobotLab/EmbodiedScan.git
 cd EmbodiedScan
 ```
 
-2. Install [PyTorch3D](https://github.com/facebookresearch/pytorch3d/blob/main/INSTALL.md)
+2. Install [PyTorch3D](https://github.com/facebookresearch/pytorch3d/blob/main/INSTALL.md).
 
 ```bash
 conda create -n embodiedscan python=3.8 -y  # pytorch3d needs python>3.7
@@ -106,7 +106,7 @@ conda activate embodiedscan
 pip install --no-index --no-cache-dir pytorch3d -f https://dl.fbaipublicfiles.com/pytorch3d/packaging/wheels/py38_cu113_pyt1110/download.html
 ```
 
-3. Install EmbodiedScan
+3. Install EmbodiedScan.
 
 ```bash
 # We plan to make EmbodiedScan easier to install by "pip install EmbodiedScan".
@@ -117,15 +117,13 @@ pip install -e .
 
 ### Data Preparation
 
-Please download ScanNet, 3RScan and matterport3d from its official website.
+Please download ScanNet, 3RScan and matterport3d from their official websites.
 
-We will release the demo data, re-organized file structure, post-processing script and annotation files in the near future.
-
-Please stay tuned.
+We will release the demo data, re-organized file structure, post-processing script and annotation files in the near future. Please stay tuned.
 
 ### Tutorial
 
-We provide a simple [tutorial](https://github.com/OpenRobotLab/EmbodiedScan/blob/main/embodiedscan/tutorial.ipynb) here as a guideline for the basic analysis and visualization of our dataset. Welcome to try and post your suggestions!
+We provide a simple tutorial [here](https://github.com/OpenRobotLab/EmbodiedScan/blob/main/embodiedscan/tutorial.ipynb) as a guideline for the basic analysis and visualization of our dataset. Welcome to try and post your suggestions!
 
 ## 📦 Model and Benchmark
 
