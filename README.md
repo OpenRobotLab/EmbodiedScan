@@ -25,8 +25,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/OpenRobotLab/EmbodiedScan" target='_blank'>
-    <img src="https://img.shields.io/badge/arXiv-2308.16911-blue?">
+  <a href="https://arxiv.org/abs/2312.16170" target='_blank'>
+    <img src="https://img.shields.io/badge/arXiv-2312.16170-blue?">
   </a>
   <a href="./assets/EmbodiedScan.pdf" target='_blank'>
     <img src="https://img.shields.io/badge/Paper-📖-blue?">
