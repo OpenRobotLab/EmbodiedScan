@@ -3,7 +3,7 @@ org/Open3D/pull/738#issuecomment-564785941.
 
 Module which creates mesh lines from a line set
 Open3D relies upon using glLineWidth to set line width on a LineSet
-However, this method is now deprecated and not fully supporeted in
+However, this method is now deprecated and not fully supported in
 newer OpenGL versions.
 See:
     Open3D Github Pull Request:
