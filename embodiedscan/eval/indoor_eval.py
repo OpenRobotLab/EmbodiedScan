@@ -115,8 +115,8 @@ def eval_det_cls(pred, gt, iou_thr=None):
             w, l, h = box.tensor[0, 3:6]
             faces = [w * l, w * h, h * l]
             if torch.any(box.tensor.new_tensor(faces) < 2e-4):
-                print('Find small predicted boxes,',
-                      'and clamp short edges to 2e-2 meters.')
+                # print('Find small predicted boxes,',
+                #       'and clamp short edges to 2e-2 meters.')
                 box.tensor[:, 3:6] = torch.clamp(box.tensor[:, 3:6], min=2e-2)
             pred_cur[box_idx] = box.tensor
             box_idx += 1

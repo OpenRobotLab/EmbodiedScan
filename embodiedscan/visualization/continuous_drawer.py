@@ -5,7 +5,8 @@ import mmengine
 import numpy as np
 import open3d as o3d
 
-from .utils import _9dof_to_box, draw_camera, from_depth_to_point
+from .utils import (_9dof_to_box, _box_add_thickness, draw_camera,
+                    from_depth_to_point)
 
 
 class ContinuousDrawer:
@@ -26,7 +27,7 @@ class ContinuousDrawer:
     """
 
     def __init__(self, dataset, dir, scene, classes, color_selector, start_idx,
-                 pcd_downsample):
+                 pcd_downsample, thickness):
         self.dir = dir
         self.dataset = dataset
         self.scene = scene
@@ -34,6 +35,7 @@ class ContinuousDrawer:
         self.color_selector = color_selector
         self.idx = start_idx
         self.downsample = pcd_downsample
+        self.thickness = thickness
         self.camera = None
         self.occupied = np.zeros((len(self.scene['instances']), ), dtype=bool)
         self.vis = o3d.visualization.VisualizerWithKeyCallback()
@@ -134,7 +136,9 @@ class ContinuousDrawer:
             box = _9dof_to_box(instance['bbox_3d'],
                                self.classes[instance['bbox_label_3d'] - 1],
                                self.color_selector)
-            vis.add_geometry(box)
+            box = _box_add_thickness(box, self.thickness)
+            for item in box:
+                vis.add_geometry(item)
 
         self.idx += 1
         ctr = vis.get_view_control()

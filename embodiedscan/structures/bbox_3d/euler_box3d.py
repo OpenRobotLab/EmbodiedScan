@@ -4,8 +4,8 @@ import torch
 from pytorch3d.ops import box3d_overlap
 from pytorch3d.transforms import euler_angles_to_matrix, matrix_to_euler_angles
 
+from ..points.base_points import BasePoints
 from .base_box3d import BaseInstance3DBoxes
-from .base_points import BasePoints
 from .utils import rotation_3d_in_euler
 
 
@@ -282,7 +282,7 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
         else:
             return rot_mat_T
 
-    def flip(self, direction='X', points=None):
+    def flip(self, direction='X'):
         """Flip the boxes in BEV along given BEV direction.
 
         In Depth coordinates, it flips x (horizontal) or y (vertical) axis.
@@ -290,11 +290,6 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
         Args:
             bev_direction (str, optional): Flip direction
                 (horizontal or vertical). Defaults to 'horizontal'.
-            points (torch.Tensor | np.ndarray | :obj:`BasePoints`, optional):
-                Points to flip. Defaults to None.
-
-        Returns:
-            torch.Tensor, numpy.ndarray or None: Flipped points.
         """
         assert direction in ['X', 'Y', 'Z']
         if direction == 'X':
@@ -309,19 +304,6 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
             self.tensor[:, 2] = -self.tensor[:, 2]
             self.tensor[:, 7] = -self.tensor[:, 7]
             self.tensor[:, 8] = -self.tensor[:, 8] + np.pi
-
-        if points is not None:
-            # assert isinstance(points, (torch.Tensor, np.ndarray, BasePoints))
-            if isinstance(points, (torch.Tensor, np.ndarray)):
-                if direction == 'X':
-                    points[:, 0] = -points[:, 0]
-                elif direction == 'Y':
-                    points[:, 1] = -points[:, 1]
-                elif direction == 'Z':
-                    points[:, 2] = -points[:, 2]
-            else:
-                points.flip(direction)
-            return points
 
     def convert_to(self, dst, rt_mat=None):
         """Convert self to ``dst`` mode.
@@ -339,9 +321,7 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
             :obj:`DepthInstance3DBoxes`:
                 The converted box of the same type in the ``dst`` mode.
         """
-        from .box_3d_mode import Box3DMode
-        assert dst == Box3DMode.EULER_DEPTH
-        return self
+        raise NotImplementedError
 
     def enlarged_box(self, extra_width):
         """Enlarge the length, width and height boxes.

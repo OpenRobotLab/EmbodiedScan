@@ -4,8 +4,6 @@ from collections import OrderedDict
 from typing import Dict, List, Optional, Sequence, Union
 
 import numpy as np
-from mmdet3d.evaluation import indoor_eval
-from mmdet3d.registry import METRICS
 from mmdet.evaluation import eval_map
 from mmengine.dist import (broadcast_object_list, collect_results,
                            is_main_process)
@@ -13,7 +11,10 @@ from mmengine.evaluator import BaseMetric
 from mmengine.evaluator.metric import _to_cpu
 from mmengine.logging import MMLogger, print_log
 
+from embodiedscan.registry import METRICS
 from embodiedscan.structures import get_box_type
+
+from .indoor_eval import indoor_eval
 
 
 @METRICS.register_module()

@@ -6,7 +6,8 @@ import numpy as np
 import torch
 from torch import Tensor
 
-from .base_points import BasePoints
+from embodiedscan.structures.points.base_points import BasePoints
+
 from .utils import limit_period
 
 

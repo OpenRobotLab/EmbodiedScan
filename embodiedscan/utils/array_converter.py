@@ -137,8 +137,8 @@ def array_converter(to_torch: bool = True,
             for i, arg_value in enumerate(named_args):
                 if arg_names[i] in apply_to:
                     new_args.append(
-                        converter.convert(
-                            input_array=arg_value, target_type=target_type))
+                        converter.convert(input_array=arg_value,
+                                          target_type=target_type))
                 else:
                     new_args.append(arg_value)
 
@@ -309,8 +309,8 @@ class ArrayConverter:
                 converted_array = input_array.cpu().numpy().astype(np.float32)
             else:
                 # default dtype is float32, device is 'cpu'
-                converted_array = torch.tensor(
-                    input_array, dtype=torch.float32)
+                converted_array = torch.tensor(input_array,
+                                               dtype=torch.float32)
         else:
             assert isinstance(target_array, (np.ndarray, torch.Tensor)), \
                 'invalid target array type'
@@ -341,8 +341,9 @@ class ArrayConverter:
         elif isinstance(input_array, torch.Tensor):
             converted_array = input_array.cpu().numpy().astype(self.dtype)
         else:
-            converted_array = torch.tensor(
-                input_array, dtype=self.dtype, device=self.device)
+            converted_array = torch.tensor(input_array,
+                                           dtype=self.dtype,
+                                           device=self.device)
         if self.is_num:
             converted_array = converted_array.item()
         return converted_array

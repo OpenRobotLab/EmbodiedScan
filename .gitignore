@@ -105,7 +105,6 @@ venv.bak/
 .mypy_cache/
 
 # cython generated cpp
-data
 .vscode
 .idea
 
@@ -121,3 +120,8 @@ demo/data/*
 
 # mac
 .DS_Store
+
+# local data
+data/
+exps/
+todo.md
