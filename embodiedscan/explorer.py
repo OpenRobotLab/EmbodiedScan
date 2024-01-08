@@ -1,7 +1,7 @@
 import os
+import pickle
 from typing import List, Union
 
-import mmengine
 import numpy as np
 import open3d as o3d
 
@@ -68,7 +68,8 @@ class EmbodiedScanExplorer:
         self.metainfo = None
         data_list = []
         for file in self.ann_files:
-            data = mmengine.load(file)
+            with open(file, 'rb') as f:
+                data = pickle.load(f)
             if self.metainfo is None:
                 self.metainfo = data['metainfo']
             else:

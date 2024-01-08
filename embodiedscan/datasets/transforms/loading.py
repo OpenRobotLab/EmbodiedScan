@@ -93,6 +93,7 @@ class LoadDepthFromFile(BaseTransform):
         return repr_str
 
 
+# TODO : refine
 @TRANSFORMS.register_module()
 class LoadAnnotations3D(LoadAnnotations):
     """Load Annotations3D.
