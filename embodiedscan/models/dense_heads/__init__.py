@@ -1,3 +1,3 @@
-from .fcaf3d_head import FCAF3DHead
+from .fcaf3d_head import FCAF3DHead, FCAF3DHeadRotMat
 
-__all__ = ['FCAF3DHead']
+__all__ = ['FCAF3DHead', 'FCAF3DHeadRotMat']
