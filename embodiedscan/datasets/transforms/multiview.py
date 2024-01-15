@@ -23,13 +23,9 @@ class MultiViewPipeline(BaseTransform):
         ids = np.arange(len(results['img_path']))
         replace = True if self.n_images > len(ids) else False
         if self.ordered:
-            step = (len(ids) - 1) // (self.n_images - 1
-                                      )  # TODO: BUG, fix from branch fbocc
-            if step > 0:
-                ids = ids[::step]
-                # sometimes can not get the accurate n_images in this way
-                # then take the first n_images one
-                ids = ids[:self.n_images]
+            step = len(ids) / self.n_images
+            if step >= 1:
+                ids = ids[int(step * i) for i in range(self.n_images)]
             # else: all the ids are evaluated
         else:
             ids = np.random.choice(ids, self.n_images, replace=replace)
