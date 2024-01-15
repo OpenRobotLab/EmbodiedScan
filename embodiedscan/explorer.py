@@ -465,14 +465,3 @@ class EmbodiedScanExplorer:
 
         print('No such camera')
         return
-
-
-if __name__ == '__main__':
-    explorer = EmbodiedScanExplorer(
-        data_root=['data/scannet', 'data/3rscan/', 'data/matterport3d/'],
-        ann_file=[
-            'data/full_10_visible/embodiedscan_infos_train_full.pkl',
-            'data/full_10_visible/embodiedscan_infos_val_full.pkl'
-        ],
-        verbose=True)
-    explorer.render_continuous_scene('scannet/scene0000_00')
