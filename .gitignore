@@ -122,6 +122,9 @@ demo/data/*
 .DS_Store
 
 # local data
-data/
+data/scannet
+data/3rscan
+data/matterport3d
+data/*.pkl
 exps/
 todo.md
