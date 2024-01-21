@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 # Follow https://github.com/NVIDIA/MinkowskiEngine/blob/master/examples/resnet.py # noqa
 # and mmcv.cnn.ResNet
 from typing import List, Union

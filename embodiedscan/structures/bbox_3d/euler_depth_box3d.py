@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 import numpy as np
 import torch
 from mmcv.ops import points_in_boxes_all, points_in_boxes_part

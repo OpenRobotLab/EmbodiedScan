@@ -159,7 +159,6 @@ train_pipeline = [
              dict(type=Resize, scale=(480, 480), keep_ratio=False)
          ]),
     dict(type=AggregateMultiViewPoints, coord_type='DEPTH', save_slices=True),
-    # dict(type='PointSample', num_points=n_points),
     dict(
         type=RandomFlip3D,
         sync_2d=False,

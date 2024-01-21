@@ -137,12 +137,6 @@ class Pack3DDetInputs(BaseTransform):
             - 'data_samples' (:obj:`Det3DDataSample`): The annotation info
               of the sample.
         """
-        # print("========before================")
-        # print(results.keys())
-        # print('=======================')
-        # Format 3D data
-        # if 'occupancy' in results:
-        #     results['occupancy'] = to_tensor(results['occupancy'])
 
         if 'points' in results:
             if isinstance(results['points'], BasePoints):
@@ -177,8 +171,6 @@ class Pack3DDetInputs(BaseTransform):
                     img = to_tensor(
                         np.ascontiguousarray(img.transpose(2, 0, 1)))
                 results['img'] = img
-        # if 'depths' in results:
-        #     results['depths'] = results['depths'][None, ...]
 
         for key in [
                 'proposals', 'gt_bboxes', 'gt_bboxes_ignore', 'gt_labels',
@@ -259,7 +251,16 @@ class Pack3DDetInputs(BaseTransform):
                 elif key == 'depth_map':
                     gt_depth_map.set_data(dict(data=results[key]))
                 elif key == 'gt_occupancy':
-                    pass
+                    data_sample.gt_occupancy = to_tensor(
+                        results['gt_occupancy'])
+                    if isinstance(results['gt_occupancy_masks'], list):
+                        data_sample.gt_occupancy_masks = [
+                            to_tensor(mask)
+                            for mask in results['gt_occupancy_masks']
+                        ]
+                    else:
+                        data_sample.gt_occupancy_masks = to_tensor(
+                            results['gt_occupancy_masks'])
                 else:
                     raise NotImplementedError(f'Please modified '
                                               f'`Pack3DDetInputs` '
@@ -276,25 +277,9 @@ class Pack3DDetInputs(BaseTransform):
         else:
             data_sample.eval_ann_info = None
 
-        if 'gt_occupancy' in results:
-            data_sample.gt_occupancy = to_tensor(results['gt_occupancy'])
-        if 'gt_occupancy_masks' in results:
-            if isinstance(results['gt_occupancy_masks'], list):
-                data_sample.gt_occupancy_masks = [
-                    to_tensor(mask) for mask in results['gt_occupancy_masks']
-                ]
-            else:
-                data_sample.gt_occupancy_masks = to_tensor(
-                    results['gt_occupancy_masks'])
-
         packed_results = dict()
         packed_results['data_samples'] = data_sample
         packed_results['inputs'] = inputs
-        # print("========after================")
-        # print(packed_results['data_samples'])
-        # print(packed_results['inputs'].keys())
-        # print('=======================')
-        # exit(0)
         return packed_results
 
     def __repr__(self) -> str:

@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 from .backbones import *  # noqa: F401,F403
 from .data_preprocessors import *  # noqa: F401,F403
 from .dense_heads import *  # noqa: F401,F403

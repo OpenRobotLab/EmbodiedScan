@@ -210,6 +210,10 @@ class BBoxCDLoss(nn.Module):
     Args:
         mode (str): Criterion mode to calculate distance.
             The valid modes are 'smooth_l1', 'l1' or 'l2'. Defaults to 'l2'.
+        group (str): How corners are grouped.
+            The valid groups are 'g8' or 'g4',
+            meaning either all 8 corners are in a single group
+            or the corners are divided into two groups, each containing 4.
         reduction (str): Method to reduce losses.
             The valid reduction method are 'none', 'sum' or 'mean'.
             Defaults to 'mean'.

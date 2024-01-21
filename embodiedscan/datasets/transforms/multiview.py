@@ -8,6 +8,21 @@ from embodiedscan.structures.points import get_points_type
 
 @TRANSFORMS.register_module()
 class MultiViewPipeline(BaseTransform):
+    """Multiview data processing pipeline.
+
+    The transform steps are as follows:
+
+        1. Select frames.
+        2. Re-ororganize the selected data structure.
+        3. Apply transforms for each selected frame.
+        4. Concatenate data to form a batch.
+
+    Args:
+        transforms (list[dict | callable]):
+            The transforms to be applied to each select frame.
+        n_images (int): Number of frames selected per scene.
+        ordered (bool): Whether to put these frames in order. Default to False.
+    """
 
     def __init__(self, transforms, n_images, ordered=False):
         super().__init__()
@@ -16,6 +31,14 @@ class MultiViewPipeline(BaseTransform):
         self.ordered = ordered
 
     def transform(self, results: dict) -> dict:
+        """Transform function.
+
+        Args:
+            results (dict): Result dict from loading pipeline.
+
+        Returns:
+            dict: output dict after transformation.
+        """
         imgs = []
         points = []
         intrinsics = []
@@ -23,9 +46,13 @@ class MultiViewPipeline(BaseTransform):
         ids = np.arange(len(results['img_path']))
         replace = True if self.n_images > len(ids) else False
         if self.ordered:
-            step = len(ids) / self.n_images
-            if step >= 1:
-                ids = ids[int(step * i) for i in range(self.n_images)]
+            step = (len(ids) - 1) // (self.n_images - 1
+                                      )  # TODO: BUG, fix from branch fbocc
+            if step > 0:
+                ids = ids[::step]
+                # sometimes can not get the accurate n_images in this way
+                # then take the first n_images one
+                ids = ids[:self.n_images]
             # else: all the ids are evaluated
         else:
             ids = np.random.choice(ids, self.n_images, replace=replace)
@@ -114,9 +141,6 @@ class AggregateMultiViewPoints(BaseTransform):
 
         if self.save_slices:
             results['points_slice_indices'] = points_slice_indices
-
-        # TODO: fix the packing of results['img'] and remove this code
-        # del results['img']
 
         return results
 

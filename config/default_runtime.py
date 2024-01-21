@@ -5,7 +5,7 @@ default_hooks = dict(timer=dict(type='IterTimerHook'),
                      param_scheduler=dict(type='ParamSchedulerHook'),
                      checkpoint=dict(type='CheckpointHook',
                                      interval=1,
-                                     max_keep_ckpts=1),
+                                     max_keep_ckpts=4),
                      sampler_seed=dict(type='DistSamplerSeedHook'))
 # visualization=dict(type='Det3DVisualizationHook'))
 

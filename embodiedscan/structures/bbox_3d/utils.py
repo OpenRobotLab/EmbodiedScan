@@ -208,6 +208,10 @@ def xywhr2xyxyr(
 def get_box_type(box_type: str) -> Tuple[type, int]:
     """Get the type and mode of box structure.
 
+    We temporarily only support EulerDepthInstance3DBoxes to
+        support 9-DoF box operations
+        and will consider refactoring this class with further experience.
+
     Args:
         box_type (str): The type of box structure. The valid value are "LiDAR",
             "Camera" and "Depth".

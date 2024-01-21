@@ -19,10 +19,7 @@ class ConvertRGBDToPoints(BaseTransform):
         self.coord_type = coord_type
         self.use_color = use_color
 
-    def transform(
-        self,
-        input_dict: dict,
-    ) -> dict:
+    def transform(self, input_dict: dict) -> dict:
         """Call function to normalize color of points.
 
         Args:

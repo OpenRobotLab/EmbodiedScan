@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 import numpy as np
 import torch
 from pytorch3d.ops import box3d_overlap
@@ -10,34 +10,15 @@ from .utils import rotation_3d_in_euler
 
 
 class EulerInstance3DBoxes(BaseInstance3DBoxes):
-    """3D boxes of instances in Depth coordinates.
+    """3D euler boxes.
 
-    Coordinates in Depth:
-
-    .. code-block:: none
-
-                    up z    y front (alpha=0.5*pi)
-                       ^   ^
-                       |  /
-                       | /
-                       0 ------> x right (alpha=0)
-
-    The relative coordinate of bottom center in a Depth box is (0.5, 0.5, 0),
-    and the yaw is around the z axis, thus the rotation axis=2.
-    The yaw is 0 at the positive direction of x axis, and decreases from
-    the positive direction of x to the positive direction of y.
-    Also note that rotation of DepthInstance3DBoxes is counterclockwise,
-    which is reverse to the definition of the yaw angle (clockwise).
-
-    A refactor is ongoing to make the three coordinate systems
-    easier to understand and convert between each other.
+    See https://en.wikipedia.org/wiki/Euler_angles for more details.
 
     Attributes:
         tensor (torch.Tensor): Float matrix of N x box_dim.
         box_dim (int): Integer indicates the dimension of a box
             Each row is (x, y, z, x_size, y_size, z_size, alpha, beta, gamma).
-        with_yaw (bool): If True, the value of yaw will be set to 0 as minmax
-            boxes.
+        with_yaw (bool): Deprecated.
     """
 
     def __init__(self,
@@ -135,8 +116,8 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
             ``boxes2``, ``boxes1`` and ``boxes2`` should be in the same type.
 
         Args:
-            boxes1 (:obj:`BaseInstance3DBoxes`): Boxes 1 contain N boxes.
-            boxes2 (:obj:`BaseInstance3DBoxes`): Boxes 2 contain M boxes.
+            boxes1 (:obj:`EulerInstance3DBoxes`): Boxes 1 contain N boxes.
+            boxes2 (:obj:`EulerInstance3DBoxes`): Boxes 2 contain M boxes.
             mode (str, optional): Mode of iou calculation. Defaults to 'iou'.
 
         Returns:
@@ -158,11 +139,6 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
         corners2 = boxes2.corners
         _, iou3d = box3d_overlap(corners1, corners2, eps=1e-4)
         return iou3d
-
-    @property
-    def bottom_center(self):
-        """torch.Tensor: A tensor with center of each box in shape (N, 3)."""
-        raise NotImplementedError('Not support')
 
     @property
     def gravity_center(self):
@@ -283,13 +259,10 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
             return rot_mat_T
 
     def flip(self, direction='X'):
-        """Flip the boxes in BEV along given BEV direction.
-
-        In Depth coordinates, it flips x (horizontal) or y (vertical) axis.
+        """Flip the boxes along the corresponding axis.
 
         Args:
-            bev_direction (str, optional): Flip direction
-                (horizontal or vertical). Defaults to 'horizontal'.
+            direction (str, optional): Flip axis. Defaults to 'X'.
         """
         assert direction in ['X', 'Y', 'Z']
         if direction == 'X':
@@ -304,87 +277,3 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
             self.tensor[:, 2] = -self.tensor[:, 2]
             self.tensor[:, 7] = -self.tensor[:, 7]
             self.tensor[:, 8] = -self.tensor[:, 8] + np.pi
-
-    def convert_to(self, dst, rt_mat=None):
-        """Convert self to ``dst`` mode.
-
-        Args:
-            dst (:obj:`Box3DMode`): The target Box mode.
-            rt_mat (np.ndarray | torch.Tensor, optional): The rotation and
-                translation matrix between different coordinates.
-                Defaults to None.
-                The conversion from ``src`` coordinates to ``dst`` coordinates
-                usually comes along the change of sensors, e.g., from camera
-                to LiDAR. This requires a transformation matrix.
-
-        Returns:
-            :obj:`DepthInstance3DBoxes`:
-                The converted box of the same type in the ``dst`` mode.
-        """
-        raise NotImplementedError
-
-    def enlarged_box(self, extra_width):
-        """Enlarge the length, width and height boxes.
-
-        Args:
-            extra_width (float | torch.Tensor): Extra width to enlarge the box.
-
-        Returns:
-            :obj:`DepthInstance3DBoxes`: Enlarged boxes.
-        """
-        raise NotImplementedError('enlarged box')
-        enlarged_boxes = self.tensor.clone()
-        enlarged_boxes[:, 3:6] += extra_width * 2
-        # bottom center z minus extra_width
-        enlarged_boxes[:, 2] -= extra_width
-        return self.new_box(enlarged_boxes)
-
-    def get_surface_line_center(self):
-        """Compute surface and line center of bounding boxes.
-
-        Returns:
-            torch.Tensor: Surface and line center of bounding boxes.
-        """
-        raise NotImplementedError('surface line center')
-        obj_size = self.dims
-        center = self.gravity_center.view(-1, 1, 3)
-        batch_size = center.shape[0]
-
-        rot_sin = torch.sin(-self.yaw)
-        rot_cos = torch.cos(-self.yaw)
-        rot_mat_T = self.yaw.new_zeros(tuple(list(self.yaw.shape) + [3, 3]))
-        rot_mat_T[..., 0, 0] = rot_cos
-        rot_mat_T[..., 0, 1] = -rot_sin
-        rot_mat_T[..., 1, 0] = rot_sin
-        rot_mat_T[..., 1, 1] = rot_cos
-        rot_mat_T[..., 2, 2] = 1
-
-        # Get the object surface center
-        offset = obj_size.new_tensor([[0, 0, 1], [0, 0, -1], [0, 1, 0],
-                                      [0, -1, 0], [1, 0, 0], [-1, 0, 0]])
-        offset = offset.view(1, 6, 3) / 2
-        surface_3d = (offset *
-                      obj_size.view(batch_size, 1, 3).repeat(1, 6, 1)).reshape(
-                          -1, 3)
-
-        # Get the object line center
-        offset = obj_size.new_tensor([[1, 0, 1], [-1, 0, 1], [0, 1, 1],
-                                      [0, -1, 1], [1, 0, -1], [-1, 0, -1],
-                                      [0, 1, -1], [0, -1, -1], [1, 1, 0],
-                                      [1, -1, 0], [-1, 1, 0], [-1, -1, 0]])
-        offset = offset.view(1, 12, 3) / 2
-
-        line_3d = (offset *
-                   obj_size.view(batch_size, 1, 3).repeat(1, 12, 1)).reshape(
-                       -1, 3)
-
-        surface_rot = rot_mat_T.repeat(6, 1, 1)
-        surface_3d = torch.matmul(surface_3d.unsqueeze(-2),
-                                  surface_rot).squeeze(-2)
-        surface_center = center.repeat(1, 6, 1).reshape(-1, 3) + surface_3d
-
-        line_rot = rot_mat_T.repeat(12, 1, 1)
-        line_3d = torch.matmul(line_3d.unsqueeze(-2), line_rot).squeeze(-2)
-        line_center = center.repeat(1, 12, 1).reshape(-1, 3) + line_3d
-
-        return surface_center, line_center

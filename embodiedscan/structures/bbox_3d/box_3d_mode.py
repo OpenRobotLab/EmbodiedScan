@@ -253,17 +253,9 @@ class Box3DMode(IntEnum):
             return original_type(arr.flatten().tolist())
         if is_numpy:
             return arr.numpy()
-        elif is_Instance3DBoxes:  # TODO
-            # if dst == Box3DMode.CAM:
-            #     target_type = CameraInstance3DBoxes
-            # elif dst == Box3DMode.LIDAR:
-            #     target_type = LiDARInstance3DBoxes
-            # elif dst == Box3DMode.DEPTH:
-            #     target_type = DepthInstance3DBoxes
-            # else:
+        elif is_Instance3DBoxes:
             raise NotImplementedError(
                 f'Conversion to {dst} through {original_type} '
                 'is not supported yet')
-            # return target_type(arr, box_dim=arr.size(-1), with_yaw=with_yaw)
         else:
             return arr

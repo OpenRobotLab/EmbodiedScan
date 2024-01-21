@@ -295,8 +295,8 @@ def batch_point_sample(img_meta: dict,
 
     if valid_flag:
         # (N, )
-        valid = (coor_x.squeeze() < w) & (coor_x.squeeze() > 0) & (
-            coor_y.squeeze() < h) & (coor_y.squeeze() > 0) & (depths > 0)
+        valid = (coor_x.squeeze(2) < w) & (coor_x.squeeze(2) > 0) & (
+            coor_y.squeeze(2) < h) & (coor_y.squeeze(2) > 0) & (depths > 0)
         valid_num = valid.sum(dim=0)  # N,
         valid_features = point_features.squeeze(2).sum(dim=0).t()  # NxC
         valid = valid_num > 0

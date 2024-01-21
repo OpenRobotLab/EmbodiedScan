@@ -26,6 +26,9 @@ class EmbodiedScanExplorer:
         verbose (bool): Whether to print related messages. Defaults to False.
         color_setting (str, optional): Color settings for visualization.
             Defaults to None.
+            Accept the path to the setting file like
+                embodiedscan/visualization/full_color_map.txt
+        thickness (float): Thickness of of the displayed box lines.
     """
 
     def __init__(self,

@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenMMLab and OpenRobotLab. All rights reserved.
 # Adapted from https://github.com/SamsungLabs/fcaf3d/blob/master/mmdet3d/models/dense_heads/fcaf3d_neck_with_head.py # noqa
 from typing import List, Optional, Tuple
 
@@ -826,7 +826,7 @@ class FCAF3DHead(BaseModel):
 
 @MODELS.register_module()
 class FCAF3DHeadRotMat(BaseModel):
-    r"""Bbox head of `FCAF3D <https://arxiv.org/abs/2112.00322>`_.
+    r"""FCAF3D head with a 6D representation for rotation of boxes.
 
     Actually here we store both the sparse 3D FPN and a head. The neck and
     the head can not be simply separated as pruning score on the i-th level
@@ -1296,20 +1296,15 @@ class FCAF3DHeadRotMat(BaseModel):
         else:
             center_loss = pos_center_preds.sum()
             bbox_loss = pos_bbox_preds.sum()
-            angle_loss = pos_bbox_preds[..., 6:].sum()
         center_nan_mask = torch.isnan(center_loss)
         bbox_nan_mask = torch.isnan(bbox_loss)
-        angle_nan_mask = torch.isnan(angle_loss)
         if center_nan_mask.any():
             torch.nan_to_num(center_loss)
             # print("center loss nan, filled with 0")
         if bbox_nan_mask.any():
             torch.nan_to_num(bbox_loss)
             # print("bbox loss nan, filled with 0")
-        if angle_nan_mask.any():
-            torch.nan_to_num(angle_loss)
-            # print("angle loss nan, filled with 0")
-        return center_loss, bbox_loss, cls_loss, angle_loss
+        return center_loss, bbox_loss, cls_loss
 
     def loss_by_feat(self,
                      center_preds: List[List[Tensor]],
@@ -1348,9 +1343,9 @@ class FCAF3DHeadRotMat(BaseModel):
         Returns:
             dict: Centerness, bbox, and classification losses.
         """
-        center_losses, bbox_losses, cls_losses, angle_losses = [], [], [], []
+        center_losses, bbox_losses, cls_losses = [], [], []
         for i in range(len(batch_input_metas)):
-            center_loss, bbox_loss, cls_loss, angle_loss = \
+            center_loss, bbox_loss, cls_loss = \
                 self._loss_by_feat_single(
                     center_preds=[x[i] for x in center_preds],
                     bbox_preds=[x[i] for x in bbox_preds],
@@ -1363,11 +1358,9 @@ class FCAF3DHeadRotMat(BaseModel):
             center_losses.append(center_loss)
             bbox_losses.append(bbox_loss)
             cls_losses.append(cls_loss)
-            angle_losses.append(angle_loss)
         return dict(loss_center=torch.mean(torch.stack(center_losses)),
                     loss_bbox=torch.mean(torch.stack(bbox_losses)),
-                    loss_cls=torch.mean(torch.stack(cls_losses)),
-                    loss_angle=torch.mean(torch.stack(angle_losses)))
+                    loss_cls=torch.mean(torch.stack(cls_losses)))
 
     def _predict_by_feat_single(self, center_preds: List[Tensor],
                                 bbox_preds: List[Tensor],

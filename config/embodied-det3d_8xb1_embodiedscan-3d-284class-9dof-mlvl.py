@@ -176,7 +176,6 @@ test_pipeline = [
          ]),
     dict(type='AggregateMultiViewPoints', coord_type='DEPTH',
          save_slices=True),
-    # dict(type='PointSample', num_points=n_points),
     dict(type='ConstructMultiSweeps'),
     dict(type='Pack3DDetInputs',
          keys=['img', 'points', 'gt_bboxes_3d', 'gt_labels_3d'])
@@ -200,22 +199,20 @@ train_dataloader = dict(
                               metainfo=metainfo,
                               remove_dontcare=True)))
 
-val_dataloader = dict(
-    batch_size=1,
-    num_workers=1,
-    persistent_workers=True,
-    drop_last=False,
-    sampler=dict(type='DefaultSampler', shuffle=False),
-    dataset=dict(
-        type=dataset_type,
-        data_root=data_root,
-        ann_file='embodiedscan_infos_val_full.pkl',  # 'debug_test.pkl',
-        pipeline=test_pipeline,
-        test_mode=True,
-        filter_empty_gt=True,
-        box_type_3d='Euler-Depth',
-        metainfo=metainfo,
-        remove_dontcare=True))
+val_dataloader = dict(batch_size=1,
+                      num_workers=1,
+                      persistent_workers=True,
+                      drop_last=False,
+                      sampler=dict(type='DefaultSampler', shuffle=False),
+                      dataset=dict(type=dataset_type,
+                                   data_root=data_root,
+                                   ann_file='embodiedscan_infos_val_full.pkl',
+                                   pipeline=test_pipeline,
+                                   test_mode=True,
+                                   filter_empty_gt=True,
+                                   box_type_3d='Euler-Depth',
+                                   metainfo=metainfo,
+                                   remove_dontcare=True))
 test_dataloader = val_dataloader
 
 val_evaluator = dict(type='IndoorDetMetric', batchwise_anns=True)
@@ -228,7 +225,7 @@ test_cfg = dict(type='TestLoop')
 
 optim_wrapper = dict(type='OptimWrapper',
                      optimizer=dict(type='AdamW',
-                                    lr=0.0004,
+                                    lr=0.0002,
                                     weight_decay=0.0001),
                      clip_grad=dict(max_norm=10, norm_type=2))
 
