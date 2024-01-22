@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenMMLab and OpenRobotLab. All rights reserved.
 from typing import Optional, Tuple, Union
 
 import torch
