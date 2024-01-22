@@ -117,6 +117,7 @@ class AggregateMultiViewPoints(BaseTransform):
         save_slices (int): Whether to save the index range of
             the points in the current point cloud.
     """
+
     def __init__(self,
                  coord_type: str = 'DEPTH',
                  save_slices: bool = False) -> None:
@@ -170,6 +171,7 @@ class ConstructMultiSweeps(BaseTransform):
     points, gt_bboxes_3d, gt_labels_3d,
     visible_instance_masks, visible_occupancy_masks
     """
+
     def __init__(self):
         super().__init__()
 

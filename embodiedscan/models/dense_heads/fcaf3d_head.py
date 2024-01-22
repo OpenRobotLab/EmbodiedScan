@@ -868,7 +868,10 @@ class FCAF3DHeadRotMat(BaseModel):
                  pts_center_threshold: int,
                  center_loss: dict = dict(type='mmdet.CrossEntropyLoss',
                                           use_sigmoid=True),
-                 bbox_loss: dict = dict(type='BBoxCDLoss', mode='l1', loss_weight=1.0, group='g8'),
+                 bbox_loss: dict = dict(type='BBoxCDLoss',
+                                        mode='l1',
+                                        loss_weight=1.0,
+                                        group='g8'),
                  cls_loss: dict = dict(type='mmdet.FocalLoss'),
                  decouple_bbox_loss: bool = False,
                  decouple_groups: int = 3,
@@ -1232,22 +1235,22 @@ class FCAF3DHeadRotMat(BaseModel):
                                 (bbox_pred_center, bbox_targ_size,
                                  bbox_targ_euler),
                                 dim=-1),
-                                                 pos_bbox_targets,
-                                                 reduction_override='none')
+                                                pos_bbox_targets,
+                                                reduction_override='none')
                         corner_bbox_loss += self.decouple_weights[
                             1] * self.bbox_loss(torch.concat(
                                 (bbox_targ_center, bbox_pred_size,
                                  bbox_targ_euler),
                                 dim=-1),
-                                                 pos_bbox_targets,
-                                                 reduction_override='none')
+                                                pos_bbox_targets,
+                                                reduction_override='none')
                         corner_bbox_loss += self.decouple_weights[
                             2] * self.bbox_loss(torch.concat(
                                 (bbox_targ_center, bbox_targ_size,
                                  bbox_pred_euler),
                                 dim=-1),
-                                                 pos_bbox_targets,
-                                                 reduction_override='none')
+                                                pos_bbox_targets,
+                                                reduction_override='none')
                         bbox_sizes = bbox_targ_size.norm(
                             dim=-1)[:, None].clamp(min=0.1)
                         corner_bbox_loss = (corner_bbox_loss /
@@ -1272,11 +1275,11 @@ class FCAF3DHeadRotMat(BaseModel):
                     if self.decouple_groups == 4:
                         corner_bbox_loss += self.decouple_weights[
                             3] * self.bbox_loss(decode_bbox_preds,
-                                                 pos_bbox_targets)
+                                                pos_bbox_targets)
 
                 else:
-                    corner_bbox_loss += self.bbox_loss(
-                        decode_bbox_preds, pos_bbox_targets)
+                    corner_bbox_loss += self.bbox_loss(decode_bbox_preds,
+                                                       pos_bbox_targets)
 
                 bbox_loss = corner_bbox_loss
 

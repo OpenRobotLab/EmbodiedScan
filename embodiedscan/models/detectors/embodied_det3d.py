@@ -34,7 +34,8 @@ class Embodied3DDetector(BaseModel):
         bbox_head (dict): Config dict of box head.
         neck (dict, optional): Config dict of neck. Defaults to None.
         neck_3d (dict, optional): Config dict of 3D neck. Defaults to None.
-        neck_lidar (dict, optional): Config dict of lidar neck. Defaults to None.
+        neck_lidar (dict, optional): Config dict of lidar neck.
+            Defaults to None.
         coord_type (str): Type of Box coordinates. Default to CAMERA.
         train_cfg (dict, optional): Config dict of training hyper-parameters.
             Defaults to None.
