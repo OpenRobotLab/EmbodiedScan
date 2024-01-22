@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenMMLab and OpenRobotLab. All rights reserved.
 from functools import partial
 from typing import List, Optional, Tuple, Union
 
@@ -219,13 +219,13 @@ def batch_point_sample(img_meta: dict,
                        padding_mode: str = 'zeros',
                        align_corners: bool = True,
                        valid_flag: bool = True) -> Tensor:
-    """Obtain image features using points.
+    """Batch version of point_sample.
 
     Args:
         img_meta (dict): Meta info.
-        img_features (Tensor): 1 x C x H x W image features.
-        points (Tensor): Nx3 point cloud in LiDAR coordinates.
-        proj_mat (Tensor): 4x4 transformation matrix.
+        img_features (Tensor): B x C x H x W image features.
+        points (Tensor): BxNx3 point cloud in LiDAR coordinates.
+        proj_mat (Tensor): Bx4x4 transformation matrix.
         coord_type (str): 'DEPTH' or 'CAMERA' or 'LIDAR'.
         img_scale_factor (Tensor): Scale factor with shape of
             (w_scale, h_scale).
