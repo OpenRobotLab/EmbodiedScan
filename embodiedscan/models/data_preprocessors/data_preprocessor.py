@@ -82,6 +82,8 @@ class Det3DDataPreprocessor(DetDataPreprocessor):
             data to device. Defaults to False.
         batch_augments (List[dict], optional): Batch-level augmentations.
             Defaults to None.
+        batchwise_inputs (bool, optional): Pack the input as a batch of samples
+            with 1-N frames for the continuous 3D perception setting.
     """
 
     def __init__(self,
