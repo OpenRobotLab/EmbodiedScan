@@ -10,7 +10,15 @@ from embodiedscan.structures.points import BasePoints, get_points_type
 
 @TRANSFORMS.register_module()
 class ConvertRGBDToPoints(BaseTransform):
-    """Convert depth map to point clouds."""
+    """Convert depth map to point clouds.
+
+    Args:
+        coord_type (str): The type of point coordinates. Defaults to 'CAMERA'.
+        use_color (bool): Whether to use color as additional features
+            when converting the image to points. Generally speaking, if False,
+            only return xyz points. Otherwise, return xyzrgb points.
+            Defaults to False.
+    """
 
     def __init__(self,
                  coord_type: str = 'CAMERA',

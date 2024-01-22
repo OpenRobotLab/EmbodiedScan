@@ -103,6 +103,16 @@ class MultiViewPipeline(BaseTransform):
 
 @TRANSFORMS.register_module()
 class AggregateMultiViewPoints(BaseTransform):
+    """Aggregate multi-view points.
+
+    Args:
+        coord_type (str): The type of output point coordinates.
+            Defaults to 'DEPTH', corresponding to the global coordinate system
+            in EmbodiedScan.
+        save_slices (bool): Whether to save point index slices to convert all
+            the points into the input for continuous 3D perception,
+            corresponding to 1-N frames. Defaults to False.
+    """
 
     def __init__(self,
                  coord_type: str = 'DEPTH',
@@ -147,6 +157,13 @@ class AggregateMultiViewPoints(BaseTransform):
 
 @TRANSFORMS.register_module()
 class ConstructMultiSweeps(BaseTransform):
+    """Construct multi-sweeps / continuous input with 1-N frames.
+
+    For efficient training of continuous 3D perception tasks, we load multi-
+    view inputs and annotations, say N frames, and convert them to N samples
+    with 1 to N frames as input with corresponding ground truths to achieve
+    batchwise training.
+    """
 
     def __init__(self):
         super().__init__()
