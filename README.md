@@ -95,15 +95,14 @@ git clone https://github.com/OpenRobotLab/EmbodiedScan.git
 cd EmbodiedScan
 ```
 
-2. Install [PyTorch3D](https://github.com/facebookresearch/pytorch3d/blob/main/INSTALL.md).
+2. Create an environment and install PyTorch.
 
 ```bash
 conda create -n embodiedscan python=3.8 -y  # pytorch3d needs python>3.7
 conda activate embodiedscan
-# We recommend installing pytorch3d with pre-compiled packages
-# For example, to install for Python 3.8, PyTorch 1.11.0 and CUDA 11.3
-# For more information, please refer to https://github.com/facebookresearch/pytorch3d/blob/main/INSTALL.md#2-install-wheels-for-linux
-pip install --no-index --no-cache-dir pytorch3d -f https://dl.fbaipublicfiles.com/pytorch3d/packaging/wheels/py38_cu113_pyt1110/download.html
+# Install PyTorch, for example, install PyTorch 1.11.0 for CUDA 11.3
+# For more information, please refer to https://pytorch.org/get-started/locally/
+conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
 ```
 
 3. Install EmbodiedScan.
@@ -112,14 +111,15 @@ pip install --no-index --no-cache-dir pytorch3d -f https://dl.fbaipublicfiles.co
 # We plan to make EmbodiedScan easier to install by "pip install EmbodiedScan".
 # Please stay tuned for the future official release.
 # Make sure you are under ./EmbodiedScan/
-pip install -e .
+# This script will install the dependencies and EmbodiedScan package automatically.
+python install.py
 ```
 
 ### Data Preparation
 
-Please download ScanNet, 3RScan and matterport3d from their official websites.
+Please refer to the [guide](data/README.md) for downloading and organization.
 
-We will release the demo data, re-organized file structure, post-processing script and annotation files in the near future. Please stay tuned.
+We will update the authorization approach and release remaining data afterward. Please stay tuned.
 
 ### Tutorial
 
@@ -162,10 +162,12 @@ Please see the [paper](./assets/EmbodiedScan.pdf) for details of our two benchma
 
 ## 📝 TODO List
 
-- \[x\] Paper and partial code release.
-- \[ \] Release EmbodiedScan annotation files.
+- \[x\] Release the paper and partial codes for datasets.
+- \[x\] Release EmbodiedScan annotation files.
+- \[x\] Release partial codes for models and evaluation.
 - \[ \] Polish dataset APIs and related codes.
 - \[ \] Release Embodied Perceptron pretrained models.
+- \[ \] Release multi-modal datasets and codes.
 - \[ \] Release codes for baselines and benchmarks.
 - \[ \] Full release and further updates.
 
