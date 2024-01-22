@@ -170,7 +170,6 @@ class Det3DDataPreprocessor(DetDataPreprocessor):
         if 'img' in data['inputs']:
             batch_pad_shape = self._get_pad_shape(data)
 
-        # TODO: add masked occupancy processing
         if self.batchwise_inputs:
             data_samples = data['data_samples']
             batchwise_data_samples = []
