@@ -10,9 +10,10 @@ from .utils import rotation_3d_in_euler
 
 
 class EulerInstance3DBoxes(BaseInstance3DBoxes):
-    """3D euler boxes.
+    """3D boxes with 1-D orientation represented by three Euler angles.
 
-    See https://en.wikipedia.org/wiki/Euler_angles for more details.
+    See https://en.wikipedia.org/wiki/Euler_angles for
+        regarding the definition of Euler angles.
 
     Attributes:
         tensor (torch.Tensor): Float matrix of N x box_dim.
