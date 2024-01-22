@@ -65,10 +65,10 @@ data
 ├── embodiedscan_infos_val_full.pkl
 ```
 
-6. Also put EmbodiedScan occupancy annotations here by running
+6. Also extract EmbodiedScan occupancy annotations here by running
 
 ```bash
-python embodiedscan/converter/put_occupancy_ann.py --src data/embodiedscan_occupancy --dst data
+python embodiedscan/converter/extract_occupancy_ann.py --src data/embodiedscan_occupancy --dst data
 ```
 
 Note: Language prompts will be released soon. Please stay tuned for the related guide.
