@@ -4,10 +4,6 @@ from argparse import ArgumentParser
 
 from tqdm import tqdm
 
-src = '/mnt/petrelfs/share_data/maoxiaohan/collect_occ'
-dst = '/mnt/petrelfs/maoxiaohan/release/EmbodiedScan/data'
-
-
 def process_dataset(dataset, src, dst):
     print('Processing dataset', dataset)
     scenes = os.listdir(os.path.join(src, dataset))
