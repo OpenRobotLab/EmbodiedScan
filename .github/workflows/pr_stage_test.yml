@@ -35,7 +35,7 @@ jobs:
       - name: Install system dependencies
         run: apt-get update && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6
       - name: Install dependencies and EmbodiedScan
-        run: python install.py
+        run: python install.py all
       - name: Run unittests and generate coverage report
         run: |
           coverage run --branch --source embodiedscan -m pytest tests/
