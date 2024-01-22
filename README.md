@@ -112,7 +112,11 @@ conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit
 # Please stay tuned for the future official release.
 # Make sure you are under ./EmbodiedScan/
 # This script will install the dependencies and EmbodiedScan package automatically.
-python install.py
+python install.py all
+# This command installs all of embodiedscan's dependencies,
+# including the execution and visualization modules.
+# If you only want to use part of the functionality,
+# you can run 'python install.py run/visual' as an alternative.
 ```
 
 ### Data Preparation
