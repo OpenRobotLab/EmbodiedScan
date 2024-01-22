@@ -848,7 +848,7 @@ class FCAF3DHeadRotMat(BaseModel):
         center_loss (dict): Config of centerness loss. Defaults to
             dict(type='mmdet.CrossEntropyLoss', use_sigmoid=True).
         bbox_loss (dict): Config of bbox loss. Defaults to
-            dict(type='AxisAlignedIoULoss').
+            dict(type='BBoxCDLoss', mode='l1', loss_weight=1.0, group='g8').
         cls_loss (dict): Config of classification loss. Defaults to
             dict = dict(type='mmdet.FocalLoss').
         train_cfg (dict, optional): Config for train stage. Defaults to None.
@@ -868,8 +868,7 @@ class FCAF3DHeadRotMat(BaseModel):
                  pts_center_threshold: int,
                  center_loss: dict = dict(type='mmdet.CrossEntropyLoss',
                                           use_sigmoid=True),
-                 bbox_loss: dict = dict(type='AxisAlignedIoULoss'),
-                 bbox_loss2: Optional[dict] = None,
+                 bbox_loss: dict = dict(type='BBoxCDLoss', mode='l1', loss_weight=1.0, group='g8'),
                  cls_loss: dict = dict(type='mmdet.FocalLoss'),
                  decouple_bbox_loss: bool = False,
                  decouple_groups: int = 3,
@@ -888,7 +887,6 @@ class FCAF3DHeadRotMat(BaseModel):
         self.pts_center_threshold = pts_center_threshold
         self.center_loss = MODELS.build(center_loss)
         self.bbox_loss = MODELS.build(bbox_loss)
-        self.bbox_loss2 = MODELS.build(bbox_loss2) if bbox_loss2 else None
         self.cls_loss = MODELS.build(cls_loss)
         self.decouple_bbox_loss = decouple_bbox_loss
         self.decouple_groups = decouple_groups
@@ -1187,8 +1185,7 @@ class FCAF3DHeadRotMat(BaseModel):
         rot_mat_preds = ortho_6d_2_Mat(x_raw, y_raw)
         euler_targets = bbox_targets[pos_inds, 6:]
         rot_mat_targets = euler_angles_to_matrix(euler_targets, 'ZXY')
-        if isinstance(self.bbox_loss, BBoxCDLoss) or isinstance(
-                self.bbox_loss2, BBoxCDLoss):
+        if isinstance(self.bbox_loss, BBoxCDLoss):
             # there is a weird coupling here
             # when we are using CD for bbox,
             #   we only care about the rotated vector of (1, 0, 0)
@@ -1224,28 +1221,28 @@ class FCAF3DHeadRotMat(BaseModel):
                 bbox_pred_euler = decode_bbox_preds[:, 6:]
 
             corner_bbox_loss = 0
-            if isinstance(self.bbox_loss2, BBoxCDLoss):
+            if isinstance(self.bbox_loss, BBoxCDLoss):
                 if self.decouple_bbox_loss:
                     assert self.decouple_groups in (
                         3, 4
                     ), 'Only support groups=3 or 4 with stable performance.'
                     if self.norm_decouple_loss:
                         corner_bbox_loss += self.decouple_weights[
-                            0] * self.bbox_loss2(torch.concat(
+                            0] * self.bbox_loss(torch.concat(
                                 (bbox_pred_center, bbox_targ_size,
                                  bbox_targ_euler),
                                 dim=-1),
                                                  pos_bbox_targets,
                                                  reduction_override='none')
                         corner_bbox_loss += self.decouple_weights[
-                            1] * self.bbox_loss2(torch.concat(
+                            1] * self.bbox_loss(torch.concat(
                                 (bbox_targ_center, bbox_pred_size,
                                  bbox_targ_euler),
                                 dim=-1),
                                                  pos_bbox_targets,
                                                  reduction_override='none')
                         corner_bbox_loss += self.decouple_weights[
-                            2] * self.bbox_loss2(torch.concat(
+                            2] * self.bbox_loss(torch.concat(
                                 (bbox_targ_center, bbox_targ_size,
                                  bbox_pred_euler),
                                 dim=-1),
@@ -1257,42 +1254,32 @@ class FCAF3DHeadRotMat(BaseModel):
                                             bbox_sizes).mean()
                     else:
                         corner_bbox_loss += self.decouple_weights[
-                            0] * self.bbox_loss2(
+                            0] * self.bbox_loss(
                                 torch.concat((bbox_pred_center, bbox_targ_size,
                                               bbox_targ_euler),
                                              dim=-1), pos_bbox_targets)
                         corner_bbox_loss += self.decouple_weights[
-                            1] * self.bbox_loss2(
+                            1] * self.bbox_loss(
                                 torch.concat((bbox_targ_center, bbox_pred_size,
                                               bbox_targ_euler),
                                              dim=-1), pos_bbox_targets)
                         corner_bbox_loss += self.decouple_weights[
-                            2] * self.bbox_loss2(
+                            2] * self.bbox_loss(
                                 torch.concat((bbox_targ_center, bbox_targ_size,
                                               bbox_pred_euler),
                                              dim=-1), pos_bbox_targets)
 
                     if self.decouple_groups == 4:
                         corner_bbox_loss += self.decouple_weights[
-                            3] * self.bbox_loss2(decode_bbox_preds,
+                            3] * self.bbox_loss(decode_bbox_preds,
                                                  pos_bbox_targets)
 
                 else:
-                    corner_bbox_loss += self.bbox_loss2(
+                    corner_bbox_loss += self.bbox_loss(
                         decode_bbox_preds, pos_bbox_targets)
 
                 bbox_loss = corner_bbox_loss
 
-            if decode_bbox_preds.shape[-1] > 7 and isinstance(
-                    self.bbox_loss,
-                    RotatedIoU3DLoss) and self.bbox_loss.loss_weight > 0:
-                yaw_bbox_preds = decode_bbox_preds[..., :7]
-                yaw_bbox_targets = pos_bbox_targets[..., :7]
-                yaw_bbox_loss = self.bbox_loss(yaw_bbox_preds,
-                                               yaw_bbox_targets,
-                                               weight=pos_center_targets,
-                                               avg_factor=center_denorm)
-                bbox_loss += yaw_bbox_loss
         else:
             center_loss = pos_center_preds.sum()
             bbox_loss = pos_bbox_preds.sum()
