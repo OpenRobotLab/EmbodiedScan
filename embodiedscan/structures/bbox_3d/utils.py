@@ -226,21 +226,9 @@ def get_box_type(box_type: str) -> Tuple[type, int]:
     from .box_3d_mode import Box3DMode
     from .euler_depth_box3d import EulerDepthInstance3DBoxes
     box_type_lower = box_type.lower()
-    # if box_type_lower == 'lidar':
-    #     box_type_3d = LiDARInstance3DBoxes
-    #     box_mode_3d = Box3DMode.LIDAR
-    # elif box_type_lower == 'camera':
-    #     box_type_3d = CameraInstance3DBoxes
-    #     box_mode_3d = Box3DMode.CAM
-    # elif box_type_lower == 'depth':
-    #     box_type_3d = DepthInstance3DBoxes
-    #     box_mode_3d = Box3DMode.DEPTH
     if box_type_lower == 'euler-depth':
         box_type_3d = EulerDepthInstance3DBoxes
         box_mode_3d = Box3DMode.EULER_DEPTH
-    # elif box_type_lower == 'euler-camera':
-    #     box_type_3d = EulerCameraInstance3DBoxes
-    #     box_mode_3d = Box3DMode.EULER_CAM
     else:
         raise ValueError(
             'Only "box_type" of "camera", "lidar", "depth", "euler"'
