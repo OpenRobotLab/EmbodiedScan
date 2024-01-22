@@ -108,3 +108,5 @@ if __name__ == '__main__':
 
     if args.mode == 'run' or args.mode == 'all':
         install_requires('requirements/run.txt')
+
+    run_subprocess([sys.executable, '-m', 'pip', 'install', '-e', '.'])
