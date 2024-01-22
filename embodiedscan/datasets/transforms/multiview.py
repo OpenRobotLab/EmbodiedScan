@@ -103,7 +103,20 @@ class MultiViewPipeline(BaseTransform):
 
 @TRANSFORMS.register_module()
 class AggregateMultiViewPoints(BaseTransform):
+    """Aggregate points from each frame together.
 
+    The transform steps are as follows:
+
+        1. Collect points from each frame.
+        2. Transform points from ego coordinate to global coordinate.
+        3. Concatenate transformed points together.
+
+    Args:
+        coord_type (str): The type of global coordinate system.
+            Default to Depth.
+        save_slices (int): Whether to save the index range of
+            the points in the current point cloud.
+    """
     def __init__(self,
                  coord_type: str = 'DEPTH',
                  save_slices: bool = False) -> None:
@@ -113,8 +126,8 @@ class AggregateMultiViewPoints(BaseTransform):
         self.save_slices = save_slices
 
     def transform(self, results: dict) -> dict:
-        points = results[
-            'points']  # TODO: transforms should use numpy instead of torch
+        # TODO: transforms should use numpy instead of torch
+        points = results['points']
         global_points = []
         points_slice_indices = [0]
         for idx in range(len(points)):
@@ -147,7 +160,16 @@ class AggregateMultiViewPoints(BaseTransform):
 
 @TRANSFORMS.register_module()
 class ConstructMultiSweeps(BaseTransform):
+    """Combine the information of the previous frames to each frame.
 
+    After the transformation, the batch will be:
+
+    [frame 1, frame 1-2, frame 1-3, ...]
+
+    The modified information contains
+    points, gt_bboxes_3d, gt_labels_3d,
+    visible_instance_masks, visible_occupancy_masks
+    """
     def __init__(self):
         super().__init__()
 
