@@ -39,7 +39,7 @@ jobs:
       - name: Install system dependencies
         run: apt-get update && apt-get install -y git ffmpeg libturbojpeg
       - name: Install dependencies and EmbodiedScan
-        run: python install.py
+        run: python install.py all
       - name: Run unittests and generate coverage report
         run: |
           coverage run --branch --source embodiedscan -m pytest tests
@@ -68,7 +68,7 @@ jobs:
       - name: Install system dependencies
         run: apt-get update && apt-get install -y git ffmpeg libturbojpeg
       - name: Install dependencies and EmbodiedScan
-        run: python install.py
+        run: python install.py all
       - name: Run unittests and generate coverage report
         run: |
           coverage run --branch --source embodiedscan -m pytest tests
