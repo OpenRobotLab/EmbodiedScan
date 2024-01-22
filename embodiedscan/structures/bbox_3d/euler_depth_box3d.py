@@ -10,6 +10,9 @@ from .euler_box3d import EulerInstance3DBoxes
 class EulerDepthInstance3DBoxes(EulerInstance3DBoxes):
     """3D boxes of instances in Depth coordinates.
 
+    We keep the "Depth" coordinate system definition in MMDet3D
+    just for clarification of the points coordinates and the flipping augmentation.
+
     Coordinates in Depth:
 
     .. code-block:: none
