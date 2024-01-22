@@ -243,9 +243,6 @@ class Det3DDataPreprocessor(DetDataPreprocessor):
                     imgs, data_samples = batch_aug(imgs, data_samples)
             batch_inputs['imgs'] = imgs
 
-            # if 'depths' in inputs:
-            #     batch_inputs['depths'] = torch.cat(inputs['depths'], dim=0)
-
         return {'inputs': batch_inputs, 'data_samples': data_samples}
 
     def preprocess_img(self, _batch_img: Tensor) -> Tensor:
