@@ -1,36 +1,22 @@
-from mmcv.transforms import LoadImageFromFile, Resize
-from mmengine.config import read_base
-from mmengine.dataset import DefaultSampler, RepeatDataset
-from mmengine.hooks import EmptyCacheHook
-from mmengine.optim import MultiStepLR, OptimWrapper
-from mmengine.runner import EpochBasedTrainLoop, TestLoop, ValLoop
-
-from embodiedscan.datasets import EmbodiedScanDataset
-from embodiedscan.datasets.transforms.augmentation import (GlobalRotScaleTrans,
-                                                           RandomFlip3D)
-from embodiedscan.datasets.transforms.formatting import Pack3DDetInputs
-from embodiedscan.datasets.transforms.loading import (LoadAnnotations3D,
-                                                      LoadDepthFromFile)
-from embodiedscan.datasets.transforms.multiview import (
-    AggregateMultiViewPoints, ConstructMultiSweeps, MultiViewPipeline)
-from embodiedscan.datasets.transforms.points import (ConvertRGBDToPoints,
-                                                     PointSample)
-from embodiedscan.eval import IndoorDetMetric
-from embodiedscan.models.backbones import MinkResNet
-from embodiedscan.models.data_preprocessors import Det3DDataPreprocessor
-from embodiedscan.models.dense_heads import FCAF3DHeadRotMat
-from embodiedscan.models.detectors import Embodied3DDetector
-from embodiedscan.models.losses import BBoxCDLoss, RotatedIoU3DLoss
-
-with read_base():
-    from .default_runtime import *
-
+_base_ = ['../default_runtime.py']
 n_points = 100000
+
 backend_args = None
+# Uncomment the following if use ceph or other file clients.
+# See https://mmcv.readthedocs.io/en/latest/api.html#mmcv.fileio.FileClient
+# for more details.
+# file_client_args = dict(
+#     backend='petrel',
+#     path_mapping=dict({
+#         './data/scannet/':
+#         's3://openmmlab/datasets/detection3d/scannet_processed/',
+#         'data/scannet/':
+#         's3://openmmlab/datasets/detection3d/scannet_processed/'
+#     }))
 
 model = dict(
-    type=Embodied3DDetector,
-    data_preprocessor=dict(type=Det3DDataPreprocessor,
+    type='Embodied3DDetector',
+    data_preprocessor=dict(type='Det3DDataPreprocessor',
                            mean=[123.675, 116.28, 103.53],
                            std=[58.395, 57.12, 57.375],
                            bgr_to_rgb=True,
@@ -47,9 +33,9 @@ model = dict(
         norm_eval=True,
         init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet50'),
         style='pytorch'),
-    backbone_lidar=dict(type=MinkResNet, in_channels=3, depth=34),
+    backbone_lidar=dict(type='MinkResNet', in_channels=3, depth=34),
     use_xyz_feat=True,
-    bbox_head=dict(type=FCAF3DHeadRotMat,
+    bbox_head=dict(type='FCAF3DHeadRotMat',
                    in_channels=(128, 256, 512, 1024),
                    out_channels=128,
                    voxel_size=.01,
@@ -60,8 +46,8 @@ model = dict(
                    num_reg_outs=12,
                    center_loss=dict(type='mmdet.CrossEntropyLoss',
                                     use_sigmoid=True),
-                   bbox_loss=dict(type=RotatedIoU3DLoss, loss_weight=0.0),
-                   bbox_loss2=dict(type=BBoxCDLoss,
+                   bbox_loss=dict(type='RotatedIoU3DLoss', loss_weight=0.0),
+                   bbox_loss2=dict(type='BBoxCDLoss',
                                    mode='l1',
                                    loss_weight=1.0,
                                    group='g8'),
@@ -73,7 +59,7 @@ model = dict(
     train_cfg=dict(),
     test_cfg=dict(nms_pre=1000, iou_thr=.5, score_thr=.01))
 
-dataset_type = EmbodiedScanDataset
+dataset_type = 'EmbodiedScanDataset'
 data_root = 'data'
 class_names = (
     'adhesive tape', 'air conditioner', 'alarm', 'album', 'arch', 'backpack',
@@ -148,57 +134,60 @@ metainfo = dict(classes=class_names,
                 box_type_3d='euler-depth')
 
 train_pipeline = [
-    dict(type=LoadAnnotations3D, with_visible_instance_masks=True),
-    dict(type=MultiViewPipeline,
+    dict(type='LoadAnnotations3D', with_visible_instance_masks=True),
+    dict(type='MultiViewPipeline',
          n_images=10,
          transforms=[
-             dict(type=LoadImageFromFile, backend_args=backend_args),
-             dict(type=LoadDepthFromFile, backend_args=backend_args),
-             dict(type=ConvertRGBDToPoints, coord_type='CAMERA'),
-             dict(type=PointSample, num_points=n_points // 10),
-             dict(type=Resize, scale=(480, 480), keep_ratio=False)
+             dict(type='LoadImageFromFile', backend_args=backend_args),
+             dict(type='LoadDepthFromFile', backend_args=backend_args),
+             dict(type='ConvertRGBDToPoints', coord_type='CAMERA'),
+             dict(type='PointSample', num_points=n_points // 10),
+             dict(type='Resize', scale=(480, 480), keep_ratio=False)
          ]),
-    dict(type=AggregateMultiViewPoints, coord_type='DEPTH', save_slices=True),
+    dict(type='AggregateMultiViewPoints', coord_type='DEPTH',
+         save_slices=True),
+    # dict(type='PointSample', num_points=n_points),
     dict(
-        type=RandomFlip3D,
+        type='RandomFlip3D',
         sync_2d=False,
         flip_2d=False,  # only flip points
         flip_ratio_bev_horizontal=0.5,
         flip_ratio_bev_vertical=0.5),
-    dict(type=GlobalRotScaleTrans,
+    dict(type='GlobalRotScaleTrans',
          rot_range=[-0.087266, 0.087266],
          scale_ratio_range=[.9, 1.1],
          translation_std=[.1, .1, .1],
          shift_height=False),
-    dict(type=ConstructMultiSweeps),
-    dict(type=Pack3DDetInputs,
+    dict(type='ConstructMultiSweeps'),
+    dict(type='Pack3DDetInputs',
          keys=['img', 'points', 'gt_bboxes_3d', 'gt_labels_3d'])
 ]
 test_pipeline = [
-    dict(type=LoadAnnotations3D, with_visible_instance_masks=True),
-    dict(type=MultiViewPipeline,
+    dict(type='LoadAnnotations3D', with_visible_instance_masks=True),
+    dict(type='MultiViewPipeline',
          n_images=50,
          ordered=True,
          transforms=[
-             dict(type=LoadImageFromFile, backend_args=backend_args),
-             dict(type=LoadDepthFromFile, backend_args=backend_args),
-             dict(type=ConvertRGBDToPoints, coord_type='CAMERA'),
-             dict(type=PointSample, num_points=n_points // 10),
-             dict(type=Resize, scale=(480, 480), keep_ratio=False)
+             dict(type='LoadImageFromFile', backend_args=backend_args),
+             dict(type='LoadDepthFromFile', backend_args=backend_args),
+             dict(type='ConvertRGBDToPoints', coord_type='CAMERA'),
+             dict(type='PointSample', num_points=n_points // 10),
+             dict(type='Resize', scale=(480, 480), keep_ratio=False)
          ]),
-    dict(type=AggregateMultiViewPoints, coord_type='DEPTH', save_slices=True),
-    # dict(type='PointSample', num_points=n_points),
-    dict(type=ConstructMultiSweeps),
-    dict(type=Pack3DDetInputs,
+    dict(type='AggregateMultiViewPoints', coord_type='DEPTH',
+         save_slices=True),
+    dict(type='ConstructMultiSweeps'),
+    dict(type='Pack3DDetInputs',
          keys=['img', 'points', 'gt_bboxes_3d', 'gt_labels_3d'])
 ]
 
+# TODO: to determine a reasonable batch size
 train_dataloader = dict(
     batch_size=1,
     num_workers=1,
     persistent_workers=True,
-    sampler=dict(type=DefaultSampler, shuffle=True),
-    dataset=dict(type=RepeatDataset,
+    sampler=dict(type='DefaultSampler', shuffle=True),
+    dataset=dict(type='RepeatDataset',
                  times=8,
                  dataset=dict(type=dataset_type,
                               data_root=data_root,
@@ -210,48 +199,46 @@ train_dataloader = dict(
                               metainfo=metainfo,
                               remove_dontcare=True)))
 
-val_dataloader = dict(
-    batch_size=1,
-    num_workers=1,
-    persistent_workers=True,
-    drop_last=False,
-    sampler=dict(type=DefaultSampler, shuffle=False),
-    dataset=dict(
-        type=dataset_type,
-        data_root=data_root,
-        ann_file='embodiedscan_infos_val_full.pkl',  # 'debug_test.pkl',
-        pipeline=test_pipeline,
-        test_mode=True,
-        filter_empty_gt=True,
-        box_type_3d='Euler-Depth',
-        metainfo=metainfo,
-        remove_dontcare=True))
+val_dataloader = dict(batch_size=1,
+                      num_workers=1,
+                      persistent_workers=True,
+                      drop_last=False,
+                      sampler=dict(type='DefaultSampler', shuffle=False),
+                      dataset=dict(type=dataset_type,
+                                   data_root=data_root,
+                                   ann_file='embodiedscan_infos_val_full.pkl',
+                                   pipeline=test_pipeline,
+                                   test_mode=True,
+                                   filter_empty_gt=True,
+                                   box_type_3d='Euler-Depth',
+                                   metainfo=metainfo,
+                                   remove_dontcare=True))
 test_dataloader = val_dataloader
 
-val_evaluator = dict(type=IndoorDetMetric, batchwise_anns=True)
+val_evaluator = dict(type='IndoorDetMetric', batchwise_anns=True)
 test_evaluator = val_evaluator
 
 # training schedule for 1x
-train_cfg = dict(type=EpochBasedTrainLoop, max_epochs=12, val_interval=12)
-val_cfg = dict(type=ValLoop)
-test_cfg = dict(type=TestLoop)
+train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=12, val_interval=12)
+val_cfg = dict(type='ValLoop')
+test_cfg = dict(type='TestLoop')
 
-optim_wrapper = dict(type=OptimWrapper,
+optim_wrapper = dict(type='OptimWrapper',
                      optimizer=dict(type='AdamW',
-                                    lr=0.0004,
+                                    lr=0.0002,
                                     weight_decay=0.0001),
                      clip_grad=dict(max_norm=10, norm_type=2))
 
 # learning rate
-param_scheduler = dict(type=MultiStepLR,
+param_scheduler = dict(type='MultiStepLR',
                        begin=0,
                        end=12,
                        by_epoch=True,
                        milestones=[8, 11],
                        gamma=0.1)
 
-custom_hooks = [dict(type=EmptyCacheHook, after_iter=True)]
+custom_hooks = [dict(type='EmptyCacheHook', after_iter=True)]
 
 # hooks
-default_hooks.update(
-    dict(checkpoint=dict(type=CheckpointHook, interval=1, max_keep_ckpts=4)))
+default_hooks = dict(
+    checkpoint=dict(type='CheckpointHook', interval=1, max_keep_ckpts=4))

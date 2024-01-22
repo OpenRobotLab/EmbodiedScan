@@ -1,4 +1,4 @@
-_base_ = ['./default_runtime.py']
+_base_ = ['../default_runtime.py']
 n_points = 100000
 
 backend_args = None
