@@ -112,10 +112,12 @@ class AggregateMultiViewPoints(BaseTransform):
         3. Concatenate transformed points together.
 
     Args:
-        coord_type (str): The type of global coordinate system.
-            Default to Depth.
-        save_slices (int): Whether to save the index range of
-            the points in the current point cloud.
+        coord_type (str): The type of output point coordinates.
+            Defaults to 'DEPTH', corresponding to the global coordinate system
+            in EmbodiedScan.
+        save_slices (bool): Whether to save point index slices to convert all
+            the points into the input for continuous 3D perception,
+            corresponding to 1-N frames. Defaults to False.
     """
 
     def __init__(self,
@@ -161,16 +163,6 @@ class AggregateMultiViewPoints(BaseTransform):
 
 @TRANSFORMS.register_module()
 class ConstructMultiSweeps(BaseTransform):
-    """Combine the information of the previous frames to each frame.
-
-    After the transformation, the batch will be:
-
-    [frame 1, frame 1-2, frame 1-3, ...]
-
-    The modified information contains
-    points, gt_bboxes_3d, gt_labels_3d,
-    visible_instance_masks, visible_occupancy_masks
-    """
 
     def __init__(self):
         super().__init__()

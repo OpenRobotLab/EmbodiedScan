@@ -26,7 +26,7 @@ from ..layers.fusion_layers.point_fusion import batch_point_sample
 
 @MODELS.register_module()
 class Embodied3DDetector(BaseModel):
-    """Embodied3DDetector.
+    """Embodied3DDetector for continuous 3D detection.
 
     Args:
         backbone (dict): Config dict of detector's backbone.
