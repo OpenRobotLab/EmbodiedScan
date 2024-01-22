@@ -9,7 +9,7 @@ Detailed steps are shown as follows.
 
 3. Download Matterport3D data [HERE](https://github.com/niessner/Matterport). Link or move the folder to this level of directory.
 
-4. Download EmbodiedScan data and extract here.
+4. Download EmbodiedScan data and extract here. Currently, please contact [openrobotlab.contact@pjlab.org.cn](openrobotlab.contact@pjlab.org.cn) for downloading the detection and occupancy annotations.
 
 The directory structure should be as below
 
