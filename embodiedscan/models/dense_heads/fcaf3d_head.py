@@ -1202,6 +1202,9 @@ class FCAF3DHeadRotMat(BaseModel):
         pos_bbox_preds = bbox_preds[pos_inds]
         pos_center_targets = center_targets[pos_inds].unsqueeze(1)
         pos_bbox_targets = bbox_targets[pos_inds]
+        # reduce_mean is outside if / else block to prevent deadlock
+        center_denorm = max(reduce_mean(pos_center_targets.sum().detach()),
+                            1e-6)
 
         if len(pos_inds) > 0:
             pos_points = points[pos_inds]
