@@ -46,7 +46,7 @@ class Embodied3DDetector(BaseModel):
         use_xyz_feat (bool, optional): Whether to use xyz features.
             Defaults to None.
         init_cfg (dict or ConfigDict, optional): the config to control the
-            initialization. Defaults to None.
+            initialization. Defaults to False.
     """
     _version = 2
 
