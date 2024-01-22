@@ -1,4 +1,4 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) OpenRobotLab. All rights reserved.
 from .bbox_3d import (BaseInstance3DBoxes, Box3DMode, Coord3DMode,
                       EulerInstance3DBoxes, get_box_type,
                       get_proj_mat_by_coord_type, limit_period,

@@ -1,7 +1,7 @@
 import os
+import pickle
 
 import cv2
-import mmengine
 import numpy as np
 import open3d as o3d
 
@@ -223,7 +223,8 @@ class ContinuousOccupancyDrawer:
         print('You can also press Esc to close window immediately,',
               'which may result in a segmentation fault.')
         self.gt = np.load(self.occ_path)
-        self.mask = mmengine.load(self.mask_path)
+        with open(self.mask_path, 'rb') as f:
+            self.mask = pickle.load(f)
 
         point_cloud_range = [-3.2, -3.2, -1.28 + 0.5, 3.2, 3.2, 1.28 + 0.5]
         occ_size = [40, 40, 16]

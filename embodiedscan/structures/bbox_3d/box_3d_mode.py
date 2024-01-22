@@ -7,9 +7,6 @@ import torch
 from torch import Tensor
 
 from .base_box3d import BaseInstance3DBoxes
-from .cam_box3d import CameraInstance3DBoxes
-from .depth_box3d import DepthInstance3DBoxes
-from .lidar_box3d import LiDARInstance3DBoxes
 from .utils import limit_period
 
 
@@ -254,16 +251,8 @@ class Box3DMode(IntEnum):
         if is_numpy:
             return arr.numpy()
         elif is_Instance3DBoxes:
-            if dst == Box3DMode.CAM:
-                target_type = CameraInstance3DBoxes
-            elif dst == Box3DMode.LIDAR:
-                target_type = LiDARInstance3DBoxes
-            elif dst == Box3DMode.DEPTH:
-                target_type = DepthInstance3DBoxes
-            else:
-                raise NotImplementedError(
-                    f'Conversion to {dst} through {original_type} '
-                    'is not supported yet')
-            return target_type(arr, box_dim=arr.size(-1), with_yaw=with_yaw)
+            raise NotImplementedError(
+                f'Conversion to {dst} through {original_type} '
+                'is not supported yet')
         else:
             return arr

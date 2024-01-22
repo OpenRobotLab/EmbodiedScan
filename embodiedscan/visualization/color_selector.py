@@ -869,7 +869,7 @@ class ColorMap(object):
                 color = eval(s[len(cate):])
                 self.color_map[cate] = color
         else:
-            from embodiedscan.utils.default_color_map import DEFAULT_COLOR_MAP
+            from .default_color_map import DEFAULT_COLOR_MAP
             self.color_map = DEFAULT_COLOR_MAP
 
         self.classes = classes

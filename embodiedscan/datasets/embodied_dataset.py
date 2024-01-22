@@ -1,13 +1,14 @@
 import os
 import warnings
+from copy import deepcopy
 from typing import Callable, List, Optional, Union
 
 import mmengine
 import numpy as np
-from mmdet3d.registry import DATASETS
 from mmengine.dataset import BaseDataset
 from mmengine.fileio import load
 
+from embodiedscan.registry import DATASETS
 from embodiedscan.structures import get_box_type
 
 
@@ -103,7 +104,13 @@ class EmbodiedScanDataset(BaseDataset):
             dict: Has `ann_info` in training stage. And
             all path has been converted to absolute path.
         """
+        info['box_type_3d'] = self.box_type_3d
         info['axis_align_matrix'] = self._get_axis_align_matrix(info)
+        ann_dataset = info['sample_idx'].split('/')[0]
+        if ann_dataset == 'matterport3d':
+            info['depth_shift'] = 4000.0
+        else:
+            info['depth_shift'] = 1000.0
         # Because multi-view settings are different from original designs
         # we temporarily follow the ori design in ImVoxelNet
         info['img_path'] = []
@@ -141,6 +148,7 @@ class EmbodiedScanDataset(BaseDataset):
         if self.test_mode and self.load_eval_anns:
             eval_ann_info = self.parse_ann_info(info)
             info['eval_ann_info'] = self._remove_dontcare(eval_ann_info)
+            info['ann_info'] = deepcopy(info['eval_ann_info'])
 
         return info
 

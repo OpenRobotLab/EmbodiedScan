@@ -1,15 +1,15 @@
 import os
+import pickle
 from typing import List, Union
 
-import mmengine
 import numpy as np
 import open3d as o3d
 
-from embodiedscan.utils.color_selector import ColorMap
-from embodiedscan.utils.continuous_drawer import (ContinuousDrawer,
-                                                  ContinuousOccupancyDrawer)
-from embodiedscan.utils.img_drawer import ImageDrawer
-from embodiedscan.utils.utils import _9dof_to_box, _box_add_thickness
+from embodiedscan.visualization.color_selector import ColorMap
+from embodiedscan.visualization.continuous_drawer import (
+    ContinuousDrawer, ContinuousOccupancyDrawer)
+from embodiedscan.visualization.img_drawer import ImageDrawer
+from embodiedscan.visualization.utils import _9dof_to_box, _box_add_thickness
 
 DATASETS = ['scannet', '3rscan', 'matterport3d']
 
@@ -26,6 +26,9 @@ class EmbodiedScanExplorer:
         verbose (bool): Whether to print related messages. Defaults to False.
         color_setting (str, optional): Color settings for visualization.
             Defaults to None.
+            Accept the path to the setting file like
+                embodiedscan/visualization/full_color_map.txt
+        thickness (float): Thickness of of the displayed box lines.
     """
 
     def __init__(self,
@@ -68,7 +71,8 @@ class EmbodiedScanExplorer:
         self.metainfo = None
         data_list = []
         for file in self.ann_files:
-            data = mmengine.load(file)
+            with open(file, 'rb') as f:
+                data = pickle.load(f)
             if self.metainfo is None:
                 self.metainfo = data['metainfo']
             else:
@@ -464,14 +468,3 @@ class EmbodiedScanExplorer:
 
         print('No such camera')
         return
-
-
-if __name__ == '__main__':
-    explorer = EmbodiedScanExplorer(
-        data_root=['data/scannet', 'data/3rscan/', 'data/matterport3d/'],
-        ann_file=[
-            'data/full_10_visible/embodiedscan_infos_train_full.pkl',
-            'data/full_10_visible/embodiedscan_infos_val_full.pkl'
-        ],
-        verbose=True)
-    explorer.render_continuous_scene('scannet/scene0000_00')

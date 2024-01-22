@@ -4,9 +4,10 @@ from typing import Tuple, Union
 
 import numpy as np
 import torch
-from mmdet3d.utils.array_converter import array_converter
 from pytorch3d.transforms import euler_angles_to_matrix
 from torch import Tensor
+
+from embodiedscan.utils.array_converter import array_converter
 
 
 @array_converter(apply_to=('val', ))
@@ -207,6 +208,10 @@ def xywhr2xyxyr(
 def get_box_type(box_type: str) -> Tuple[type, int]:
     """Get the type and mode of box structure.
 
+    We temporarily only support EulerDepthInstance3DBoxes to
+    support 9-DoF box operations
+    and will consider refactoring this class with further experience.
+
     Args:
         box_type (str): The type of box structure. The valid value are "LiDAR",
             "Camera" and "Depth".
@@ -218,25 +223,15 @@ def get_box_type(box_type: str) -> Tuple[type, int]:
     Returns:
         tuple: Box type and box mode.
     """
-    from .box_3d_mode import (Box3DMode, CameraInstance3DBoxes,
-                              DepthInstance3DBoxes, EulerCameraInstance3DBoxes,
-                              EulerDepthInstance3DBoxes, LiDARInstance3DBoxes)
+    from .box_3d_mode import Box3DMode
+    from .euler_depth_box3d import EulerDepthInstance3DBoxes
     box_type_lower = box_type.lower()
-    if box_type_lower == 'lidar':
-        box_type_3d = LiDARInstance3DBoxes
-        box_mode_3d = Box3DMode.LIDAR
-    elif box_type_lower == 'camera':
-        box_type_3d = CameraInstance3DBoxes
-        box_mode_3d = Box3DMode.CAM
-    elif box_type_lower == 'depth':
-        box_type_3d = DepthInstance3DBoxes
-        box_mode_3d = Box3DMode.DEPTH
-    elif box_type_lower == 'euler-depth':
+    if box_type_lower == 'euler-depth':
         box_type_3d = EulerDepthInstance3DBoxes
         box_mode_3d = Box3DMode.EULER_DEPTH
-    elif box_type_lower == 'euler-camera':
-        box_type_3d = EulerCameraInstance3DBoxes
-        box_mode_3d = Box3DMode.EULER_CAM
+    # elif box_type_lower == 'euler-camera':
+    #     box_type_3d = EulerCameraInstance3DBoxes
+    #     box_mode_3d = Box3DMode.EULER_CAM
     else:
         raise ValueError(
             'Only "box_type" of "camera", "lidar", "depth", "euler"'

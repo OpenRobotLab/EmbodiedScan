@@ -4,13 +4,14 @@ from typing import Dict, Optional, Sequence
 
 import numpy as np
 import torch
-from mmdet3d.registry import METRICS
 from mmengine.dist import (broadcast_object_list, collect_results,
                            is_main_process)
 from mmengine.evaluator import BaseMetric
 from mmengine.evaluator.metric import _to_cpu
 from mmengine.logging import MMLogger, print_log
 from terminaltables import AsciiTable
+
+from embodiedscan.registry import METRICS
 
 
 @METRICS.register_module()
