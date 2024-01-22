@@ -1,5 +1,8 @@
 ### Prepare EmbodiedScan Data
 
+Given the licenses of respective raw datasets, we recommend users download the raw data from their official websites and then organize them following the below guide.
+Detailed steps are shown as follows.
+
 1. Download ScanNet v2 data [HERE](https://github.com/ScanNet/ScanNet). Link or move the folder to this level of directory.
 
 2. Download 3RScan data [HERE](https://github.com/WaldJohannaU/3RScan). Link or move the folder to this level of directory.
@@ -57,13 +60,15 @@ data
 ├── matterport3d
 │   ├── <scene_id>
 │   ├── ...
-├── embodied_occupancy
+├── embodiedscan_occupancy
 ├── embodiedscan_infos_train_full.pkl
 ├── embodiedscan_infos_val_full.pkl
 ```
 
-6. Put EmbodiedScan occupancy annotations by running
+6. Also put EmbodiedScan occupancy annotations here by running
 
 ```bash
-python embodiedscan/converter/put_occupancy_ann.py --src data/embodied_occupancy --dst data
+python embodiedscan/converter/put_occupancy_ann.py --src data/embodiedscan_occupancy --dst data
 ```
+
+Note: Language prompts will be released soon. Please stay tuned for the related guide.
