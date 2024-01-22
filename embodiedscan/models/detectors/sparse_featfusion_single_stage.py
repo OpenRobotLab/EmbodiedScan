@@ -31,8 +31,12 @@ class SparseFeatureFusionSingleStage3DDetector(BaseModel):
 
     Args:
         backbone (dict): Config dict of detector's backbone.
+        backbone_lidar (dict): Config dict of detector's lidar backbone.
+        bbox_head (dict): Config dict of box head.
         neck (dict, optional): Config dict of neck. Defaults to None.
-        bbox_head (dict, optional): Config dict of box head. Defaults to None.
+        neck_3d (dict, optional): Config dict of 3D neck. Defaults to None.
+        neck_lidar (dict, optional): Config dict of lidar neck. Defaults to None.
+        coord_type (str): Type of Box coordinates. Default to CAMERA.
         train_cfg (dict, optional): Config dict of training hyper-parameters.
             Defaults to None.
         test_cfg (dict, optional): Config dict of test hyper-parameters.
@@ -40,6 +44,8 @@ class SparseFeatureFusionSingleStage3DDetector(BaseModel):
         data_preprocessor (dict or ConfigDict, optional): The pre-process
             config of :class:`BaseDataPreprocessor`.  it usually includes,
                 ``pad_size_divisor``, ``pad_value``, ``mean`` and ``std``.
+        use_xyz_feat (bool, optional): Whether to use xyz features.
+            Defaults to False.
         init_cfg (dict or ConfigDict, optional): the config to control the
             initialization. Defaults to None.
     """

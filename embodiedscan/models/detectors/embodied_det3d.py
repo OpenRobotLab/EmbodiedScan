@@ -44,7 +44,7 @@ class Embodied3DDetector(BaseModel):
             config of :class:`BaseDataPreprocessor`.  it usually includes,
                 ``pad_size_divisor``, ``pad_value``, ``mean`` and ``std``.
         use_xyz_feat (bool, optional): Whether to use xyz features.
-            Defaults to None.
+            Defaults to False.
         init_cfg (dict or ConfigDict, optional): the config to control the
             initialization. Defaults to False.
     """
