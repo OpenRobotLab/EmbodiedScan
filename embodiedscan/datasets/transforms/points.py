@@ -23,7 +23,7 @@ class ConvertRGBDToPoints(BaseTransform):
         """Call function to normalize color of points.
 
         Args:
-            results (dict): Result dict containing point clouds data.
+            input_dict (dict): Result dict containing point clouds data.
 
         Returns:
             dict: The result dict containing the normalized points.
