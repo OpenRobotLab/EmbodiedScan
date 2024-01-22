@@ -27,9 +27,6 @@ class EulerDepthInstance3DBoxes(EulerInstance3DBoxes):
     Also note that rotation of DepthInstance3DBoxes is counterclockwise,
     which is reverse to the definition of the yaw angle (clockwise).
 
-    A refactor is ongoing to make the three coordinate systems
-    easier to understand and convert between each other.
-
     Attributes:
         tensor (torch.Tensor): Float matrix of N x box_dim.
         box_dim (int): Integer indicates the dimension of a box
