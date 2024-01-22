@@ -25,8 +25,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/OpenRobotLab/EmbodiedScan" target='_blank'>
-    <img src="https://img.shields.io/badge/arXiv-2308.16911-blue?">
+  <a href="https://arxiv.org/abs/2312.16170" target='_blank'>
+    <img src="https://img.shields.io/badge/arXiv-2312.16170-blue?">
   </a>
   <a href="./assets/EmbodiedScan.pdf" target='_blank'>
     <img src="https://img.shields.io/badge/Paper-📖-blue?">
@@ -43,6 +43,19 @@
 </div> -->
 
 [![demo](assets/demo_fig.png "demo")](https://tai-wang.github.io/embodiedscan)
+
+<!-- contents with emoji -->
+
+## 📋 Contents
+
+1. [About](#-about)
+2. [News](#-news)
+3. [Getting Started](#-getting-started)
+4. [Model and Benchmark](#-model-and-benchmark)
+5. [TODO List](#-todo-list)
+6. [Citation](#-citation)
+7. [License](#-license)
+8. [Acknowledgements](#-acknowledgements)
 
 ## 🏠 About
 
@@ -62,9 +75,61 @@ Building upon this database, we introduce a baseline framework named <b>Embodied
 
 - \[2023-12\] We release the [paper](./assets/EmbodiedScan.pdf) of EmbodiedScan. Please check the [webpage](https://tai-wang.github.io/embodiedscan) and view our demos!
 
-## 🔍 Overview
+## 📚 Getting Started
 
-### Model
+### Installation
+
+We test our codes under the following environment:
+
+- Ubuntu 20.04
+- NVIDIA Driver: 525.147.05
+- CUDA 12.0
+- Python 3.8.18
+- PyTorch 1.11.0+cu113
+- PyTorch3D 0.7.2
+
+1. Clone this repository.
+
+```bash
+git clone https://github.com/OpenRobotLab/EmbodiedScan.git
+cd EmbodiedScan
+```
+
+2. Install [PyTorch3D](https://github.com/facebookresearch/pytorch3d/blob/main/INSTALL.md).
+
+```bash
+conda create -n embodiedscan python=3.8 -y  # pytorch3d needs python>3.7
+conda activate embodiedscan
+# We recommend installing pytorch3d with pre-compiled packages
+# For example, to install for Python 3.8, PyTorch 1.11.0 and CUDA 11.3
+# For more information, please refer to https://github.com/facebookresearch/pytorch3d/blob/main/INSTALL.md#2-install-wheels-for-linux
+pip install --no-index --no-cache-dir pytorch3d -f https://dl.fbaipublicfiles.com/pytorch3d/packaging/wheels/py38_cu113_pyt1110/download.html
+```
+
+3. Install EmbodiedScan.
+
+```bash
+# We plan to make EmbodiedScan easier to install by "pip install EmbodiedScan".
+# Please stay tuned for the future official release.
+# Make sure you are under ./EmbodiedScan/
+pip install -e .
+```
+
+### Data Preparation
+
+Please download ScanNet, 3RScan and matterport3d from their official websites.
+
+We will release the demo data, re-organized file structure, post-processing script and annotation files in the near future. Please stay tuned.
+
+### Tutorial
+
+We provide a simple tutorial [here](https://github.com/OpenRobotLab/EmbodiedScan/blob/main/embodiedscan/tutorial.ipynb) as a guideline for the basic analysis and visualization of our dataset. Welcome to try and post your suggestions!
+
+## 📦 Model and Benchmark
+
+We will release the code for model training and benchmark with pretrained checkpoints in the 2024 Q1.
+
+### Model Overview
 
 <p align="center">
   <img src="assets/framework.png" align="center" width="100%">
@@ -90,6 +155,10 @@ Embodied Perceptron accepts RGB-D sequence with any number of views along with t
 #### ''Multi-agent'' Interaction Planned by LLMs
 <video src="assets/scannet_two_bed_demo.mp4" controls>
 </video> -->
+
+### Benchmark
+
+Please see the [paper](./assets/EmbodiedScan.pdf) for details of our two benchmarks, fundamental 3D perception and language-grounded benchmarks. This dataset is still scaling up and the benchmark is being polished and extended. Please stay tuned for our recent updates.
 
 ## 📝 TODO List
 
@@ -153,7 +222,7 @@ This work is under the <a rel="license" href="http://creativecommons.org/license
 
 ## 👏 Acknowledgements
 
-- [OpenMMLab](https://github.com/open-mmlab): Our dataset code uses [MMEngine](https://github.com/open-mmlab/mmengine) and our model is built upon of [MMDetection3D](https://github.com/open-mmlab/mmdetection3d).
+- [OpenMMLab](https://github.com/open-mmlab): Our dataset code uses [MMEngine](https://github.com/open-mmlab/mmengine) and our model is built upon [MMDetection3D](https://github.com/open-mmlab/mmdetection3d).
 - [PyTorch3D](https://github.com/facebookresearch/pytorch3d): We use some functions supported in PyTorch3D for efficient computations on fundamental 3D data structures.
 - [ScanNet](https://github.com/ScanNet/ScanNet), [3RScan](https://github.com/WaldJohannaU/3RScan), [Matterport3D](https://github.com/niessner/Matterport): Our dataset uses the raw data from these datasets.
 - [ReferIt3D](https://github.com/referit3d/referit3d): We refer to the SR3D's approach to obtaining the language prompt annotations.

@@ -128,3 +128,6 @@ data/matterport3d
 data/*.pkl
 exps/
 todo.md
+
+# demo data
+demo/data
