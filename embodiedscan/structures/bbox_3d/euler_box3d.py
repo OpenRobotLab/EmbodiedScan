@@ -19,14 +19,9 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
         tensor (torch.Tensor): Float matrix of N x box_dim.
         box_dim (int): Integer indicates the dimension of a box
             Each row is (x, y, z, x_size, y_size, z_size, alpha, beta, gamma).
-        with_yaw (bool): Deprecated.
     """
 
-    def __init__(self,
-                 tensor,
-                 box_dim=9,
-                 with_yaw=True,
-                 origin=(0.5, 0.5, 0.5)):
+    def __init__(self, tensor, box_dim=9, origin=(0.5, 0.5, 0.5)):
         if isinstance(tensor, torch.Tensor):
             device = tensor.device
         else:
@@ -41,22 +36,19 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
 
         if tensor.shape[-1] == 6:
             # If the dimension of boxes is 6, we expand box_dim by padding
-            # 0 as a fake yaw and set with_yaw to False.
+            # (0, 0, 0) as a fake euler angle.
             assert box_dim == 6
             fake_rot = tensor.new_zeros(tensor.shape[0], 3)
             tensor = torch.cat((tensor, fake_rot), dim=-1)
             self.box_dim = box_dim + 3
-            self.with_yaw = True  # TODO
         elif tensor.shape[-1] == 7:
             assert box_dim == 7
             fake_euler = tensor.new_zeros(tensor.shape[0], 2)
             tensor = torch.cat((tensor, fake_euler), dim=-1)
             self.box_dim = box_dim + 2
-            self.with_yaw = True
         else:
             assert tensor.shape[-1] == 9
             self.box_dim = box_dim
-            self.with_yaw = True  # TODO
         self.tensor = tensor.clone()
 
         self.origin = origin

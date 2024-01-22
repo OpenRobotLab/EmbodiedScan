@@ -10,8 +10,8 @@ from .euler_box3d import EulerInstance3DBoxes
 class EulerDepthInstance3DBoxes(EulerInstance3DBoxes):
     """3D boxes of instances in Depth coordinates.
 
-    We keep the "Depth" coordinate system definition in MMDet3D
-    just for clarification of the points coordinates and the flipping augmentation.
+    We keep the "Depth" coordinate system definition in MMDet3D just for
+    clarification of the points coordinates and the flipping augmentation.
 
     Coordinates in Depth:
 
@@ -43,7 +43,7 @@ class EulerDepthInstance3DBoxes(EulerInstance3DBoxes):
                  box_dim=9,
                  with_yaw=True,
                  origin=(0.5, 0.5, 0.5)):
-        super().__init__(tensor, box_dim, with_yaw, origin)
+        super().__init__(tensor, box_dim, origin)
 
     def flip(self, bev_direction='horizontal', points=None):
         """Flip the boxes in BEV along given BEV direction.
