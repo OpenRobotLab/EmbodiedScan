@@ -4,7 +4,9 @@ from argparse import ArgumentParser
 
 from tqdm import tqdm
 
-def process_dataset(dataset, src, dst):
+
+def extract_occupancy(dataset, src, dst):
+    """Extract occupancy annotations of a single dataset to dataset root."""
     print('Processing dataset', dataset)
     scenes = os.listdir(os.path.join(src, dataset))
     dst_dataset = os.path.join(dst, dataset)
@@ -42,4 +44,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     datasets = os.listdir(args.src)
     for dataset in datasets:
-        process_dataset(dataset, args.src, args.dst)
+        extract_occupancy(dataset, args.src, args.dst)
