@@ -40,6 +40,7 @@ class MultiViewPipeline(BaseTransform):
             dict: output dict after transformation.
         """
         imgs = []
+        img_paths = []
         points = []
         intrinsics = []
         extrinsics = []
@@ -73,6 +74,7 @@ class MultiViewPipeline(BaseTransform):
                 _results.pop('depth_shift')
             if 'img' in _results:
                 imgs.append(_results['img'])
+                img_paths.append(_results['img_path'])
             if 'points' in _results:
                 points.append(_results['points'])
             if isinstance(results['depth2img']['intrinsic'], list):
@@ -81,10 +83,11 @@ class MultiViewPipeline(BaseTransform):
                 intrinsics.append(results['depth2img']['intrinsic'])
             extrinsics.append(results['depth2img']['extrinsic'][i])
         for key in _results.keys():
-            if key not in ['img', 'points']:
+            if key not in ['img', 'points', 'img_path']:
                 results[key] = _results[key]
         if len(imgs):
             results['img'] = imgs
+            results['img_path'] = img_paths
         if len(points):
             results['points'] = points
         if 'visible_instance_masks' in results:
