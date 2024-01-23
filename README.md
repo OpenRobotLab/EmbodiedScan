@@ -24,7 +24,6 @@
   </p>
 </p>
 
-
 <!-- <p align="center">
   <a href="https://arxiv.org/abs/2312.16170" target='_blank'>
     <img src="https://img.shields.io/badge/arXiv-2312.16170-blue?">
@@ -38,13 +37,12 @@
 </p> -->
 
 <div id="top" align="center">
-  
-[![arXiv](https://img.shields.io/badge/arXiv-2312.16170-blue?)](https://arxiv.org/abs/2312.16170)
-[![](https://img.shields.io/badge/Paper-📖-blue?)](./assets/EmbodiedScan.pdf)
-[![](https://img.shields.io/badge/Project-&#x1F680-blue)](https://tai-wang.github.io/embodiedscan)
+
+[![arXiv](https://img.shields.io/badge/arXiv-2312.16170-blue)](https://arxiv.org/abs/2312.16170)
+[![](https://img.shields.io/badge/Paper-%F0%9F%93%96-blue)](./assets/EmbodiedScan.pdf)
+[![](https://img.shields.io/badge/Project-%F0%9F%9A%80-blue)](https://tai-wang.github.io/embodiedscan)
 
 </div>
-
 
 ## 🤖 [Demo](https://tai-wang.github.io/embodiedscan)
 
