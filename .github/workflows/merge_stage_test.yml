@@ -23,7 +23,7 @@ jobs:
       image: pytorch/pytorch:1.13.0-cuda11.6-cudnn8-devel
     strategy:
       matrix:
-        python-version: [3.8]
+        python-version: [3.9]
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
