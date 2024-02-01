@@ -139,6 +139,10 @@ We will update the authorization approach and release remaining data afterward. 
 
 We provide a simple tutorial [here](https://github.com/OpenRobotLab/EmbodiedScan/blob/main/embodiedscan/tutorial.ipynb) as a guideline for the basic analysis and visualization of our dataset. Welcome to try and post your suggestions!
 
+### Run Demo
+
+We provide a demo for running EmbodiedScan's model on a sample scan. Please refer to the [notebook](demo/demo.ipynb) for more details.
+
 ## 📦 Model and Benchmark
 
 We will release the code for model training and benchmark with pretrained checkpoints in the 2024 Q1.
