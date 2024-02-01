@@ -89,10 +89,10 @@ def nms_filter(pred_results, iou_thr=0.15, score_thr=0.075, topk_per_class=10):
     Args:
         pred_results (mmengine.structures.instance_data.InstanceData):
             Results predicted by the model
-        iou_thr (float): IoU thresholds for NMS. Default to 0.15.
+        iou_thr (float): IoU thresholds for NMS. Defaults to 0.15.
         score_thr (float): Score thresholds.
             Instances with scores below thresholds will not be kept.
-            Default to 0.075.
+            Defaults to 0.075.
         topk_per_class (int): Number of instances kept per category.
 
     Returns:

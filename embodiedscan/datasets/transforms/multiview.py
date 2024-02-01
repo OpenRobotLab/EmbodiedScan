@@ -21,7 +21,8 @@ class MultiViewPipeline(BaseTransform):
         transforms (list[dict | callable]):
             The transforms to be applied to each select frame.
         n_images (int): Number of frames selected per scene.
-        ordered (bool): Whether to put these frames in order. Default to False.
+        ordered (bool): Whether to put these frames in order.
+            Defaults to False.
     """
 
     def __init__(self, transforms, n_images, ordered=False):

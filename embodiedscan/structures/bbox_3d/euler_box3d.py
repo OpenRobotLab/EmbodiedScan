@@ -112,7 +112,7 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
             boxes1 (:obj:`EulerInstance3DBoxes`): Boxes 1 contain N boxes.
             boxes2 (:obj:`EulerInstance3DBoxes`): Boxes 2 contain M boxes.
             mode (str): Mode of iou calculation. Defaults to 'iou'.
-            eps (bool): Epsilon. Default to 1e-4.
+            eps (bool): Epsilon. Defaults to 1e-4.
 
         Returns:
             torch.Tensor: Calculated 3D overlaps of the boxes.
