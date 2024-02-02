@@ -13,8 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build_cu116:
-    runs-on: ubuntu-22.04
+  build_cu113:
+    runs-on: ubuntu-20.04
     container:
       image: pytorch/pytorch:1.11.0-cuda11.3-cudnn8-devel
     strategy:
