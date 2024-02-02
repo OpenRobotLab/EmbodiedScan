@@ -20,10 +20,10 @@ jobs:
   build_cu116:
     runs-on: ubuntu-22.04
     container:
-      image: pytorch/pytorch:1.13.0-cuda11.6-cudnn8-devel
+      image: pytorch/pytorch:1.11.0-cuda11.3-cudnn8-devel
     strategy:
       matrix:
-        python-version: [3.9]
+        python-version: [3.7]
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
