@@ -83,8 +83,8 @@ def init_model(config: Union[str, Path, Config],
 
 def nms_filter(pred_results, iou_thr=0.15, score_thr=0.075, topk_per_class=10):
     """Non-Maximum Suppression for 3D Euler boxes. Additionally, only the top-k
-    boxes will be kept for each category to avoid redundant boxes
-    in the visualization.
+    boxes will be kept for each category to avoid redundant boxes in the
+    visualization.
 
     Args:
         pred_results (mmengine.structures.instance_data.InstanceData):
