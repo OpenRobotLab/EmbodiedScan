@@ -137,7 +137,7 @@ We will update the authorization approach and release remaining data afterward. 
 
 We provide a simple tutorial [here](https://github.com/OpenRobotLab/EmbodiedScan/blob/main/embodiedscan/tutorial.ipynb) as a guideline for the basic analysis and visualization of our dataset. Welcome to try and post your suggestions!
 
-### Run Demo
+### Demo Inference
 
 We provide a demo for running EmbodiedScan's model on a sample scan. Please refer to the [notebook](demo/demo.ipynb) for more details.
 
