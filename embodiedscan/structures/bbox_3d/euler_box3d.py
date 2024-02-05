@@ -101,7 +101,7 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
         return corners
 
     @classmethod
-    def overlaps(cls, boxes1, boxes2, mode='iou'):
+    def overlaps(cls, boxes1, boxes2, mode='iou', eps=1e-4):
         """Calculate 3D overlaps of two boxes.
 
         Note:
@@ -111,7 +111,8 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
         Args:
             boxes1 (:obj:`EulerInstance3DBoxes`): Boxes 1 contain N boxes.
             boxes2 (:obj:`EulerInstance3DBoxes`): Boxes 2 contain M boxes.
-            mode (str, optional): Mode of iou calculation. Defaults to 'iou'.
+            mode (str): Mode of iou calculation. Defaults to 'iou'.
+            eps (bool): Epsilon. Defaults to 1e-4.
 
         Returns:
             torch.Tensor: Calculated 3D overlaps of the boxes.
@@ -130,7 +131,7 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
 
         corners1 = boxes1.corners
         corners2 = boxes2.corners
-        _, iou3d = box3d_overlap(corners1, corners2, eps=1e-4)
+        _, iou3d = box3d_overlap(corners1, corners2, eps=eps)
         return iou3d
 
     @property

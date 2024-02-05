@@ -21,22 +21,25 @@ class ContinuousDrawer:
         dir (str): Root path of the dataset.
         scene (dict): Annotation of the selected scene.
         classes (list): Class information.
+        id_to_index (dict): Mapping class id to the index of class names.
         color_selector (ColorMap): ColorMap for visualization.
         start_idx (int) : Index of the frame which the task starts.
         pcd_downsample (int) : The rate of downsample.
     """
 
-    def __init__(self, dataset, dir, scene, classes, color_selector, start_idx,
-                 pcd_downsample, thickness):
+    def __init__(self, dataset, dir, scene, classes, id_to_index,
+                 color_selector, start_idx, pcd_downsample, thickness):
         self.dir = dir
         self.dataset = dataset
         self.scene = scene
         self.classes = classes
         self.color_selector = color_selector
+        self.id_to_index = id_to_index
         self.idx = start_idx
         self.downsample = pcd_downsample
         self.thickness = thickness
         self.camera = None
+        self.demo = False
         self.occupied = np.zeros((len(self.scene['instances']), ), dtype=bool)
         self.vis = o3d.visualization.VisualizerWithKeyCallback()
         self.vis.register_key_callback(262, self.draw_next)  # Right Arrow
@@ -67,16 +70,27 @@ class ContinuousDrawer:
             pcdpath = os.path.join(self.dir, building, 'region_segmentations',
                                    f'{region}.ply')
         else:
-            raise NotImplementedError
-        mesh = o3d.io.read_triangle_mesh(pcdpath, True)
-        mesh.transform(self.scene['axis_align_matrix'])
-        frame = o3d.geometry.TriangleMesh.create_coordinate_frame()
-        self.vis.create_window()
-        self.vis.add_geometry(mesh)
-        self.vis.add_geometry(frame)
-        ctr = self.vis.get_view_control()
-        self.view_param = ctr.convert_to_pinhole_camera_parameters()
-        self.vis.remove_geometry(mesh)
+            self.demo = True
+            self.drawed_boxes = []
+            pcdpath = None
+            camera_config_path = os.path.join(self.dir, region, 'camera.json')
+            cam = o3d.io.read_pinhole_camera_parameters(camera_config_path)
+        if pcdpath is None:
+            self.vis.create_window(width=cam.intrinsic.width,
+                                   height=cam.intrinsic.height)
+            ctr = self.vis.get_view_control()
+            ctr.convert_from_pinhole_camera_parameters(cam)
+            self.view_param = cam
+        else:
+            mesh = o3d.io.read_triangle_mesh(pcdpath, True)
+            mesh.transform(self.scene['axis_align_matrix'])
+            frame = o3d.geometry.TriangleMesh.create_coordinate_frame()
+            self.vis.create_window()
+            self.vis.add_geometry(mesh)
+            self.vis.add_geometry(frame)
+            ctr = self.vis.get_view_control()
+            self.view_param = ctr.convert_to_pinhole_camera_parameters()
+            self.vis.remove_geometry(mesh)
         self.draw_next(self.vis)
 
     def draw_next(self, vis):
@@ -128,17 +142,24 @@ class ContinuousDrawer:
             self.camera = draw_camera(extrinsic)
             vis.add_geometry(self.camera)
 
+        if self.demo:
+            for box in self.drawed_boxes:
+                vis.remove_geometry(box)
+            self.drawed_boxes = []
         for ins_idx in img['visible_instance_ids']:
             if self.occupied[ins_idx]:
                 continue
             self.occupied[ins_idx] = True
             instance = self.scene['instances'][ins_idx]
-            box = _9dof_to_box(instance['bbox_3d'],
-                               self.classes[instance['bbox_label_3d'] - 1],
-                               self.color_selector)
+            box = _9dof_to_box(
+                instance['bbox_3d'],
+                self.classes[self.id_to_index[instance['bbox_label_3d']]],
+                self.color_selector)
             box = _box_add_thickness(box, self.thickness)
             for item in box:
                 vis.add_geometry(item)
+                if self.demo:
+                    self.drawed_boxes.append(item)
 
         self.idx += 1
         ctr = vis.get_view_control()
@@ -170,16 +191,18 @@ class ContinuousOccupancyDrawer:
         dir (str): Root path of the dataset.
         scene (dict): Annotation of the selected scene.
         classes (list): Class information.
+        id_to_index (dict): Mapping class id to the index of class names.
         color_selector (ColorMap): ColorMap for visualization.
         start_idx (int) : Index of the frame which the task starts.
     """
 
-    def __init__(self, dataset, dir, scene, classes, color_selector,
-                 start_idx):
+    def __init__(self, dataset, dir, scene, classes, id_to_index,
+                 color_selector, start_idx):
         self.dir = dir
         self.dataset = dataset
         self.scene = scene
         self.classes = classes
+        self.id_to_index = id_to_index
         self.color_selector = color_selector
         self.idx = start_idx
         self.camera = None
@@ -240,7 +263,7 @@ class ContinuousOccupancyDrawer:
             if label_id == 0:
                 label = 'object'
             else:
-                label = self.classes[label_id - 1]
+                label = self.classes[self.id_to_index[label_id]]
             color = self.color_selector.get_color(label)
             color = [x / 255.0 for x in color]
             self.points[i][:3] = [

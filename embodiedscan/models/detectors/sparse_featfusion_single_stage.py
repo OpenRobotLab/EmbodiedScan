@@ -37,7 +37,7 @@ class SparseFeatureFusionSingleStage3DDetector(BaseModel):
         neck_3d (dict, optional): Config dict of 3D neck. Defaults to None.
         neck_lidar (dict, optional): Config dict of lidar neck.
             Defaults to None.
-        coord_type (str): Type of Box coordinates. Default to CAMERA.
+        coord_type (str): Type of Box coordinates. Defaults to CAMERA.
         train_cfg (dict, optional): Config dict of training hyper-parameters.
             Defaults to None.
         test_cfg (dict, optional): Config dict of test hyper-parameters.

@@ -71,15 +71,33 @@ class EmbodiedScanExplorer:
         self.metainfo = None
         data_list = []
         for file in self.ann_files:
-            with open(file, 'rb') as f:
-                data = pickle.load(f)
+            if isinstance(file, list):
+                data_list += file
+                continue
+            elif isinstance(file, dict):
+                if 'data_list' in file:
+                    data = file
+                else:
+                    data_list.append(file)
+                    continue
+            elif isinstance(file, str):
+                with open(file, 'rb') as f:
+                    data = pickle.load(f)
             if self.metainfo is None:
                 self.metainfo = data['metainfo']
             else:
                 assert self.metainfo == data['metainfo']
             data_list += data['data_list']
 
-        self.classes = list(self.metainfo['categories'].keys())
+        if isinstance(self.metainfo['categories'], list):
+            self.classes = self.metainfo['categories']
+            self.id_to_index = {i: i for i in range(len(self.classes))}
+        elif isinstance(self.metainfo['categories'], dict):
+            self.classes = list(self.metainfo['categories'].keys())
+            self.id_to_index = {
+                i: self.classes.index(classes)
+                for classes, i in self.metainfo['categories'].items()
+            }
         self.color_selector = ColorMap(classes=self.classes,
                                        init_file=color_setting)
         self.data = []
@@ -100,7 +118,8 @@ class EmbodiedScanExplorer:
                     dirpath = os.path.join(self.data_root['matterport3d'],
                                            building)
                 else:
-                    raise NotImplementedError
+                    region = splits[1]
+                    dirpath = os.path.join(self.data_root[dataset], region)
                 if os.path.exists(dirpath):
                     self.data.append(data)
 
@@ -148,6 +167,8 @@ class EmbodiedScanExplorer:
                     elif dataset == 'matterport3d':
                         cam_name = img_path.split(
                             '/')[-1][:-8] + img_path.split('/')[-1][-7:-4]
+                    else:
+                        cam_name = img_path.split('/')[-1][:-4]
                     res.append(cam_name)
                 return res
 
@@ -168,7 +189,8 @@ class EmbodiedScanExplorer:
             if sample['sample_idx'] == scene:
                 res = []
                 for instance in sample['instances']:
-                    label = self.classes[instance['bbox_label_3d'] - 1]
+                    label = self.classes[self.id_to_index[
+                        instance['bbox_label_3d']]]
                     res.append({
                         '9dof_bbox': instance['bbox_3d'],
                         'label': label
@@ -244,9 +266,10 @@ class EmbodiedScanExplorer:
             if self.verbose:
                 print('Rendering box')
             for instance in select['instances']:
-                box = _9dof_to_box(instance['bbox_3d'],
-                                   self.classes[instance['bbox_label_3d'] - 1],
-                                   self.color_selector)
+                box = _9dof_to_box(
+                    instance['bbox_3d'],
+                    self.classes[self.id_to_index[instance['bbox_label_3d']]],
+                    self.color_selector)
                 boxes += _box_add_thickness(box, self.thickness)
             if self.verbose:
                 print('Rendering complete')
@@ -287,6 +310,8 @@ class EmbodiedScanExplorer:
                         elif dataset == 'matterport3d':
                             cam_name = img_path.split(
                                 '/')[-1][:-8] + img_path.split('/')[-1][-7:-4]
+                        else:
+                            cam_name = img_path.split('/')[-1][:-4]
                         if cam_name == start_cam:
                             start_idx = i
                             break
@@ -302,8 +327,8 @@ class EmbodiedScanExplorer:
 
         drawer = ContinuousDrawer(dataset, self.data_root[dataset],
                                   selected_scene, self.classes,
-                                  self.color_selector, start_idx,
-                                  pcd_downsample, self.thickness)
+                                  self.id_to_index, self.color_selector,
+                                  start_idx, pcd_downsample, self.thickness)
         drawer.begin()
 
     def render_continuous_occupancy(self, scene_name, start_cam=None):
@@ -336,6 +361,8 @@ class EmbodiedScanExplorer:
                         elif dataset == 'matterport3d':
                             cam_name = img_path.split(
                                 '/')[-1][:-8] + img_path.split('/')[-1][-7:-4]
+                        else:
+                            cam_name = img_path.split('/')[-1][:-4]
                         if cam_name == start_cam:
                             start_idx = i
                             break
@@ -351,6 +378,7 @@ class EmbodiedScanExplorer:
 
         drawer = ContinuousOccupancyDrawer(dataset, self.data_root[dataset],
                                            selected_scene, self.classes,
+                                           self.id_to_index,
                                            self.color_selector, start_idx)
         drawer.begin()
 
@@ -394,7 +422,7 @@ class EmbodiedScanExplorer:
             if label_id == 0:
                 label = 'object'
             else:
-                label = self.classes[label_id - 1]
+                label = self.classes[self.id_to_index[label_id]]
             color = self.color_selector.get_color(label)
             color = [x / 255.0 for x in color]
             points[i][:3] = [
@@ -436,6 +464,8 @@ class EmbodiedScanExplorer:
             elif dataset == 'matterport3d':
                 cam_name = img_path.split('/')[-1][:-8] + img_path.split(
                     '/')[-1][-7:-4]
+            else:
+                cam_name = img_path.split('/')[-1][:-4]
             if cam_name == camera_name:
                 axis_align_matrix = select['axis_align_matrix']
                 extrinsic = axis_align_matrix @ camera['cam2global']
@@ -450,10 +480,11 @@ class EmbodiedScanExplorer:
                     for i in camera['visible_instance_ids']:
                         instance = select['instances'][i]
                         box = _9dof_to_box(
-                            instance['bbox_3d'],
-                            self.classes[instance['bbox_label_3d'] - 1],
+                            instance['bbox_3d'], self.classes[self.id_to_index[
+                                instance['bbox_label_3d']]],
                             self.color_selector)
-                        label = self.classes[instance['bbox_label_3d'] - 1]
+                        label = self.classes[self.id_to_index[
+                            instance['bbox_label_3d']]]
                         color = self.color_selector.get_color(label)
                         img_drawer.draw_box3d(box,
                                               color,
