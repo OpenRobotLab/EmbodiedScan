@@ -84,6 +84,12 @@ def install_package(line):
         links = mmcv_links()
         run_subprocess(
             [sys.executable, '-m', 'pip', 'install', line, '-f', links])
+    elif package_name == 'MinkowskiEngine':
+        run_subprocess([sys.executable, '-m', 'pip', 'install', 'ninja'])
+        run_subprocess([
+            sys.executable, '-m', 'pip', 'install', '-U',
+            'git+https://github.com/NVIDIA/MinkowskiEngine', '--no-deps'
+        ])  # noqa: E501
     else:
         run_subprocess([sys.executable, '-m', 'pip', 'install', line])
 

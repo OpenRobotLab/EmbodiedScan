@@ -121,12 +121,14 @@ conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit
 # Please stay tuned for the future official release.
 # Make sure you are under ./EmbodiedScan/
 # This script will install the dependencies and EmbodiedScan package automatically.
-python install.py all
-# This command installs all of embodiedscan's dependencies,
-# including the execution and visualization modules.
-# If you only want to use part of the functionality,
-# you can run 'python install.py run/visual' as an alternative.
+# use [python install.py run] to install only the execution dependencies
+# use [python install.py visual] to install only the visualization dependencies
+python install.py all  # install all the dependencies
 ```
+
+**Note:** The automatic installation script make each step a subprocess and the related messages are only printed when the subprocess is finished or killed. Therefore, it is normal to seemingly hang when installing heavier packages, such as Mink Engine and PyTorch3D.
+
+BTW, from our experience, it is easier to encounter problems when installing these two packages. Feel free to post your questions or suggestions during the installation procedure.
 
 ### Data Preparation
 
@@ -197,7 +199,8 @@ If you find our work helpful, please cite:
   author={Wang, Tai and Mao, Xiaohan and Zhu, Chenming and Xu, Runsen and Lyu, Ruiyuan and Li, Peisen and Chen, Xiao and Zhang, Wenwei and Chen, Kai and Xue, Tianfan and Liu, Xihui and Lu, Cewu and Lin, Dahua and Pang, Jiangmiao},
   title={EmbodiedScan: A Holistic Multi-Modal 3D Perception Suite Towards Embodied AI},
   journal={Arxiv},
-  year={2023},
+  year={2023}
+}
 ```
 
 If you use our dataset and benchmark, please kindly cite the original datasets involved in our work. BibTex entries are provided below.
