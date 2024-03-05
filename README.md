@@ -203,13 +203,13 @@ Note that the performance is a little different from the results provided in the
 
 | Method | Input | AP@0.25 | AR@0.25 | AP@0.5 | AR@0.5 | Download |
 |:------:|:-----:|:-------:|:-------:|:------:|:------:|:------:|
-| [Baseline](configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py) | RGB-D | 15.22  | 52.23  | 8.13  | 26.66 | [Model](https://pjlab-my.sharepoint.cn/:u:/g/personal/wangtai_pjlab_org_cn/Efl363DOsXdAiikGcHIC3aQB_rjqHKsgxACyUgrHzqRmMA?e=XQDeY7) | [Log](https://pjlab-my.sharepoint.cn/:u:/g/personal/wangtai_pjlab_org_cn/ET5FOsjHqOBBsGs_WHeUIpUBY-iLXeWdYPNeWZ3nh9wbYg?e=1fsirH) |
+| [Baseline](configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py) | RGB-D | 15.22  | 52.23  | 8.13  | 26.66 | [Model](https://pjlab-my.sharepoint.cn/:u:/g/personal/wangtai_pjlab_org_cn/Efl363DOsXdAiikGcHIC3aQB_rjqHKsgxACyUgrHzqRmMA?e=XQDeY7) \| [Log](https://pjlab-my.sharepoint.cn/:u:/g/personal/wangtai_pjlab_org_cn/ET5FOsjHqOBBsGs_WHeUIpUBY-iLXeWdYPNeWZ3nh9wbYg?e=1fsirH) |
 
 #### Multi-View 3D Visual Grounding
 
 | Method |AP@0.25| AP@0.5| Download |
 |:------:|:-----:|:-------:|:------:|
-| [Baseline-Mini](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof.py) | 33.59 | 14.40 | [Model](https://pjlab-my.sharepoint.cn/:u:/g/personal/wangtai_pjlab_org_cn/EbrSZQM6bLROuVdG5MgRhqABJH0Cs91vHE9B-PfjZXvE0w?e=D5wbIK) | [Log](https://pjlab-my.sharepoint.cn/:u:/g/personal/wangtai_pjlab_org_cn/EbhDHknA5nNMiBTiYZhnyCIBSZ881MJXUSfPgQGMm-spEw?e=Fp9fwZ)
+| [Baseline-Mini](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof.py) | 33.59 | 14.40 | [Model](https://pjlab-my.sharepoint.cn/:u:/g/personal/wangtai_pjlab_org_cn/EbrSZQM6bLROuVdG5MgRhqABJH0Cs91vHE9B-PfjZXvE0w?e=D5wbIK) \| [Log](https://pjlab-my.sharepoint.cn/:u:/g/personal/wangtai_pjlab_org_cn/EbhDHknA5nNMiBTiYZhnyCIBSZ881MJXUSfPgQGMm-spEw?e=Fp9fwZ) |
 | [Baseline-Mini (w/ FCAF box coder)](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof_fcaf-coder.py) | - | - | - |
 | [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | - | - | - |
 
