@@ -180,7 +180,7 @@ We provide configs for different tasks [here](configs/) and you can run the trai
 For example, to train a multi-view 3D detection model with pytorch, just run:
 
 ```bash
-python tools/train.py configs/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py --work-dir=work_dirs/mv-3ddet --launcher="pytorch"
+python tools/train.py configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py --work-dir=work_dirs/mv-3ddet --launcher="pytorch"
 ```
 
 Or on the cluster with multiple machines, run the script with the slurm launcher following the sample script provided [here](tools/mv-grounding.sh).
@@ -190,7 +190,7 @@ NOTE: To run the multi-view 3D grounding experiments, please first download the 
 To inference and evaluate the model (e.g., the checkpoint `work_dirs/mv-3ddet/epoch_12.pth`), just run the test script:
 
 ```bash
-python tools/test.py configs/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py work_dirs/mv-3ddet/epoch_12.pth --launcher="pytorch"
+python tools/test.py configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py work_dirs/mv-3ddet/epoch_12.pth --launcher="pytorch"
 ```
 
 ### Benchmark
