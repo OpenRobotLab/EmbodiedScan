@@ -135,4 +135,3 @@ demo/data
 
 # logs and checkpoints
 work_dirs/
-tools/*.sh
