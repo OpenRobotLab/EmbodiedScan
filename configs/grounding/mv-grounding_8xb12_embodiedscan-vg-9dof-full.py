@@ -139,32 +139,30 @@ train_dataloader = dict(
     sampler=dict(type='DefaultSampler', shuffle=True),
     dataset=dict(type='RepeatDataset',
                  times=1,
-                 dataset=dict(
-                     type=dataset_type,
-                     data_root=data_root,
-                     ann_file='embodiedscan_infos_train_split_filtered.pkl',
-                     vg_file='embodiedscan_train_full_vg.json',
-                     metainfo=metainfo,
-                     pipeline=train_pipeline,
-                     test_mode=False,
-                     filter_empty_gt=True,
-                     box_type_3d='Euler-Depth')))
+                 dataset=dict(type=dataset_type,
+                              data_root=data_root,
+                              ann_file='embodiedscan_infos_train.pkl',
+                              vg_file='embodiedscan_train_full_vg.json',
+                              metainfo=metainfo,
+                              pipeline=train_pipeline,
+                              test_mode=False,
+                              filter_empty_gt=True,
+                              box_type_3d='Euler-Depth')))
 
 val_dataloader = dict(batch_size=12,
                       num_workers=12,
                       persistent_workers=True,
                       drop_last=False,
                       sampler=dict(type='DefaultSampler', shuffle=False),
-                      dataset=dict(
-                          type=dataset_type,
-                          data_root=data_root,
-                          ann_file='embodiedscan_infos_val_split_filtered.pkl',
-                          vg_file='embodiedscan_val_full_vg.json',
-                          metainfo=metainfo,
-                          pipeline=test_pipeline,
-                          test_mode=True,
-                          filter_empty_gt=True,
-                          box_type_3d='Euler-Depth'))
+                      dataset=dict(type=dataset_type,
+                                   data_root=data_root,
+                                   ann_file='embodiedscan_infos_val.pkl',
+                                   vg_file='embodiedscan_val_full_vg.json',
+                                   metainfo=metainfo,
+                                   pipeline=test_pipeline,
+                                   test_mode=True,
+                                   filter_empty_gt=True,
+                                   box_type_3d='Euler-Depth'))
 test_dataloader = val_dataloader
 
 val_evaluator = dict(type='GroundingMetric')
