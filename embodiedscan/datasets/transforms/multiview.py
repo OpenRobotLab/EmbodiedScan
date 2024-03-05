@@ -55,7 +55,11 @@ class MultiViewPipeline(BaseTransform):
                 # sometimes can not get the accurate n_images in this way
                 # then take the first n_images one
                 ids = ids[:self.n_images]
-            # else: all the ids are evaluated
+            else:  # the number of images < pre-set n_images
+                # randomly select n_images ids to enable batch-wise inference
+                # In practice, can directly use the original ids to avoid
+                # redundant computation
+                ids = np.random.choice(ids, self.n_images, replace=replace)
         else:
             ids = np.random.choice(ids, self.n_images, replace=replace)
         for i in ids.tolist():

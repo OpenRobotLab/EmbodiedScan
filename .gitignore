@@ -126,6 +126,7 @@ data/scannet
 data/3rscan
 data/matterport3d
 data/*.pkl
+data/*.json
 exps/
 todo.md
 

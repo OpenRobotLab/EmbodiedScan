@@ -1,8 +1,9 @@
 from collections.abc import Sized
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
+from mmdet.models.task_modules.samplers import SamplingResult
 from mmengine.config import ConfigDict
 from mmengine.structures import BaseDataElement, InstanceData
 
@@ -189,8 +190,21 @@ class PointData(BaseDataElement):
             return 0
 
 
-SampleList = List[Det3DDataElement]
+# Type hint of config data
 ConfigType = Union[ConfigDict, dict]
+OptConfigType = Optional[ConfigType]
+
+# Type hint of one or more config data
+MultiConfig = Union[ConfigType, List[ConfigType]]
+OptMultiConfig = Optional[MultiConfig]
+
 InstanceList = List[InstanceData]
+OptInstanceList = Optional[InstanceList]
 ForwardResults = Union[Dict[str, torch.Tensor], List[Det3DDataElement],
                        Tuple[torch.Tensor], torch.Tensor]
+
+SamplingResultList = List[SamplingResult]
+
+OptSamplingResultList = Optional[SamplingResultList]
+SampleList = List[Det3DDataElement]
+OptSampleList = Optional[SampleList]
