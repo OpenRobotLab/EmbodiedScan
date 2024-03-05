@@ -25,9 +25,13 @@ data
 ├── matterport3d
 │   ├── <scene_id>
 │   ├── ...
-├── embodied_occupancy
-├── embodiedscan_infos_train_full.pkl
-├── embodiedscan_infos_val_full.pkl
+├── embodiedscan_occupancy
+├── embodiedscan_infos_train.pkl
+├── embodiedscan_infos_val.pkl
+├── embodiedscan_infos_train_full_vg.json
+├── embodiedscan_infos_val_full_vg.json
+├── embodiedscan_infos_train_mini_vg.json
+├── embodiedscan_infos_val_mini_vg.json
 ```
 
 5. Enter the project root directory, extract images by running
@@ -63,6 +67,10 @@ data
 ├── embodiedscan_occupancy
 ├── embodiedscan_infos_train_full.pkl
 ├── embodiedscan_infos_val_full.pkl
+├── embodiedscan_infos_train_full_vg.json
+├── embodiedscan_infos_val_full_vg.json
+├── embodiedscan_infos_train_mini_vg.json
+├── embodiedscan_infos_val_mini_vg.json
 ```
 
 6. Also extract EmbodiedScan occupancy annotations here by running
@@ -70,5 +78,3 @@ data
 ```bash
 python embodiedscan/converter/extract_occupancy_ann.py --src data/embodiedscan_occupancy --dst data
 ```
-
-Note: Language prompts will be released soon. Please stay tuned for the related guide.
