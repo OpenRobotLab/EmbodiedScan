@@ -109,6 +109,8 @@ class SparseFeatureFusionSingleStage3DDetector(BaseModel):
         points = batch_inputs_dict['points']
 
         # construct sparse tensor and features
+        # coordinates shape: (N, D+1), features shape: (N, F)
+        # N is the total point number in the batch
         if self.use_xyz_feat:
             coordinates, features = ME.utils.batch_sparse_collate(
                 [(p[:, :3] / self.voxel_size, p) for p in points],
@@ -120,7 +122,7 @@ class SparseFeatureFusionSingleStage3DDetector(BaseModel):
 
         x = ME.SparseTensor(coordinates=coordinates, features=features)
         x = self.backbone_lidar(x)
-        num_levels = len(x)
+        num_levels = len(x)  # 4 levels
         num_samples = len(x[0].decomposed_coordinates)
 
         # extract img features
@@ -188,6 +190,8 @@ class SparseFeatureFusionSingleStage3DDetector(BaseModel):
                 proj_mat = points.new_tensor(proj_mat)
                 points_imgfeats = []
                 for level_idx in range(num_levels):
+                    # get the corresponding voxel coordinates
+                    # and * voxel_size to get the absolute positions
                     point = x[level_idx].decomposed_coordinates[
                         idx] * self.voxel_size
                     points_imgfeat = point_sample(

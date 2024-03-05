@@ -14,7 +14,7 @@ from mmengine.logging import MMLogger, print_log
 from embodiedscan.registry import METRICS
 from embodiedscan.structures import get_box_type
 
-from .indoor_eval import indoor_eval
+from ..indoor_eval import indoor_eval
 
 
 @METRICS.register_module()

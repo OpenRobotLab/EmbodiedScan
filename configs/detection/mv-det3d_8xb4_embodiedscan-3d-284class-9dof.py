@@ -15,13 +15,12 @@ backend_args = None
 #     }))
 
 model = dict(
-    type='Embodied3DDetector',
+    type='SparseFeatureFusionSingleStage3DDetector',
     data_preprocessor=dict(type='Det3DDataPreprocessor',
                            mean=[123.675, 116.28, 103.53],
                            std=[58.395, 57.12, 57.375],
                            bgr_to_rgb=True,
-                           pad_size_divisor=32,
-                           batchwise_inputs=True),
+                           pad_size_divisor=32),
     backbone=dict(
         type='mmdet.ResNet',
         depth=50,
@@ -39,7 +38,7 @@ model = dict(
                    in_channels=(128, 256, 512, 1024),
                    out_channels=128,
                    voxel_size=.01,
-                   pts_prune_threshold=20000,
+                   pts_prune_threshold=100000,
                    pts_assign_threshold=27,
                    pts_center_threshold=18,
                    num_classes=284,
@@ -133,9 +132,9 @@ metainfo = dict(classes=class_names,
                 box_type_3d='euler-depth')
 
 train_pipeline = [
-    dict(type='LoadAnnotations3D', with_visible_instance_masks=True),
+    dict(type='LoadAnnotations3D'),
     dict(type='MultiViewPipeline',
-         n_images=10,
+         n_images=20,
          transforms=[
              dict(type='LoadImageFromFile', backend_args=backend_args),
              dict(type='LoadDepthFromFile', backend_args=backend_args),
@@ -143,9 +142,8 @@ train_pipeline = [
              dict(type='PointSample', num_points=n_points // 10),
              dict(type='Resize', scale=(480, 480), keep_ratio=False)
          ]),
-    dict(type='AggregateMultiViewPoints', coord_type='DEPTH',
-         save_slices=True),
-    # dict(type='PointSample', num_points=n_points),
+    dict(type='AggregateMultiViewPoints', coord_type='DEPTH'),
+    dict(type='PointSample', num_points=n_points),
     dict(
         type='RandomFlip3D',
         sync_2d=False,
@@ -157,12 +155,11 @@ train_pipeline = [
          scale_ratio_range=[.9, 1.1],
          translation_std=[.1, .1, .1],
          shift_height=False),
-    dict(type='ConstructMultiSweeps'),
     dict(type='Pack3DDetInputs',
          keys=['img', 'points', 'gt_bboxes_3d', 'gt_labels_3d'])
 ]
 test_pipeline = [
-    dict(type='LoadAnnotations3D', with_visible_instance_masks=True),
+    dict(type='LoadAnnotations3D'),
     dict(type='MultiViewPipeline',
          n_images=50,
          ordered=True,
@@ -173,30 +170,28 @@ test_pipeline = [
              dict(type='PointSample', num_points=n_points // 10),
              dict(type='Resize', scale=(480, 480), keep_ratio=False)
          ]),
-    dict(type='AggregateMultiViewPoints', coord_type='DEPTH',
-         save_slices=True),
-    dict(type='ConstructMultiSweeps'),
+    dict(type='AggregateMultiViewPoints', coord_type='DEPTH'),
+    dict(type='PointSample', num_points=n_points),
     dict(type='Pack3DDetInputs',
          keys=['img', 'points', 'gt_bboxes_3d', 'gt_labels_3d'])
 ]
 
 # TODO: to determine a reasonable batch size
 train_dataloader = dict(
-    batch_size=1,
-    num_workers=1,
+    batch_size=4,
+    num_workers=4,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
     dataset=dict(type='RepeatDataset',
-                 times=8,
+                 times=10,
                  dataset=dict(type=dataset_type,
                               data_root=data_root,
-                              ann_file='embodiedscan_infos_train_full.pkl',
+                              ann_file='embodiedscan_infos_train.pkl',
                               pipeline=train_pipeline,
                               test_mode=False,
                               filter_empty_gt=True,
                               box_type_3d='Euler-Depth',
-                              metainfo=metainfo,
-                              remove_dontcare=True)))
+                              metainfo=metainfo)))
 
 val_dataloader = dict(batch_size=1,
                       num_workers=1,
@@ -205,26 +200,25 @@ val_dataloader = dict(batch_size=1,
                       sampler=dict(type='DefaultSampler', shuffle=False),
                       dataset=dict(type=dataset_type,
                                    data_root=data_root,
-                                   ann_file='embodiedscan_infos_val_full.pkl',
+                                   ann_file='embodiedscan_infos_val.pkl',
                                    pipeline=test_pipeline,
                                    test_mode=True,
                                    filter_empty_gt=True,
                                    box_type_3d='Euler-Depth',
-                                   metainfo=metainfo,
-                                   remove_dontcare=True))
+                                   metainfo=metainfo))
 test_dataloader = val_dataloader
 
-val_evaluator = dict(type='IndoorDetMetric', batchwise_anns=True)
+val_evaluator = dict(type='IndoorDetMetric')
 test_evaluator = val_evaluator
 
 # training schedule for 1x
-train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=12, val_interval=12)
+train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=12, val_interval=1)
 val_cfg = dict(type='ValLoop')
 test_cfg = dict(type='TestLoop')
 
 optim_wrapper = dict(type='OptimWrapper',
                      optimizer=dict(type='AdamW',
-                                    lr=0.0002,
+                                    lr=0.001,
                                     weight_decay=0.0001),
                      clip_grad=dict(max_norm=10, norm_type=2))
 
