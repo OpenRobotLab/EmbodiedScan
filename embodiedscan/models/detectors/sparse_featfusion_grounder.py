@@ -553,7 +553,7 @@ class SparseFeatureFusion3DGrounder(BaseModel):
             # (1, max_text_length)
             data_samples.gt_instances_3d.text_token_mask = \
                 text_token_mask.unsqueeze(0).repeat(
-                    len(positive_maps), 1)
+                    len(positive_maps[i]), 1)
 
         head_inputs_dict = self.forward_transformer(point_feats, scores,
                                                     point_xyz, text_dict,

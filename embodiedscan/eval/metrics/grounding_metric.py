@@ -160,15 +160,24 @@ class GroundingMetric(BaseMetric):
         """
         logger: MMLogger = MMLogger.get_current_instance()  # noqa
         annotations, preds = zip(*results)
-        import pdb
-        pdb.set_trace()
+        # import pdb
+        # pdb.set_trace()
         ret_dict = {}
         if self.format_only:
             # preds is a list of dict
-            for pre in preds:
+            results = []
+            for pred in preds:
+                result = dict()
                 # convert the Euler boxes to the numpy array to save
-                pred['bboxes_3d'] = pred['bboxes_3d'].tensor.numpy()
-            mmengine.dump(preds, os.path.join(self.result_dir, 'test_results.json'))
+                bboxes_3d = pred['bboxes_3d'].tensor
+                scores_3d = pred['scores_3d']
+                box_index = scores_3d.argsort(dim=-1, descending=True)[:20]
+                top_bboxes_3d = bboxes_3d[box_index]
+                top_scores_3d = scores_3d[box_index]
+                result['bboxes_3d'] = top_bboxes_3d.numpy()
+                result['scores_3d'] = top_scores_3d.numpy()
+                results.append(result)
+            mmengine.dump(results, os.path.join(self.result_dir, 'test_results.json'))
             return ret_dict
 
         ret_dict = self.ground_eval(annotations, preds)
