@@ -38,7 +38,7 @@ def ground_eval(gt_annos, det_annos, iou_thr):
         for sample_id in range(len(det_annos)):
             det_anno = det_annos[sample_id]
             gt_anno = gt_annos[sample_id]['ann_info']
-            target_scores = det_anno['target_scores_3d']  # (num_query, )
+            # target_scores = det_anno['target_scores_3d']  # (num_query, )
             scores = det_anno['scores_3d']  # (num_query, )
 
             bboxes = det_anno['bboxes_3d']
