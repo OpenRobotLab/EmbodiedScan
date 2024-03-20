@@ -1,6 +1,8 @@
 # Copyright (c) OpenRobotLab. All rights reserved.
+import os
 from typing import Dict, List, Optional, Sequence
 
+import mmengine
 from mmengine.evaluator import BaseMetric
 from mmengine.logging import MMLogger, print_log
 from terminaltables import AsciiTable
@@ -30,10 +32,15 @@ class GroundingMetric(BaseMetric):
     def __init__(self,
                  iou_thr: List[float] = [0.25, 0.5],
                  collect_device: str = 'cpu',
-                 prefix: Optional[str] = None) -> None:
+                 prefix: Optional[str] = None,
+                 format_only=False,
+                 result_dir='') -> None:
         super(GroundingMetric, self).__init__(prefix=prefix,
                                               collect_device=collect_device)
         self.iou_thr = [iou_thr] if isinstance(iou_thr, float) else iou_thr
+        self.prefix = prefix
+        self.format_only = format_only
+        self.result_dir = result_dir
 
     def process(self, data_batch: dict, data_samples: Sequence[dict]) -> None:
         """Process one batch of data samples and predictions.
@@ -153,6 +160,12 @@ class GroundingMetric(BaseMetric):
         """
         logger: MMLogger = MMLogger.get_current_instance()  # noqa
         annotations, preds = zip(*results)
+        import pdb
+        pdb.set_trace()
+        ret_dict = {}
+        if self.format_only:
+            mmengine.dump(preds, os.path.join(self.result_dir, 'results.pkl'))
+            return ret_dict
 
         ret_dict = self.ground_eval(annotations, preds)
 

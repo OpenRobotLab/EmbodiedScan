@@ -510,7 +510,6 @@ class GroundingHead(BaseModule):
             data_samples.gt_instances_3d.positive_maps
             for data_samples in batch_data_samples
         ]
-        batch_token_positive_maps = None
 
         outs = self(hidden_states, text_feats, text_token_mask)
 
@@ -519,17 +518,14 @@ class GroundingHead(BaseModule):
             all_layers_pred_bboxes,
             batch_input_metas=batch_input_metas,
             batch_gt_bboxes_3d=batch_gt_bboxes_3d,
-            batch_positive_maps=batch_positive_maps,
-            batch_token_positive_maps=batch_token_positive_maps)
+            batch_positive_maps=batch_positive_maps)
         return predictions
 
-    def predict_by_feat(self,
-                        all_layers_cls_scores: Tensor,
+    def predict_by_feat(self, all_layers_cls_scores: Tensor,
                         all_layers_pred_bboxes: Tensor,
                         batch_input_metas: List[Dict],
                         batch_gt_bboxes_3d: List,
-                        batch_positive_maps: List,
-                        batch_token_positive_maps=None) -> InstanceList:
+                        batch_positive_maps: List) -> InstanceList:
         """Transform a batch of output features extracted from the head into
         bbox results.
 
@@ -541,8 +537,7 @@ class GroundingHead(BaseModule):
                 layers. Each is a 12-tensor with shape (num_decoder_layers, bs,
                 num_queries, reg_num).
             batch_input_metas (List[Dict]): _description_
-            batch_token_positive_maps (list[dict], Optional): Batch token
-                positive map. Defaults to None.  Actually batch_data_samples
+            batch_positive_maps (list[dict], Optional): Batch positive map.
 
         Returns:
             list[:obj:`InstanceData`]: Object detection results of each image
@@ -596,16 +591,17 @@ class GroundingHead(BaseModule):
         assert len(cls_score) == len(bbox_pred)  # num_queries
 
         cls_score = cls_score.sigmoid()  # (num_query, self.max_text_len 256)
-        target_token_maps = positive_maps.squeeze(0) > 0
-        # (num_query, num_target_tokens)
-        target_cls_score = cls_score[:, target_token_maps]
         scores, _ = cls_score.max(-1)
-        target_scores = target_cls_score.sum(-1)
+        # target_token_maps = positive_maps.squeeze(0) > 0
+        # (num_query, num_target_tokens)
+        # target_cls_score = cls_score[:, target_token_maps]
+        # target_scores = target_cls_score.sum(-1)
 
         results = InstanceData()
         results.bboxes_3d = EulerDepthInstance3DBoxes(bbox_pred)
         results.scores_3d = scores
-        results.target_scores_3d = target_scores
+        # results.target_scores_3d = target_scores
+        results.target_scores_3d = scores
 
         return results
 

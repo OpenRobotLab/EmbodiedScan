@@ -144,13 +144,6 @@ class MultiView3DGroundingDataset(BaseDataset):
             if metainfo['classes'] == 'all':
                 metainfo['classes'] = list(self.METAINFO['classes'])
 
-        self.det3d_valid_id2label = np.zeros(
-            max(self.METAINFO['valid_class_ids']) + 1, dtype=np.int64)
-        for _ in range(self.det3d_valid_id2label.shape[0]):
-            self.det3d_valid_id2label[_] = -1
-        for cls_idx, cat_id in enumerate(self.METAINFO['valid_class_ids']):
-            self.det3d_valid_id2label[cat_id] = cls_idx
-
         self.box_type_3d, self.box_mode_3d = get_box_type(box_type_3d)
         self.filter_empty_gt = filter_empty_gt
         self.remove_dontcare = remove_dontcare
@@ -295,10 +288,10 @@ class MultiView3DGroundingDataset(BaseDataset):
         # language_infos = [
         #     {
         #         'scan_id': anno['scan_id'],
-        #         'target_id': int(anno['target_id']),
-        #         'distractor_ids': anno['distractor_ids'],
         #         'text': anno['text'],
-        #         'tokens_positive': anno['tokens_positive']
+        #         'target_id': int(anno['target_id']), (training)
+        #         'distractor_ids': anno['distractor_ids'], (training)
+        #         'tokens_positive': anno['tokens_positive'] (training)
         #     }
         #     for anno in language_annotations
         # ]
@@ -309,10 +302,7 @@ class MultiView3DGroundingDataset(BaseDataset):
             language_info = dict()
             language_info.update({
                 'scan_id': anno['scan_id'],
-                'target_id': int(anno['target_id']),
-                'distractor_ids': anno['distractor_ids'],
-                'text': anno['text'],
-                'tokens_positive': anno['tokens_positive']
+                'text': anno['text']
             })
             data = self.scans[language_info['scan_id']]
             language_info['axis_align_matrix'] = data['axis_align_matrix']
@@ -326,26 +316,42 @@ class MultiView3DGroundingDataset(BaseDataset):
             language_info['depth_cam2img'] = data['depth_cam2img']
 
             ann_info = data['ann_info']
-            object_ids = ann_info['bbox_id']  # numpy array
-            labels = ann_info['gt_labels_3d']  # all box labels in the scan
-            bboxes = ann_info['gt_bboxes_3d']  # BaseInstanceBboxes
-            # obtain all objects sharing the same category with
-            # the target object, the num of such objects <= 32
-            object_ind = np.where(object_ids == language_info['target_id'])[0]
-            if len(object_ind) != 1:
-                continue
+
             # save the bounding boxes and corresponding labels
             language_anno_info = dict()
-            language_anno_info['gt_bboxes_3d'] = bboxes[object_ind]
-            language_anno_info['gt_labels_3d'] = labels[object_ind]
-            # the 'distractor_ids' starts from 1, not 0
             language_anno_info['is_view_dep'] = self._is_view_dep(
                 language_info['text'])
-            language_anno_info['is_hard'] = len(
-                language_info['distractor_ids']
-            ) > 3  # more than three distractors
-            language_anno_info['is_unique'] = len(
-                language_info['distractor_ids']) == 0
+            labels = ann_info['gt_labels_3d']  # all box labels in the scan
+            bboxes = ann_info['gt_bboxes_3d']  # BaseInstanceBboxes
+            if 'target_id' in anno:  # w/ ground truths
+                language_info.update({'target_id': int(anno['target_id'])})
+                # obtain all objects sharing the same category with
+                # the target object, the num of such objects <= 32
+                object_ids = ann_info['bbox_id']  # numpy array
+                object_ind = np.where(
+                    object_ids == language_info['target_id'])[0]
+                if len(object_ind) != 1:
+                    continue
+                language_anno_info['gt_bboxes_3d'] = bboxes[object_ind]
+                language_anno_info['gt_labels_3d'] = labels[object_ind]
+                # include other optional keys
+                optional_keys = ['distractor_ids', 'tokens_positive']
+                for key in optional_keys:
+                    if key in anno:
+                        language_info.update({key: anno[key]})
+                # the 'distractor_ids' starts from 1, not 0
+                language_anno_info['is_hard'] = len(
+                    language_info['distractor_ids']
+                ) > 3  # more than three distractors
+                language_anno_info['is_unique'] = len(
+                    language_info['distractor_ids']) == 0
+            else:
+                # inference w/o gt, assign the placeholder gt_boxes and labels
+                language_anno_info['gt_bboxes_3d'] = bboxes
+                language_anno_info['gt_labels_3d'] = labels
+                # placeholder value for 'is_hard' and 'is_unique'
+                language_anno_info['is_hard'] = False
+                language_anno_info['is_unique'] = False
 
             if not self.test_mode:
                 language_info['ann_info'] = language_anno_info
@@ -430,70 +436,51 @@ class MultiView3DGroundingDataset(BaseDataset):
         Returns:
             dict: Processed `ann_info`.
         """
-        for instance in info['instances']:
-            if instance['bbox_label_3d'] < self.det3d_valid_id2label.shape[0]:
-                value = self.det3d_valid_id2label[instance['bbox_label_3d']]
-                if value < 0:
-                    raise Exception('Class out of range')
-                instance['bbox_label_3d'] = value
+        ann_info = None
+
+        if 'instances' in info and len(info['instances']) > 0:
+            # add s or gt prefix for most keys after concat
+            # we only process 3d annotations here, the corresponding
+            # 2d annotation process is in the `LoadAnnotations3D`
+            # in `transforms`
+            name_mapping = {
+                'bbox_label_3d': 'gt_labels_3d',
+                'bbox_label': 'gt_bboxes_labels',
+                'bbox': 'gt_bboxes',
+                'bbox_3d': 'gt_bboxes_3d',
+                'depth': 'depths',
+                'center_2d': 'centers_2d',
+                'attr_label': 'attr_labels',
+                'velocity': 'velocities',
+            }
+            instances = info['instances']
+            # empty gt
+            if len(instances) == 0:
+                return None
             else:
-                raise Exception('Class out of range')
+                keys = list(instances[0].keys())
+                ann_info = dict()
+                for ann_name in keys:
+                    temp_anns = [item[ann_name] for item in instances]
+                    # map the original dataset label to training label
+                    if 'label' in ann_name and ann_name != 'attr_label':
+                        temp_anns = [
+                            self.label_mapping[item] for item in temp_anns
+                        ]
+                    if ann_name in name_mapping:
+                        mapped_ann_name = name_mapping[ann_name]
+                    else:
+                        mapped_ann_name = ann_name
 
-        # ann_info = None
-        # if 'instances' in info and len(info['instances']) > 0:
-        #     ann_info = dict(
-        #         gt_bboxes_3d=np.zeros((len(info['instances']), 9),
-        #                               dtype=np.float32),
-        #         gt_labels_3d=np.zeros((len(info['instances']), ),
-        #                               dtype=np.int64),
-        #     )
-        #     for idx, instance in enumerate(info['instances']):
-        #         ann_info['gt_bboxes_3d'][idx] = instance['bbox_3d']
-        #         ann_info['gt_labels_3d'][idx] = self.label_mapping[
-        #             instance['bbox_label_3d']]
+                    if 'label' in ann_name:
+                        temp_anns = np.array(temp_anns).astype(np.int64)
+                    elif ann_name in name_mapping:
+                        temp_anns = np.array(temp_anns).astype(np.float32)
+                    else:
+                        temp_anns = np.array(temp_anns)
 
-        # add s or gt prefix for most keys after concat
-        # we only process 3d annotations here, the corresponding
-        # 2d annotation process is in the `LoadAnnotations3D`
-        # in `transforms`
-        name_mapping = {
-            'bbox_label_3d': 'gt_labels_3d',
-            'bbox_label': 'gt_bboxes_labels',
-            'bbox': 'gt_bboxes',
-            'bbox_3d': 'gt_bboxes_3d',
-            'depth': 'depths',
-            'center_2d': 'centers_2d',
-            'attr_label': 'attr_labels',
-            'velocity': 'velocities',
-        }
-        instances = info['instances']
-        # empty gt
-        if len(instances) == 0:
-            return None
-        else:
-            keys = list(instances[0].keys())
-            ann_info = dict()
-            for ann_name in keys:
-                temp_anns = [item[ann_name] for item in instances]
-                # map the original dataset label to training label
-                if 'label' in ann_name and ann_name != 'attr_label':
-                    temp_anns = [
-                        self.label_mapping[item] for item in temp_anns
-                    ]
-                if ann_name in name_mapping:
-                    mapped_ann_name = name_mapping[ann_name]
-                else:
-                    mapped_ann_name = ann_name
-
-                if 'label' in ann_name:
-                    temp_anns = np.array(temp_anns).astype(np.int64)
-                elif ann_name in name_mapping:
-                    temp_anns = np.array(temp_anns).astype(np.float32)
-                else:
-                    temp_anns = np.array(temp_anns)
-
-                ann_info[mapped_ann_name] = temp_anns
-            ann_info['instances'] = info['instances']
+                    ann_info[mapped_ann_name] = temp_anns
+                ann_info['instances'] = info['instances']
 
         if ann_info is None:
             ann_info = dict()

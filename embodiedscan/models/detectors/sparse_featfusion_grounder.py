@@ -27,61 +27,6 @@ from embodiedscan.utils.typing_config import (ForwardResults, InstanceList,
                                               OptSampleList, SampleList)
 
 
-def create_positive_map(tokenized,
-                        tokens_positive: list,
-                        max_num_entities: int = 256) -> Tensor:
-    """construct a map such that positive_map[i,j] = True
-    if box i is associated to token j
-
-    Args:
-        tokenized: The tokenized input.
-        tokens_positive (list): A list of token ranges
-            associated with positive boxes.
-        max_num_entities (int, optional): The maximum number of entities.
-            Defaults to 256.
-
-    Returns:
-        torch.Tensor: The positive map.
-
-    Raises:
-        Exception: If an error occurs during token-to-char mapping.
-    """
-    # max number of tokens
-    positive_map = torch.zeros((len(tokens_positive), max_num_entities),
-                               dtype=torch.float)
-
-    for j, tok_list in enumerate(tokens_positive):
-        for (beg, end) in tok_list:
-            try:
-                beg_pos = tokenized.char_to_token(beg)
-                end_pos = tokenized.char_to_token(end - 1)
-            except Exception as e:
-                print('beg:', beg, 'end:', end)
-                print('token_positive:', tokens_positive)
-                raise e
-            if beg_pos is None:
-                try:
-                    beg_pos = tokenized.char_to_token(beg + 1)
-                    if beg_pos is None:
-                        beg_pos = tokenized.char_to_token(beg + 2)
-                except Exception:
-                    beg_pos = None
-            if end_pos is None:
-                try:
-                    end_pos = tokenized.char_to_token(end - 2)
-                    if end_pos is None:
-                        end_pos = tokenized.char_to_token(end - 3)
-                except Exception:
-                    end_pos = None
-            if beg_pos is None or end_pos is None:
-                continue
-
-            assert beg_pos is not None and end_pos is not None
-            positive_map[j, beg_pos:end_pos + 1].fill_(1)
-    # softmax for tokens to ensure the sum <= 1
-    return positive_map / (positive_map.sum(-1)[:, None] + 1e-6)
-
-
 @MODELS.register_module()
 class SparseFeatureFusion3DGrounder(BaseModel):
     """SparseFusionSingleStage3DDetector.
@@ -90,6 +35,8 @@ class SparseFeatureFusion3DGrounder(BaseModel):
         backbone (dict): Config dict of detector's backbone.
         neck (dict, optional): Config dict of neck. Defaults to None.
         bbox_head (dict, optional): Config dict of box head. Defaults to None.
+        max_num_entities (int, optional): The maximum number of entities.
+            Defaults to 256.
         train_cfg (dict, optional): Config dict of training hyper-parameters.
             Defaults to None.
         test_cfg (dict, optional): Config dict of test hyper-parameters.
@@ -112,6 +59,7 @@ class SparseFeatureFusion3DGrounder(BaseModel):
                  decoder: ConfigType = None,
                  voxel_size: float = 0.01,
                  num_queries: int = 512,
+                 max_num_entities: int = 256,
                  coord_type: str = 'CAMERA',
                  train_cfg: OptConfigType = None,
                  test_cfg: OptConfigType = None,
@@ -136,6 +84,7 @@ class SparseFeatureFusion3DGrounder(BaseModel):
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
         self.num_queries = num_queries
+        self.max_num_entities = max_num_entities
         if ME is None:
             raise ImportError(
                 'Please follow `getting_started.md` to install MinkowskiEngine.`'  # noqa: E501
@@ -563,10 +512,6 @@ class SparseFeatureFusion3DGrounder(BaseModel):
             data_samples.text for data_samples in batch_data_samples
         ]  # txt list
 
-        tokens_positive = [
-            data_samples.tokens_positive for data_samples in batch_data_samples
-        ]
-
         point_feats, scores, point_xyz = self.extract_feat(
             batch_inputs_dict, batch_data_samples)
 
@@ -574,7 +519,23 @@ class SparseFeatureFusion3DGrounder(BaseModel):
         tokenized = self.tokenizer.batch_encode_plus(
             text_prompts, padding='longest',
             return_tensors='pt').to(batch_inputs_dict['points'][0].device)
+
+        # import pdb
+        # pdb.set_trace()
+        if 'tokens_positive' in batch_data_samples[0]:
+            tokens_positive = [
+                data_samples.tokens_positive
+                for data_samples in batch_data_samples
+            ]
+        else:
+            # hack a pseudo tokens_positive
+            tokens_positive = [[0, 1] for _ in range(len(batch_data_samples))]
         positive_maps = self.get_positive_map(tokenized, tokens_positive)
+        positive_maps = [
+            positive_map.to(batch_inputs_dict['points']
+                            [0].device).bool().float().unsqueeze(0)
+            for positive_map in positive_maps
+        ]  # each positive_map: (1, max_text_length)
 
         encoded_text = self.text_encoder(**tokenized)
         text_feats = self.text_feat_map(encoded_text.last_hidden_state)
@@ -586,16 +547,13 @@ class SparseFeatureFusion3DGrounder(BaseModel):
         # because its the opposite in pytorch transformer
         # text_dict['tokenized'] = tokenized
         for i, data_samples in enumerate(batch_data_samples):
-            positive_map = positive_maps[i].to(
-                batch_inputs_dict['points']
-                [0].device).bool().float().unsqueeze(0)  # (1, max_text_length)
             text_token_mask = text_dict['text_token_mask'][
                 i]  # (max_text_length)
-            data_samples.gt_instances_3d.positive_maps = positive_map
+            data_samples.gt_instances_3d.positive_maps = positive_maps[i]
             # (1, max_text_length)
             data_samples.gt_instances_3d.text_token_mask = \
                 text_token_mask.unsqueeze(0).repeat(
-                    len(positive_map), 1)
+                    len(positive_maps), 1)
 
         head_inputs_dict = self.forward_transformer(point_feats, scores,
                                                     point_xyz, text_dict,
@@ -608,9 +566,7 @@ class SparseFeatureFusion3DGrounder(BaseModel):
             data_sample.pred_instances_3d = pred_instances_3d
         return batch_data_samples
 
-    def create_positive_map(tokenized,
-                            tokens_positive: list,
-                            max_num_entities: int = 256) -> Tensor:
+    def create_positive_map(self, tokenized, tokens_positive: list) -> Tensor:
         """construct a map such that positive_map[i,j] = True
         if box i is associated to token j
 
@@ -618,8 +574,6 @@ class SparseFeatureFusion3DGrounder(BaseModel):
             tokenized: The tokenized input.
             tokens_positive (list): A list of token ranges
                 associated with positive boxes.
-            max_num_entities (int, optional): The maximum number of entities.
-                Defaults to 256.
 
         Returns:
             torch.Tensor: The positive map.
@@ -628,8 +582,8 @@ class SparseFeatureFusion3DGrounder(BaseModel):
             Exception: If an error occurs during token-to-char mapping.
         """
         # max number of tokens
-        positive_map = torch.zeros((len(tokens_positive), max_num_entities),
-                                   dtype=torch.float)
+        positive_map = torch.zeros(
+            (len(tokens_positive), self.max_num_entities), dtype=torch.float)
 
         for j, tok_list in enumerate(tokens_positive):
             for (beg, end) in tok_list:
@@ -663,9 +617,7 @@ class SparseFeatureFusion3DGrounder(BaseModel):
         return positive_map / (positive_map.sum(-1)[:, None] + 1e-6)
 
     def get_positive_map(self, tokenized, tokens_positive):
-        positive_map = create_positive_map(tokenized,
-                                           tokens_positive,
-                                           max_num_entities=256)
+        positive_map = self.create_positive_map(tokenized, tokens_positive)
         return positive_map
 
     def forward(self,
