@@ -164,7 +164,11 @@ class GroundingMetric(BaseMetric):
         pdb.set_trace()
         ret_dict = {}
         if self.format_only:
-            mmengine.dump(preds, os.path.join(self.result_dir, 'results.pkl'))
+            # preds is a list of dict
+            for pre in preds:
+                # convert the Euler boxes to the numpy array to save
+                pred['bboxes_3d'] = pred['bboxes_3d'].tensor.numpy()
+            mmengine.dump(preds, os.path.join(self.result_dir, 'test_results.json'))
             return ret_dict
 
         ret_dict = self.ground_eval(annotations, preds)

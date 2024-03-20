@@ -529,7 +529,7 @@ class SparseFeatureFusion3DGrounder(BaseModel):
             ]
         else:
             # hack a pseudo tokens_positive
-            tokens_positive = [[0, 1] for _ in range(len(batch_data_samples))]
+            tokens_positive = [[[0, 1]] for _ in range(len(batch_data_samples))]
         positive_maps = self.get_positive_map(tokenized, tokens_positive)
         positive_maps = [
             positive_map.to(batch_inputs_dict['points']
