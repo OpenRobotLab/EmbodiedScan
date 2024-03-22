@@ -143,7 +143,7 @@ We provide a simple tutorial [here](https://github.com/OpenRobotLab/EmbodiedScan
 
 ### Demo Inference
 
-We provide a demo for running EmbodiedScan's model on a sample scan. Please refer to the [notebook](demo/demo.ipynb) for more details.
+We provide a demo for running EmbodiedScan's model on a sample scan. Please download the raw dara from [Google Drive](https://drive.google.com/file/d/1nXIbH56TmIoEVv1AML7mZS0szTR5HgNC/view?usp=sharing) or [BaiduYun](https://pan.baidu.com/s/1GK9Z4M-VbRSMWErB39QGpg?pwd=v5w1) and refer to the [notebook](demo/demo.ipynb) for more details.
 
 ## 📦 Model and Benchmark
 
