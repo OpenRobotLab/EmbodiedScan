@@ -8,7 +8,7 @@
     <a href='https://runsenxu.com/' target='_blank'>Runsen Xu</a>&emsp;
     <a href='https://openreview.net/profile?id=~Ruiyuan_Lyu1' target='_blank'>Ruiyuan Lyu</a>&emsp;
     <a href='https://openreview.net/profile?id=~Peisen_Li1' target='_blank'>Peisen Li</a>&emsp;
-    <a href='https://xiao-chen.info/' target='_blank'>Xiao Chen</a>&emsp;
+    <a href='https://xiao-chen.tech/' target='_blank'>Xiao Chen</a>&emsp;
     <br>
     <a href='http://zhangwenwei.cn/' target='_blank'>Wenwei Zhang</a>&emsp;
     <a href='https://chenkai.site/' target='_blank'>Kai Chen</a>&emsp;
@@ -143,7 +143,7 @@ We provide a simple tutorial [here](https://github.com/OpenRobotLab/EmbodiedScan
 
 ### Demo Inference
 
-We provide a demo for running EmbodiedScan's model on a sample scan. Please download the raw dara from [Google Drive](https://drive.google.com/file/d/1nXIbH56TmIoEVv1AML7mZS0szTR5HgNC/view?usp=sharing) or [BaiduYun](https://pan.baidu.com/s/1GK9Z4M-VbRSMWErB39QGpg?pwd=v5w1) and refer to the [notebook](demo/demo.ipynb) for more details.
+We provide a demo for running EmbodiedScan's model on a sample scan. Please download the raw data from [Google Drive](https://drive.google.com/file/d/1nXIbH56TmIoEVv1AML7mZS0szTR5HgNC/view?usp=sharing) or [BaiduYun](https://pan.baidu.com/s/1GK9Z4M-VbRSMWErB39QGpg?pwd=v5w1) and refer to the [notebook](demo/demo.ipynb) for more details.
 
 ## 📦 Model and Benchmark
 
