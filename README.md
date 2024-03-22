@@ -143,7 +143,7 @@ We provide a simple tutorial [here](https://github.com/OpenRobotLab/EmbodiedScan
 
 ### Demo Inference
 
-We provide a demo for running EmbodiedScan's model on a sample scan. Please refer to the [notebook](demo/demo.ipynb) for more details.
+We provide a demo for running EmbodiedScan's model on a sample scan. Please download the raw dara from [Google Drive](https://drive.google.com/file/d/1nXIbH56TmIoEVv1AML7mZS0szTR5HgNC/view?usp=sharing) or [BaiduYun](https://pan.baidu.com/s/1GK9Z4M-VbRSMWErB39QGpg?pwd=v5w1) and refer to the [notebook](demo/demo.ipynb) for more details.
 
 ## 📦 Model and Benchmark
 
@@ -203,13 +203,13 @@ Note that the performance is a little different from the results provided in the
 
 | Method | Input | AP@0.25 | AR@0.25 | AP@0.5 | AR@0.5 | Download |
 |:------:|:-----:|:-------:|:-------:|:------:|:------:|:------:|
-| [Baseline](configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py) | RGB-D | 15.22  | 52.23  | 8.13  | 26.66 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-3ddet.pth) \| [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-3ddet.log) |
+| [Baseline](configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py) | RGB-D | 15.22  | 52.23  | 8.13  | 26.66 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-3ddet.pth), [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-3ddet.log) |
 
 #### Multi-View 3D Visual Grounding
 
 | Method |AP@0.25| AP@0.5| Download |
 |:------:|:-----:|:-------:|:------:|
-| [Baseline-Mini](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof.py) | 33.59 | 14.40 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding.pth) \| [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding.log) |
+| [Baseline-Mini](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof.py) | 33.59 | 14.40 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding.pth), [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding.log) |
 | [Baseline-Mini (w/ FCAF box coder)](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof_fcaf-coder.py) | - | - | - |
 | [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | - | - | - |
 
