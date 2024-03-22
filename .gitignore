@@ -136,3 +136,7 @@ demo/data
 # logs and checkpoints
 work_dirs/
 tools/*.sh
+
+# test submission results
+*.pkl
+*.json
