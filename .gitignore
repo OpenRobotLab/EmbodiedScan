@@ -126,8 +126,13 @@ data/scannet
 data/3rscan
 data/matterport3d
 data/*.pkl
+data/*.json
 exps/
 todo.md
 
 # demo data
 demo/data
+
+# logs and checkpoints
+work_dirs/
+tools/*.sh

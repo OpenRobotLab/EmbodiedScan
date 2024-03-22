@@ -9,9 +9,9 @@ Detailed steps are shown as follows.
 
 3. Download Matterport3D data [HERE](https://github.com/niessner/Matterport). Link or move the folder to this level of directory.
 
-4. Download EmbodiedScan data and extract here. Currently, please contact [openrobotlab.contact@pjlab.org.cn](openrobotlab.contact@pjlab.org.cn) for downloading the detection and occupancy annotations.
+4. Download EmbodiedScan data and extract it here. Currently, please fill in the [form](https://docs.google.com/forms/d/e/1FAIpQLScUXEDTksGiqHZp31j7Zp7zlCNV7p_08uViwP_Nbzfn3g6hhw/viewform?usp=sf_link), and we will reply with the data download link.
 
-The directory structure should be as below
+The directory structure should be as below.
 
 ```
 data
@@ -25,9 +25,13 @@ data
 ├── matterport3d
 │   ├── <scene_id>
 │   ├── ...
-├── embodied_occupancy
-├── embodiedscan_infos_train_full.pkl
-├── embodiedscan_infos_val_full.pkl
+├── embodiedscan_occupancy
+├── embodiedscan_infos_train.pkl
+├── embodiedscan_infos_val.pkl
+├── embodiedscan_infos_train_full_vg.json
+├── embodiedscan_infos_val_full_vg.json
+├── embodiedscan_infos_train_mini_vg.json
+├── embodiedscan_infos_val_mini_vg.json
 ```
 
 5. Enter the project root directory, extract images by running
@@ -63,6 +67,10 @@ data
 ├── embodiedscan_occupancy
 ├── embodiedscan_infos_train_full.pkl
 ├── embodiedscan_infos_val_full.pkl
+├── embodiedscan_infos_train_full_vg.json
+├── embodiedscan_infos_val_full_vg.json
+├── embodiedscan_infos_train_mini_vg.json
+├── embodiedscan_infos_val_mini_vg.json
 ```
 
 6. Also extract EmbodiedScan occupancy annotations here by running
@@ -70,5 +78,3 @@ data
 ```bash
 python embodiedscan/converter/extract_occupancy_ann.py --src data/embodiedscan_occupancy --dst data
 ```
-
-Note: Language prompts will be released soon. Please stay tuned for the related guide.

@@ -81,6 +81,8 @@ Building upon this database, we introduce a baseline framework named <b>Embodied
 
 ## 🔥 News
 
+- \[2024-03\] We first release the data and baselines for the challenge. Please fill in the [form](https://docs.google.com/forms/d/e/1FAIpQLScUXEDTksGiqHZp31j7Zp7zlCNV7p_08uViwP_Nbzfn3g6hhw/viewform?usp=sf_link) to apply for downloading the data and try our baselines. Welcome any feedback!
+- \[2024-02\] We will co-organize [Autonomous Grand Challenge](https://opendrivelab.com/challenge2024/) in CVPR 2024. Welcome to try the Multi-View 3D Visual Grounding track! We will release more details about the challenge with the baseline after the Chinese New Year.
 - \[2023-12\] We release the [paper](./assets/EmbodiedScan.pdf) of EmbodiedScan. Please check the [webpage](https://tai-wang.github.io/embodiedscan) and view our demos!
 
 ## 📚 Getting Started
@@ -120,12 +122,14 @@ conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit
 # Please stay tuned for the future official release.
 # Make sure you are under ./EmbodiedScan/
 # This script will install the dependencies and EmbodiedScan package automatically.
-python install.py all
-# This command installs all of embodiedscan's dependencies,
-# including the execution and visualization modules.
-# If you only want to use part of the functionality,
-# you can run 'python install.py run/visual' as an alternative.
+# use [python install.py run] to install only the execution dependencies
+# use [python install.py visual] to install only the visualization dependencies
+python install.py all  # install all the dependencies
 ```
+
+**Note:** The automatic installation script make each step a subprocess and the related messages are only printed when the subprocess is finished or killed. Therefore, it is normal to seemingly hang when installing heavier packages, such as Mink Engine and PyTorch3D.
+
+BTW, from our experience, it is easier to encounter problems when installing these two packages. Feel free to post your questions or suggestions during the installation procedure.
 
 ### Data Preparation
 
@@ -142,8 +146,6 @@ We provide a simple tutorial [here](https://github.com/OpenRobotLab/EmbodiedScan
 We provide a demo for running EmbodiedScan's model on a sample scan. Please refer to the [notebook](demo/demo.ipynb) for more details.
 
 ## 📦 Model and Benchmark
-
-We will release the code for model training and benchmark with pretrained checkpoints in the 2024 Q1.
 
 ### Model Overview
 
@@ -172,9 +174,46 @@ Embodied Perceptron accepts RGB-D sequence with any number of views along with t
 <video src="assets/scannet_two_bed_demo.mp4" controls>
 </video> -->
 
+### Training and Inference
+
+We provide configs for different tasks [here](configs/) and you can run the train and test script in the [tools folder](tools/) for training and inference.
+For example, to train a multi-view 3D detection model with pytorch, just run:
+
+```bash
+python tools/train.py configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py --work-dir=work_dirs/mv-3ddet --launcher="pytorch"
+```
+
+Or on the cluster with multiple machines, run the script with the slurm launcher following the sample script provided [here](tools/mv-grounding.sh).
+
+NOTE: To run the multi-view 3D grounding experiments, please first download the 3D detection pretrained model to accelerate its training procedure. After downloading the detection checkpoint, please check the path used in the config, for example, the `load_from` [here](https://github.com/OpenRobotLab/EmbodiedScan/blob/main/configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof.py#L210), is correct.
+
+To inference and evaluate the model (e.g., the checkpoint `work_dirs/mv-3ddet/epoch_12.pth`), just run the test script:
+
+```bash
+python tools/test.py configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py work_dirs/mv-3ddet/epoch_12.pth --launcher="pytorch"
+```
+
 ### Benchmark
 
-Please see the [paper](./assets/EmbodiedScan.pdf) for details of our two benchmarks, fundamental 3D perception and language-grounded benchmarks. This dataset is still scaling up and the benchmark is being polished and extended. Please stay tuned for our recent updates.
+We preliminarily provide several baseline results here with their logs and pretrained models.
+
+Note that the performance is a little different from the results provided in the paper because we re-split the training set as the released training and validation set while keeping the original validation set as the test set for the public benchmark.
+
+#### Multi-View 3D Detection
+
+| Method | Input | AP@0.25 | AR@0.25 | AP@0.5 | AR@0.5 | Download |
+|:------:|:-----:|:-------:|:-------:|:------:|:------:|:------:|
+| [Baseline](configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py) | RGB-D | 15.22  | 52.23  | 8.13  | 26.66 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-3ddet.pth) \| [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-3ddet.log) |
+
+#### Multi-View 3D Visual Grounding
+
+| Method |AP@0.25| AP@0.5| Download |
+|:------:|:-----:|:-------:|:------:|
+| [Baseline-Mini](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof.py) | 33.59 | 14.40 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding.pth) \| [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding.log) |
+| [Baseline-Mini (w/ FCAF box coder)](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof_fcaf-coder.py) | - | - | - |
+| [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | - | - | - |
+
+Please see the [paper](./assets/EmbodiedScan.pdf) for more details of our two benchmarks, fundamental 3D perception and language-grounded benchmarks. This dataset is still scaling up and the benchmark is being polished and extended. Please stay tuned for our recent updates.
 
 ## 📝 TODO List
 
@@ -182,9 +221,9 @@ Please see the [paper](./assets/EmbodiedScan.pdf) for details of our two benchma
 - \[x\] Release EmbodiedScan annotation files.
 - \[x\] Release partial codes for models and evaluation.
 - \[ \] Polish dataset APIs and related codes.
-- \[ \] Release Embodied Perceptron pretrained models.
-- \[ \] Release multi-modal datasets and codes.
-- \[ \] Release codes for baselines and benchmarks.
+- \[x\] Release Embodied Perceptron pretrained models.
+- \[x\] Release multi-modal datasets and codes.
+- \[x\] Release codes for baselines and benchmarks.
 - \[ \] Full release and further updates.
 
 ## 🔗 Citation
@@ -192,11 +231,12 @@ Please see the [paper](./assets/EmbodiedScan.pdf) for details of our two benchma
 If you find our work helpful, please cite:
 
 ```bibtex
-@article{wang2023embodiedscan,
-  author={Wang, Tai and Mao, Xiaohan and Zhu, Chenming and Xu, Runsen and Lyu, Ruiyuan and Li, Peisen and Chen, Xiao and Zhang, Wenwei and Chen, Kai and Xue, Tianfan and Liu, Xihui and Lu, Cewu and Lin, Dahua and Pang, Jiangmiao},
-  title={EmbodiedScan: A Holistic Multi-Modal 3D Perception Suite Towards Embodied AI},
-  journal={Arxiv},
-  year={2023},
+@inproceedings{wang2023embodiedscan,
+    title={EmbodiedScan: A Holistic Multi-Modal 3D Perception Suite Towards Embodied AI},
+    author={Wang, Tai and Mao, Xiaohan and Zhu, Chenming and Xu, Runsen and Lyu, Ruiyuan and Li, Peisen and Chen, Xiao and Zhang, Wenwei and Chen, Kai and Xue, Tianfan and Liu, Xihui and Lu, Cewu and Lin, Dahua and Pang, Jiangmiao},
+    year={2024},
+    booktitle={IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+}
 ```
 
 If you use our dataset and benchmark, please kindly cite the original datasets involved in our work. BibTex entries are provided below.

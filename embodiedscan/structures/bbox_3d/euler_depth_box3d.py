@@ -44,6 +44,7 @@ class EulerDepthInstance3DBoxes(EulerInstance3DBoxes):
                  with_yaw=True,
                  origin=(0.5, 0.5, 0.5)):
         super().__init__(tensor, box_dim, origin)
+        self.with_yaw = with_yaw
 
     def flip(self, bev_direction='horizontal', points=None):
         """Flip the boxes in BEV along given BEV direction.

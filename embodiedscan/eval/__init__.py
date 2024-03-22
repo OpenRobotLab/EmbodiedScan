@@ -1,4 +1,3 @@
-from .det_metric import IndoorDetMetric
-from .occupancy_metric import OccupancyMetric
+from .metrics import GroundingMetric, IndoorDetMetric, OccupancyMetric
 
-__all__ = ['IndoorDetMetric', 'OccupancyMetric']
+__all__ = ['IndoorDetMetric', 'OccupancyMetric', 'GroundingMetric']
