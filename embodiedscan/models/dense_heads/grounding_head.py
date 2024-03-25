@@ -537,7 +537,7 @@ class GroundingHead(BaseModule):
                 layers. Each is a 12-tensor with shape (num_decoder_layers, bs,
                 num_queries, reg_num).
             batch_input_metas (List[Dict]): _description_
-            batch_positive_maps (list[dict], Optional): Batch positive map.
+            batch_positive_maps (list[dict]): Batch positive map.
 
         Returns:
             list[:obj:`InstanceData`]: Object detection results of each image
@@ -592,15 +592,13 @@ class GroundingHead(BaseModule):
 
         cls_score = cls_score.sigmoid()  # (num_query, self.max_text_len 256)
         scores, _ = cls_score.max(-1)
-        # target_token_maps = positive_maps.squeeze(0) > 0
-        # (num_query, num_target_tokens)
-        # target_cls_score = cls_score[:, target_token_maps]
-        # target_scores = target_cls_score.sum(-1)
 
         results = InstanceData()
         results.bboxes_3d = EulerDepthInstance3DBoxes(bbox_pred)
         results.scores_3d = scores
-        # results.target_scores_3d = target_scores
+        # NOTE: We regard scores as target_scores_3d during inference
+        # considering they are trained to be the same during training
+        # and there is no positive tokens given during inference
         results.target_scores_3d = scores
 
         return results

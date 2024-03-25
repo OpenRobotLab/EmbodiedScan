@@ -27,6 +27,10 @@ class GroundingMetric(BaseMetric):
             names to disambiguate homonymous metrics of different evaluators.
             If prefix is not provided in the argument, self.default_prefix will
             be used instead. Defaults to None.
+        format_only (bool): Whether to only inference the predictions without
+            evaluation. Defaults to False.
+        result_dir (str): Dir to save results, e.g., if result_dir = './',
+            the result file will be './test_results.json'. Defaults to ''.
     """
 
     def __init__(self,
@@ -160,8 +164,6 @@ class GroundingMetric(BaseMetric):
         """
         logger: MMLogger = MMLogger.get_current_instance()  # noqa
         annotations, preds = zip(*results)
-        # import pdb
-        # pdb.set_trace()
         ret_dict = {}
         if self.format_only:
             # preds is a list of dict
@@ -171,13 +173,16 @@ class GroundingMetric(BaseMetric):
                 # convert the Euler boxes to the numpy array to save
                 bboxes_3d = pred['bboxes_3d'].tensor
                 scores_3d = pred['scores_3d']
+                # Note: hard-code save top-20 predictions
+                # eval top-10 predictions during the test phase by default
                 box_index = scores_3d.argsort(dim=-1, descending=True)[:20]
                 top_bboxes_3d = bboxes_3d[box_index]
                 top_scores_3d = scores_3d[box_index]
                 result['bboxes_3d'] = top_bboxes_3d.numpy()
                 result['scores_3d'] = top_scores_3d.numpy()
                 results.append(result)
-            mmengine.dump(results, os.path.join(self.result_dir, 'test_results.json'))
+            mmengine.dump(results,
+                          os.path.join(self.result_dir, 'test_results.json'))
             return ret_dict
 
         ret_dict = self.ground_eval(annotations, preds)

@@ -1,3 +1,4 @@
+# Copyright (c) OpenRobotLab. All rights reserved.
 import mmengine
 
 # Please modify the following content to submit your results

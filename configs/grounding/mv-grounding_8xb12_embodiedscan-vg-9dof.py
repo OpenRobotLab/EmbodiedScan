@@ -163,6 +163,7 @@ val_dataloader = dict(batch_size=12,
                                    test_mode=True,
                                    filter_empty_gt=True,
                                    box_type_3d='Euler-Depth'))
+
 test_dataloader = dict(batch_size=12,
                        num_workers=12,
                        persistent_workers=True,

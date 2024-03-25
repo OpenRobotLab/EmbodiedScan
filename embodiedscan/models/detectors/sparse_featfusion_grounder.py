@@ -520,16 +520,15 @@ class SparseFeatureFusion3DGrounder(BaseModel):
             text_prompts, padding='longest',
             return_tensors='pt').to(batch_inputs_dict['points'][0].device)
 
-        # import pdb
-        # pdb.set_trace()
         if 'tokens_positive' in batch_data_samples[0]:
             tokens_positive = [
                 data_samples.tokens_positive
                 for data_samples in batch_data_samples
             ]
         else:
-            # hack a pseudo tokens_positive
-            tokens_positive = [[[0, 1]] for _ in range(len(batch_data_samples))]
+            # hack a pseudo tokens_positive during format-only inference
+            tokens_positive = [[[0, 1]]
+                               for _ in range(len(batch_data_samples))]
         positive_maps = self.get_positive_map(tokenized, tokens_positive)
         positive_maps = [
             positive_map.to(batch_inputs_dict['points']
