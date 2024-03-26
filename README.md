@@ -174,7 +174,7 @@ Embodied Perceptron accepts RGB-D sequence with any number of views along with t
 <video src="assets/scannet_two_bed_demo.mp4" controls>
 </video> -->
 
-### Training and Inference
+### Training and Evaluation
 
 We provide configs for different tasks [here](configs/) and you can run the train and test script in the [tools folder](tools/) for training and inference.
 For example, to train a multi-view 3D detection model with pytorch, just run:
@@ -192,6 +192,27 @@ To inference and evaluate the model (e.g., the checkpoint `work_dirs/mv-3ddet/ep
 ```bash
 python tools/test.py configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py work_dirs/mv-3ddet/epoch_12.pth --launcher="pytorch"
 ```
+
+### Inference and Submit your Results
+
+We preliminarily support format-only inference for multi-view 3D visual grounding. To achieve format-only inference during test, just set `format_only=True` in `test_evaluator` in the corresponding config like [here](https://github.com/OpenRobotLab/EmbodiedScan/blob/main/configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof.py#L183). Then just run the test script like:
+
+```bash
+python tools/test.py configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof.py work_dirs/mv-grounding/epoch_12.pth --launcher="pytorch"
+```
+
+The prediction file will be saved to `./test_results.json` in the current directory.
+You can also set the `result_dir` in `test_evaluator` to specify the directory to save the result file.
+
+Finally, to pack the prediction file into the submission format, please modify the script `tools/submit_results.py` according to your team information and saving paths, and run:
+
+```bash
+python tools/submit_results.py
+```
+
+Then you can submit the resulting pkl file to the test server (to go live by the end of March) and wait for the lottery :)
+
+We also provide a sample script `tools/eval_script.py` for evaluating the submission file and you can check it by yourself to ensure your submitted file has the correct format.
 
 ### Benchmark
 
