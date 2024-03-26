@@ -1,15 +1,15 @@
 # Copyright (c) OpenRobotLab. All rights reserved.
 import argparse
+from typing import Union
 
 import mmengine
-from mmengine.logging import print_log
-from terminaltables import AsciiTable
-
-from typing import Union
-import torch
 import numpy as np
+import torch
+from mmengine.logging import print_log
 from pytorch3d.ops import box3d_overlap
 from pytorch3d.transforms import euler_angles_to_matrix
+from terminaltables import AsciiTable
+
 
 def rotation_3d_in_euler(points, angles, return_mat=False, clockwise=False):
     """Rotate points by angles according to axis.
@@ -66,6 +66,7 @@ def rotation_3d_in_euler(points, angles, return_mat=False, clockwise=False):
     else:
         return points_new
 
+
 class EulerDepthInstance3DBoxes:
     """3D boxes of instances in Depth coordinates.
 
@@ -102,7 +103,7 @@ class EulerDepthInstance3DBoxes:
                  box_dim=9,
                  with_yaw=True,
                  origin=(0.5, 0.5, 0.5)):
-        
+
         if isinstance(tensor, torch.Tensor):
             device = tensor.device
         else:
@@ -138,14 +139,12 @@ class EulerDepthInstance3DBoxes:
             src = self.tensor.new_tensor(origin)
             self.tensor[:, :3] += self.tensor[:, 3:6] * (dst - src)
         self.with_yaw = with_yaw
-    
+
     def __len__(self) -> int:
         """int: Number of boxes in the current object."""
         return self.tensor.shape[0]
-    
-    def __getitem__(
-            self, item: Union[int, slice, np.ndarray,
-                              torch.Tensor]):
+
+    def __getitem__(self, item: Union[int, slice, np.ndarray, torch.Tensor]):
         """
         Args:
             item (int or slice or np.ndarray or Tensor): Index of boxes.
@@ -176,12 +175,12 @@ class EulerDepthInstance3DBoxes:
         assert b.dim() == 2, \
             f'Indexing on Boxes with {item} failed to return a matrix!'
         return original_type(b, box_dim=self.box_dim, with_yaw=self.with_yaw)
-    
+
     @property
     def dims(self) -> torch.Tensor:
         """Tensor: Size dimensions of each box in shape (N, 3)."""
         return self.tensor[:, 3:6]
-    
+
     @classmethod
     def overlaps(cls, boxes1, boxes2, mode='iou', eps=1e-4):
         """Calculate 3D overlaps of two boxes.
@@ -259,6 +258,7 @@ class EulerDepthInstance3DBoxes:
 
         corners += self.tensor[:, :3].view(-1, 1, 3)
         return corners
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
