@@ -13,13 +13,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build_cu117:
-    runs-on: ubuntu-22.04
+  build_cu113:
+    runs-on: ubuntu-18.04
     container:
-      image: pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel
+      image: pytorch/pytorch:1.11.0-cuda11.3-cudnn8-devel
     strategy:
       matrix:
-        python-version: [3.9]
+        python-version: [3.7]
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -33,11 +33,11 @@ jobs:
           apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
           apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/7fa2af80.pub
       - name: Install system dependencies
-        run: apt-get update && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6
+        run: apt-get update && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 libc6
       - name: Install dependencies and EmbodiedScan
-        run: python install.py all
+        run: python install.py run
       - name: Run unittests and generate coverage report
         run: |
-          coverage run --branch --source embodiedscan -m pytest tests/
+          coverage run --branch --source embodiedscan -m pytest tests
           coverage xml
           coverage report -m
