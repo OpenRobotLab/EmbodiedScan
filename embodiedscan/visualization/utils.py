@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import open3d as o3d
+from torch import Tensor
 
 from .line_mesh import LineMesh
 
@@ -39,9 +40,11 @@ def _box_add_thickness(box, thickness):
     return results
 
 
-def _9dof_to_box(box, label, color_selector):
+def _9dof_to_box(box, label=None, color_selector=None, color=None):
     if isinstance(box, list):
         box = np.array(box)
+    if isinstance(box, Tensor):
+        box = box.cpu().numpy()
     center = box[:3].reshape(3, 1)
     scale = box[3:6].reshape(3, 1)
     rot = box[6:].reshape(3, 1)
@@ -49,10 +52,64 @@ def _9dof_to_box(box, label, color_selector):
         rot)
     geo = o3d.geometry.OrientedBoundingBox(center, rot_mat, scale)
 
-    color = color_selector.get_color(label)
-    color = [x / 255.0 for x in color]
-    geo.color = color
+    if color is not None:
+        geo.color = [x / 255.0 for x in color]
+        return geo
+
+    if label is not None and color_selector is not None:
+        color = color_selector.get_color(label)
+        color = [x / 255.0 for x in color]
+        geo.color = color
     return geo
+
+
+def nms_filter(pred_results, iou_thr=0.15, score_thr=0.075, topk_per_class=10):
+    """Non-Maximum Suppression for 3D Euler boxes. Additionally, only the top-k
+    boxes will be kept for each category to avoid redundant boxes in the
+    visualization.
+
+    Args:
+        pred_results (mmengine.structures.instance_data.InstanceData):
+            Results predicted by the model
+        iou_thr (float): IoU thresholds for NMS. Defaults to 0.15.
+        score_thr (float): Score thresholds.
+            Instances with scores below thresholds will not be kept.
+            Defaults to 0.075.
+        topk_per_class (int): Number of instances kept per category.
+
+    Returns:
+        boxes (numpy.ndarray[float]): filtered instances, shape (N,9)
+        labels (numpy.ndarray[int]): filtered labels, shape (N,)
+    """
+    boxes = pred_results.bboxes_3d
+    boxes_tensor = boxes.tensor.cpu().numpy()
+    iou = boxes.overlaps(boxes, boxes, eps=1e-5)
+    score = pred_results.scores_3d.cpu().numpy()
+    label = pred_results.labels_3d.cpu().numpy()
+    selected_per_class = dict()
+
+    n = boxes_tensor.shape[0]
+    idx = list(range(n))
+    idx.sort(key=lambda x: score[x], reverse=True)
+    selected_idx = []
+    for i in idx:
+        if selected_per_class.get(label[i], 0) >= topk_per_class:
+            continue
+        if score[i] < score_thr:
+            continue
+        bo = False
+        for j in selected_idx:
+            if iou[i][j] > iou_thr:
+                bo = True
+                break
+        if not bo:
+            selected_idx.append(i)
+            if label[i] not in selected_per_class:
+                selected_per_class[label[i]] = 1
+            else:
+                selected_per_class[label[i]] += 1
+
+    return boxes_tensor[selected_idx], label[selected_idx]
 
 
 def draw_camera(camera_pose, camera_size=0.5, return_points=False):

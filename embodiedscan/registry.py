@@ -3,6 +3,8 @@ from mmengine import METRICS as MMENGINE_METRICS
 from mmengine import MODELS as MMENGINE_MODELS
 from mmengine import TASK_UTILS as MMENGINE_TASK_UTILS
 from mmengine import TRANSFORMS as MMENGINE_TRANSFORMS
+from mmengine import VISBACKENDS as MMENGINE_VISBACKENDS
+from mmengine import VISUALIZERS as MMENGINE_VISUALIZERS
 from mmengine import Registry
 
 MODELS = Registry('model',
@@ -20,3 +22,10 @@ METRICS = Registry('metric',
 TASK_UTILS = Registry('task util',
                       parent=MMENGINE_TASK_UTILS,
                       locations=['embodiedscan.models'])
+VISUALIZERS = Registry('visualizer',
+                       parent=MMENGINE_VISUALIZERS,
+                       locations=['embodiedscan.visualizer'])
+# manage visualizer backend
+VISBACKENDS = Registry('vis_backend',
+                       parent=MMENGINE_VISBACKENDS,
+                       locations=['embodiedscan.visualizer'])
