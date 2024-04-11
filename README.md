@@ -193,6 +193,10 @@ To inference and evaluate the model (e.g., the checkpoint `work_dirs/mv-3ddet/ep
 python tools/test.py configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py work_dirs/mv-3ddet/epoch_12.pth --launcher="pytorch"
 ```
 
+### Using Visualizer during inference
+
+We provide EmbodiedBaseVisualizer to visualize the output of models during inference. Please refer to the [guide](embodiedscan/visualizer/README.md) for detail.
+
 ### Inference and Submit your Results
 
 We preliminarily support format-only inference for multi-view 3D visual grounding. To achieve format-only inference during test, just set `format_only=True` in `test_evaluator` in the corresponding config like [here](https://github.com/OpenRobotLab/EmbodiedScan/blob/main/configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof.py#L183). Then just run the test script like:

@@ -1,11 +1,16 @@
 import os
 
-import open3d as o3d
 from mmengine.dist import master_only
 from mmengine.visualization import Visualizer
 
 from embodiedscan.registry import VISUALIZERS
-from embodiedscan.visualization.utils import _9dof_to_box, nms_filter
+
+try:
+    import open3d as o3d
+
+    from embodiedscan.visualization.utils import _9dof_to_box, nms_filter
+except ImportError:
+    o3d = None
 
 
 @VISUALIZERS.register_module()
@@ -18,6 +23,9 @@ class EmbodiedBaseVisualizer(Visualizer):
         super().__init__(name=name,
                          vis_backends=vis_backends,
                          save_dir=save_dir)
+
+        if o3d is None:
+            raise ImportError('Please install open3d.')
 
     @staticmethod
     def get_root_dir(img_path):
