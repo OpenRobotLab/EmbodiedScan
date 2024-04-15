@@ -15,6 +15,14 @@ except ImportError:
 
 @VISUALIZERS.register_module()
 class EmbodiedBaseVisualizer(Visualizer):
+    """Embodiedscan BaseVisualizer. Method to visualize 3D scenes and Euler
+    boxes.
+
+    Args:
+        name (str): Name of the visualizer. Default to 'visualizer'.
+        save_dir (str): Directory to save visualizations.
+        vis_backends (list[ConfigType]): List of visualization backends to use.
+    """
 
     def __init__(self,
                  name: str = 'visualizer',
@@ -29,6 +37,7 @@ class EmbodiedBaseVisualizer(Visualizer):
 
     @staticmethod
     def get_root_dir(img_path):
+        """Get the root directory of the dataset."""
         if 'posed_images' in img_path:
             return img_path.split('posed_images')[0]
         if 'sequence' in img_path:
@@ -39,6 +48,7 @@ class EmbodiedBaseVisualizer(Visualizer):
 
     @staticmethod
     def get_ply(root_dir, scene_name):
+        """Get the path of the ply file."""
         s = scene_name.split('/')
         if len(s) == 2:
             dataset, region = s
@@ -58,6 +68,17 @@ class EmbodiedBaseVisualizer(Visualizer):
 
     @master_only
     def visual_scene(self, data_samples, class_filter=None, nms_args=dict()):
+        """Visualize the 3D scene with 3D boxes.
+
+        Args:
+            data_samples (list[Det3DDataSample]): The output of the model.
+            class_filter (int or None): Class filter for visualization.
+                Default to None to show all classes.
+            nms_args (dict): NMS arguments for filtering boxes.
+                Default to dict(iou_thr = 0.15,
+                                score_thr = 0.075,
+                                topk_per_class = 10)
+        """
         assert len(data_samples) == 1
         data_sample = data_samples[0]
 

@@ -41,6 +41,15 @@ def _box_add_thickness(box, thickness):
 
 
 def _9dof_to_box(box, label=None, color_selector=None, color=None):
+    """Convert 9-DoF box from array/tensor to open3d.OrientedBoundingBox.
+
+    Args:
+        box (numpy.ndarray or torch.Tensor): 9-DoF box with shape (9,)
+        label (int): Label of the box
+        color_selector (ColorSelector): Color selector for boxes
+        color (tuple): Color of the box.
+            You can directly specify the color.
+    """
     if isinstance(box, list):
         box = np.array(box)
     if isinstance(box, Tensor):
@@ -113,6 +122,18 @@ def nms_filter(pred_results, iou_thr=0.15, score_thr=0.075, topk_per_class=10):
 
 
 def draw_camera(camera_pose, camera_size=0.5, return_points=False):
+    """Draw the camera pose in the form of a cone.
+
+    Args:
+        camera_pose (numpy.ndarray): 4x4 camera pose from camera to world.
+        camera_size (float): Size of the camera cone. Defaults to 0.5.
+        return_points (bool): Whether to return the points of the camera cone.
+            Defaults to False.
+
+    Returns:
+        if return_points is True, return the points of the camera cone.
+        Otherwise, return the camera cone as an open3d.LineSet.
+    """
     # camera_pose : 4*4 camera to world
     point = np.array([[0, 0, 0], [-camera_size, -camera_size, camera_size * 2],
                       [camera_size, -camera_size, camera_size * 2],
