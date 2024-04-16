@@ -224,33 +224,33 @@ Note that the performance is a little different from the results provided in the
 
 | Method | Input | AP@0.25 | AR@0.25 | AP@0.5 | AR@0.5 | Download |
 |:------:|:-----:|:-------:|:-------:|:------:|:------:|:------:|
-| [Baseline](configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py) | RGB-D | 15.22  | 52.23  | 8.13  | 26.66 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-3ddet.pth), [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-3ddet.log) |
+| [Baseline](configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py) | RGB-D | 15.22  | 52.23  | 8.13  | 26.66 | [Model](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=mv-3ddet.pth&sign=463b8f3d1018a2308933c4880eb45809&nonce=1713253422165), [Log](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=mv-3ddet.log&sign=31e1b4d08fcdc1b849ad997d3986355c&nonce=1713253411612) |
 
 #### Continuous 3D Detection
 
 | Method | Input | AP@0.25 | AR@0.25 | AP@0.5 | AR@0.5 | Download |
 |:------:|:-----:|:-------:|:-------:|:------:|:------:|:------:|
-| [Baseline](configs/detection/cont-det3d_8xb1_embodiedscan-3d-284class-9dof.py) | RGB-D | 17.83  | 47.53  | 9.04  | 23.04 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/cont-3ddet.pth), [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/cont-3ddet.log) |
+| [Baseline](configs/detection/cont-det3d_8xb1_embodiedscan-3d-284class-9dof.py) | RGB-D | 17.83  | 47.53  | 9.04  | 23.04 | [Model](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=cont-3ddet.pth&sign=33a9d8c7269d9cb8a6c12596eccf33fb&nonce=1713253437312), [Log](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=cont-3ddet.log&sign=1941012e5c4de98852fe64d4c7ca8c2b&nonce=1713253431164) |
 
 #### Multi-View Occupancy Prediction
 
 | Method | Input | mIoU | Download |
 |:------:|:-----:|:----:|:--------:|
-| [Baseline](configs/occupancy/mv-occ_8xb1_embodiedscan-occ-80class.py) | RGB-D | 21.28 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-occ.pth), [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-occ.log) |
+| [Baseline](configs/occupancy/mv-occ_8xb1_embodiedscan-occ-80class.py) | RGB-D | 21.28 | [Model](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=mv-occ.pth&sign=994480cb17c8522c963a5ac8df699a93&nonce=1713253452434), [Log](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=mv-occ.log&sign=edca607abc7ed35f369dda0552caf732&nonce=1713253459552) |
 
 #### Continuous Occupancy Prediction
 
 | Method | Input | mIoU | Download |
 |:------:|:-----:|:----:|:--------:|
-| [Baseline](configs/occupancy/cont-occ_8xb1_embodiedscan-occ-80class.py) | RGB-D | 22.92 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/cont-occ.pth), [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/cont-occ.log) |
+| [Baseline](configs/occupancy/cont-occ_8xb1_embodiedscan-occ-80class.py) | RGB-D | 22.92 | [Model](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=cont-occ.pth&sign=c561946827abbae17a260cb85765bfc5&nonce=1713253478620), [Log](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=cont-occ.log&sign=06c5dd32250079257b1469d4e2b34a93&nonce=1713253472602) |
 
 #### Multi-View 3D Visual Grounding
 
 | Method |AP@0.25| AP@0.5| Download |
 |:------:|:-----:|:-------:|:------:|
-| [Baseline-Mini](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof.py) | 33.59 | 14.40 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding.pth), [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding.log) |
+| [Baseline-Mini](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof.py) | 33.59 | 14.40 | [Model](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=mv-grounding.pth&sign=b88b76044eadb27aa035a30390d358f8&nonce=1713253489268), [Log](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=mv-grounding.log&sign=5fb591b76407097792a3a2bdb885fa45&nonce=1713253496042) |
 | [Baseline-Mini (w/ FCAF box coder)](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof_fcaf-coder.py) | - | - | - |
-| [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | 36.78 | 15.97 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding-full.pth), [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding-full.log) |
+| [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | 36.78 | 15.97 | [Model](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=mv-grounding-full.pth&sign=6e0ecfb03f3cf9bf248c9b0a1692dd19&nonce=1713253505107), [Log](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=mv-grounding-full.log&sign=b658bb9b731e3cf4351d3aac26ff02ed&nonce=1713253511050) |
 
 Note: As mentioned in the paper, due to much more instances annotated with our new tools and pipelines, we concatenate several simple prompts as more complex ones to ensure those prompts to be more accurate without potential ambiguity. The above table is the benchmark without complex prompts using the initial version of visual grounding data.
 
@@ -258,9 +258,9 @@ We found such data is much less than the main part though, it can boost the mult
 
 | Method | train | val | AP@0.25| AP@0.5| Download |
 |:------:|:-----:|:---:|:------:|:-----:|:--------:|
-| [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | w/o complex | w/o complex | 36.78 | 15.97 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding-full.pth), [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding-full.log) |
-| [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | w/ complex | w/o complex | 39.26 | 18.86 |[Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding-complex.pth), [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding-complex.log) |
-| [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | w/ complex | w/ complex | 39.21 | 18.84 |[Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding-complex.pth), [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding-complex.log) |
+| [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | w/o complex | w/o complex | 36.78 | 15.97 | [Model](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=mv-grounding-full.pth&sign=6e0ecfb03f3cf9bf248c9b0a1692dd19&nonce=1713253505107), [Log](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=mv-grounding-full.log&sign=b658bb9b731e3cf4351d3aac26ff02ed&nonce=1713253511050) |
+| [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | w/ complex | w/o complex | 39.26 | 18.86 |[Model](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=mv-grounding-complex.pth&sign=fe1fb560a3d51f59486c353d5748081f&nonce=1713253535423), [Log](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=mv-grounding-complex.log&sign=af7c5dcb19cadc40cc64c15b8c5d5d51&nonce=1713253542450) |
+| [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | w/ complex | w/ complex | 39.21 | 18.84 |[Model](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=mv-grounding-complex.pth&sign=fe1fb560a3d51f59486c353d5748081f&nonce=1713253535423), [Log](https://download.openxlab.org.cn/repos/file/wangtai/EmbodiedScan/main?filepath=mv-grounding-complex.log&sign=af7c5dcb19cadc40cc64c15b8c5d5d51&nonce=1713253542450) |
 
 Please see the [paper](./assets/EmbodiedScan.pdf) for more details of our two benchmarks, fundamental 3D perception and language-grounded benchmarks. This dataset is still scaling up and the benchmark is being polished and extended. Please stay tuned for our recent updates.
 
