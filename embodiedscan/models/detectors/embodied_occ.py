@@ -1,9 +1,8 @@
 # Copyright (c) OpenRobotLab. All rights reserved.
-# Adapted from https://github.com/SamsungLabs/fcaf3d/blob/master/mmdet3d/models/detectors/single_stage_sparse.py # noqa
-from typing import Dict, List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import torch
-from torch import Tensor
+from mmengine.structures import InstanceData
 
 try:
     import MinkowskiEngine as ME
@@ -13,11 +12,10 @@ except ImportError:
     pass
 
 from mmengine.model import BaseModel
-from mmengine.structures import InstanceData
 
-from embodiedscan.registry import MODELS
+from embodiedscan.registry import MODELS, TASK_UTILS
 from embodiedscan.structures.bbox_3d import get_proj_mat_by_coord_type
-from embodiedscan.utils import ConfigType
+from embodiedscan.utils import ConfigType, OptConfigType
 from embodiedscan.utils.typing_config import (ForwardResults, InstanceList,
                                               SampleList)
 
@@ -25,45 +23,52 @@ from ..layers.fusion_layers.point_fusion import batch_point_sample
 
 
 @MODELS.register_module()
-class Embodied3DDetector(BaseModel):
-    """Embodied3DDetector for continuous 3D detection.
+class EmbodiedOccPredictor(BaseModel):
+    """Embodied occupancy prediction network.
 
     Args:
-        backbone (dict): Config dict of detector's backbone.
-        backbone_3d (dict): Config dict of detector's 3D backbone.
-        bbox_head (dict): Config dict of box head.
-        neck (dict, optional): Config dict of neck. Defaults to None.
-        neck_3d (dict, optional): Config dict of 3D neck. Defaults to None.
-        neck_lidar (dict, optional): Config dict of lidar neck.
-            Defaults to None.
-        coord_type (str): Type of Box coordinates. Defaults to CAMERA.
-        train_cfg (dict, optional): Config dict of training hyper-parameters.
-            Defaults to None.
-        test_cfg (dict, optional): Config dict of test hyper-parameters.
-            Defaults to None.
+        backbone (:obj:`ConfigDict` or dict): The backbone config.
+        neck (:obj:`ConfigDict` or dict): The neck config.
+        neck_3d (:obj:`ConfigDict` or dict): The 3D neck config.
+        bbox_head (:obj:`ConfigDict` or dict): The bbox head config.
+        prior_generator (:obj:`ConfigDict` or dict): The prior grid generator
+            config.
+        n_voxels (list): Number of voxels along x, y, z axis.
+        coord_type (str): The type of coordinates of points cloud:
+            'DEPTH', 'LIDAR', or 'CAMERA'.
+        use_valid_mask (bool): Whether to use valid masks to handle
+            visible voxels. Defaults to False.
+        use_xyz_feat (bool): Whether to use xyz features.
+            Defaults to False.
+        point_cloud_range (list]): Point cloud range, [x_min, y_min, z_min,
+            x_max, y_max, z_max], e.g., [-3.2, -3.2, -0.78, 3.2, 3.2, 1.78].
+        train_cfg (:obj:`ConfigDict` or dict, optional): Config dict of
+            training hyper-parameters. Defaults to None.
+        test_cfg (:obj:`ConfigDict` or dict, optional): Config dict of test
+            hyper-parameters. Defaults to None.
         data_preprocessor (dict or ConfigDict, optional): The pre-process
             config of :class:`BaseDataPreprocessor`.  it usually includes,
                 ``pad_size_divisor``, ``pad_value``, ``mean`` and ``std``.
-        use_xyz_feat (bool, optional): Whether to use xyz features.
-            Defaults to False.
-        init_cfg (dict or ConfigDict, optional): the config to control the
-            initialization. Defaults to False.
+        init_cfg (:obj:`ConfigDict` or dict, optional): The initialization
+            config. Defaults to None.
     """
-    _version = 2
 
     def __init__(self,
                  backbone: ConfigType,
                  backbone_3d: ConfigType,
+                 neck: ConfigType,
+                 neck_3d: ConfigType,
                  bbox_head: ConfigType,
-                 neck: ConfigType = None,
-                 neck_3d: ConfigType = None,
-                 neck_lidar: ConfigType = None,
-                 coord_type: str = 'CAMERA',
-                 train_cfg: Optional[ConfigType] = None,
-                 test_cfg: Optional[ConfigType] = None,
-                 data_preprocessor: Optional[ConfigType] = None,
+                 prior_generator: ConfigType,
+                 n_voxels: List,
+                 coord_type: str,
+                 use_valid_mask=True,
                  use_xyz_feat: bool = False,
-                 init_cfg: Optional[ConfigType] = None):
+                 point_cloud_range=None,
+                 train_cfg: OptConfigType = None,
+                 test_cfg: OptConfigType = None,
+                 data_preprocessor: OptConfigType = None,
+                 init_cfg: OptConfigType = None):
         super().__init__(data_preprocessor=data_preprocessor,
                          init_cfg=init_cfg)
         self.backbone = MODELS.build(backbone)
@@ -72,45 +77,65 @@ class Embodied3DDetector(BaseModel):
             self.neck = MODELS.build(neck)
         if neck_3d is not None:
             self.neck_3d = MODELS.build(neck_3d)
-        if neck_lidar is not None:
-            self.neck_lidar = MODELS.build(neck_lidar)
         bbox_head.update(train_cfg=train_cfg)
         bbox_head.update(test_cfg=test_cfg)
         self.bbox_head = MODELS.build(bbox_head)
+        self.n_voxels = n_voxels
+        self.point_cloud_range = point_cloud_range
+        prior_range = prior_generator['ranges'][0]
+        if backbone_3d['type'] == 'MinkResNet':
+            self.voxel_stride = 2**6
+        else:
+            self.voxel_stride = 1
+        self.voxel_size = [(prior_range[3] - prior_range[0]) /
+                           self.n_voxels[0] / self.voxel_stride,
+                           (prior_range[4] - prior_range[1]) /
+                           self.n_voxels[1] / self.voxel_stride,
+                           (prior_range[5] - prior_range[2]) /
+                           self.n_voxels[2] / self.voxel_stride]
+        self.prior_generator = TASK_UTILS.build(prior_generator)
         self.coord_type = coord_type
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
+        self.use_valid_mask = use_valid_mask
+        self.use_xyz_feat = use_xyz_feat
+
         if ME is None:
             raise ImportError(
                 'Please follow `getting_started.md` to install MinkowskiEngine.`'  # noqa: E501
             )
-        self.voxel_size = bbox_head['voxel_size']
-        self.use_xyz_feat = use_xyz_feat
 
-    def extract_feat(
-        self, batch_inputs_dict: Dict[str,
-                                      Tensor], batch_data_samples: SampleList
-    ) -> Union[Tuple[torch.Tensor], Dict[str, Tensor]]:
-        """Directly extract features from the backbone+neck.
+    @property
+    def with_neck(self):
+        """Whether the detector has a 2D backbone."""
+        return hasattr(self, 'neck') and self.neck is not None
+
+    @property
+    def with_neck_3d(self):
+        """Whether the detector has a 3D neck."""
+        return hasattr(self, 'neck_3d') and self.neck_3d is not None
+
+    def extract_feat(self, batch_inputs_dict: dict,
+                     batch_data_samples: SampleList):
+        """Extract 3d features from the backbone -> fpn -> 3d projection.
+
+        -> 3d neck -> bbox_head.
 
         Args:
-            batch_inputs_dict (dict): The model input dict which includes
-                'points' keys.
+            batch_inputs_dict (dict): The model input dict which include
+                the 'imgs' key.
 
-                    - points (list[torch.Tensor]): Point cloud of each sample.
+                    - imgs (torch.Tensor, optional): Image of each sample.
+            batch_data_samples (list[:obj:`DetDataSample`]): The batch
+                data samples. It usually includes information such
+                as `gt_instance` or `gt_panoptic_seg` or `gt_sem_seg`.
 
         Returns:
-            tuple[Tensor] | dict:  For outside 3D object detection, we
-                typically obtain a tuple of features from the backbone + neck,
-                and for inside 3D object detection, usually a dict containing
-                features will be obtained.
+            Tuple:
+             - torch.Tensor: Features of shape (N, C_out, N_x, N_y, N_z).
+             - torch.Tensor: Valid mask of shape (N, 1, N_x, N_y, N_z).
         """
-        points = batch_inputs_dict['points']
-        assert len(points[0]) == 1, 'only support batch_size=1 for now!'
-        # TODO: remove the tuple packing in points[idx]
-        points = [points[idx][0] for idx in range(len(points))]
-
-        # extract img features
+        # 1. Extract the feature volume from images
         img = batch_inputs_dict['imgs']
         batch_img_metas = [
             data_samples.metainfo for data_samples in batch_data_samples
@@ -120,30 +145,23 @@ class Embodied3DDetector(BaseModel):
         if len(img.shape) > 4:  # (B, n_views, C, H, W)
             img = img.reshape([-1] + list(img.shape)[2:])
             img_features = self.backbone(img)
-            img_features = [
-                img_feat.reshape([batch_size, -1] + list(img_feat.shape)[1:])
-                for img_feat in img_features
-            ]
+            img_features = self.neck(img_features)[0]
+            img_features = img_features.reshape([batch_size, -1] +
+                                                list(img_features.shape)[1:])
         else:
             img_features = self.backbone(img)
+            img_features = self.neck(img_features)[0]
 
-        all_points_imgfeats = []
+        prior_points = self.prior_generator.grid_anchors(
+            [self.n_voxels[::-1]], device=img.device)[0][:, :3]
 
-        if self.use_xyz_feat:
-            coordinates, features = ME.utils.batch_sparse_collate(
-                [(p[:, :3] / self.voxel_size, p) for p in points],
-                device=points[0].device)
-        else:
-            coordinates, features = ME.utils.batch_sparse_collate(
-                [(p[:, :3] / self.voxel_size, p[:, 3:]) for p in points],
-                device=points[0].device)
+        if 'origin' in batch_img_metas[0]['depth2img'].keys():
+            prior_points += prior_points.new_tensor(
+                batch_img_metas[0]['depth2img']['origin'])
+            # For calibration with original ImVoxelNet implementation
+            # prior_points += prior_points.new_tensor([-0.08, -0.08, -0.08])
 
-        x = ME.SparseTensor(coordinates=coordinates, features=features)
-        x = self.backbone_3d(x)
-
-        num_levels = len(x)
-        num_samples = len(x[0].decomposed_coordinates)
-        # query the corresponding image features
+        volumes, valid_preds = [], []
         for idx in range(len(batch_img_metas)):
             img_meta = batch_img_metas[idx]
             img_scale_factor = (img.new_tensor(img_meta['scale_factor'][:2])
@@ -152,7 +170,7 @@ class Embodied3DDetector(BaseModel):
             img_crop_offset = (img.new_tensor(img_meta['img_crop_offset'])
                                if 'img_crop_offset' in img_meta.keys() else 0)
             proj_mat = get_proj_mat_by_coord_type(img_meta, self.coord_type)
-            # Multi-View Sparse Fusion
+            # Multi-View ImVoxelNet
             if isinstance(proj_mat, dict):
                 assert 'extrinsic' in proj_mat.keys()
                 assert 'intrinsic' in proj_mat.keys()
@@ -166,65 +184,91 @@ class Embodied3DDetector(BaseModel):
                     extrinsic = img.new_tensor(proj_mat['extrinsic'][proj_idx])
                     projection.append(intrinsic @ extrinsic)
                 proj_mat = torch.stack(projection)
-                points_imgfeats = []
-                for level_idx in range(num_levels):
-                    point = x[level_idx].decomposed_coordinates[
-                        idx] * self.voxel_size
-                    points_imgfeat = batch_point_sample(
-                        img_meta,
-                        img_features=img_features[level_idx][0]
-                        [:idx + 1],  # batch_size=1
-                        points=point,
-                        proj_mat=proj_mat[:idx + 1],
-                        coord_type=self.coord_type,
-                        img_scale_factor=img_scale_factor,
-                        img_crop_offset=img_crop_offset,
-                        img_flip=img_flip,
-                        img_pad_shape=img.shape[-2:],
-                        img_shape=img_meta['img_shape'][:2],
-                        aligned=False)
-                    points_imgfeats.append(
-                        points_imgfeat)  # one sample, all levels
-            else:
-                raise NotImplementedError
-            all_points_imgfeats.append(
-                points_imgfeats)  # all samples, all levels
+                volume = batch_point_sample(
+                    img_meta,
+                    img_features=img_features[0][:idx + 1],  # batch_size=1
+                    points=prior_points,
+                    proj_mat=proj_mat[:idx + 1],
+                    coord_type=self.coord_type,
+                    img_scale_factor=img_scale_factor,
+                    img_crop_offset=img_crop_offset,
+                    img_flip=img_flip,
+                    img_pad_shape=img.shape[-2:],
+                    img_shape=img_meta['img_shape'][:2],
+                    aligned=False)
+            volumes.append(
+                volume.reshape(self.n_voxels[::-1] + [-1]).permute(3, 2, 1, 0))
+            valid_preds.append(
+                ~torch.all(volumes[-1] == 0, dim=0, keepdim=True))
+        img_volume = torch.stack(volumes)
 
-        # append img features
-        for level_idx in range(num_levels):
-            mlvl_feats = torch.cat([
-                all_points_imgfeats[sample_idx][level_idx]
-                for sample_idx in range(num_samples)
-            ])
-            img_x = ME.SparseTensor(
-                features=mlvl_feats,
-                coordinate_map_key=x[level_idx].coordinate_map_key,
-                coordinate_manager=x[level_idx].coordinate_manager)
-            x[level_idx] = ME.cat(x[level_idx], img_x)
+        # 2. Extract sparse point feats and scatter to the feat volume
+        points = batch_inputs_dict['points']
+        # TODO: remove the tuple packing in points[idx]
+        points = [points[idx][0] for idx in range(len(points))]
 
-        if self.with_neck_lidar:
-            x = self.neck_lidar(x)
-        return x
+        voxel_size = prior_points.new_tensor(self.voxel_size)
+        point_cloud_range = prior_points.new_tensor(self.point_cloud_range)
+        # construct sparse tensor and features
+        if self.use_xyz_feat:
+            coordinates, features = ME.utils.batch_sparse_collate(
+                [((p[:, :3] - point_cloud_range[:3]) / voxel_size, p)
+                 for p in points],
+                device=points[0].device)
+        else:
+            coordinates, features = ME.utils.batch_sparse_collate(
+                [((p[:, :3] - point_cloud_range[:3] / voxel_size), p[:, 3:])
+                 for p in points],
+                device=points[0].device)
+
+        coordinates[:, 1:] = coordinates[:, 1:].clamp(
+            min=torch.tensor([0, 0, 0],
+                             dtype=coordinates.dtype,
+                             device=coordinates.device),
+            max=torch.tensor(
+                [n * self.voxel_stride - 1 for n in self.n_voxels],
+                dtype=coordinates.dtype,
+                device=coordinates.device))
+
+        sparse_point_feat = ME.SparseTensor(coordinates=coordinates,
+                                            features=features)
+        sparse_point_feat = self.backbone_3d(sparse_point_feat)
+
+        # TOCHECK: to_dense operation can support batch_size > 1
+        point_volume = sparse_point_feat[-1].dense(
+            shape=torch.Size([
+                len(points), sparse_point_feat[-1].features.shape[-1],
+                *self.n_voxels
+            ]),
+            min_coordinate=torch.IntTensor([0, 0, 0]))[0]
+
+        x = torch.cat([img_volume, point_volume], dim=1)
+        x = self.neck_3d(x)
+        return x, torch.stack(valid_preds).float()
 
     def loss(self, batch_inputs_dict: dict, batch_data_samples: SampleList,
              **kwargs) -> Union[dict, list]:
-        """Calculate losses from a batch of inputs dict and data samples.
+        """Calculate losses from a batch of inputs and data samples.
 
         Args:
             batch_inputs_dict (dict): The model input dict which include
-                'points', 'img' keys.
+                the 'imgs' key.
 
-                    - points (list[torch.Tensor]): Point cloud of each sample.
                     - imgs (torch.Tensor, optional): Image of each sample.
-
-            batch_data_samples (List[:obj:`Det3DDataSample`]): The Data
-                Samples. It usually includes information such as
-                `gt_instance_3d`, `gt_panoptic_seg_3d` and `gt_sem_seg_3d`.
+            batch_data_samples (list[:obj:`DetDataSample`]): The batch
+                data samples. It usually includes information such
+                as `gt_instance` or `gt_panoptic_seg` or `gt_sem_seg`.
 
         Returns:
             dict: A dictionary of loss components.
         """
-        x = self.extract_feat(batch_inputs_dict, batch_data_samples)
+        x, valid_preds = self.extract_feat(batch_inputs_dict,
+                                           batch_data_samples)
+        # For indoor datasets ImVoxelNet uses ImVoxelHead that handles
+        # mask of visible voxels.
+        if self.coord_type in ('DEPTH', 'CAMERA') and self.use_valid_mask:
+            x += (valid_preds, )
+
         losses = self.bbox_head.loss(x, batch_data_samples, **kwargs)
         return losses
 
@@ -235,20 +279,17 @@ class Embodied3DDetector(BaseModel):
 
         Args:
             batch_inputs_dict (dict): The model input dict which include
-                'points', 'img' keys.
+                the 'imgs' key.
 
-                    - points (list[torch.Tensor]): Point cloud of each sample.
                     - imgs (torch.Tensor, optional): Image of each sample.
 
             batch_data_samples (List[:obj:`Det3DDataSample`]): The Data
                 Samples. It usually includes information such as
                 `gt_instance_3d`, `gt_panoptic_seg_3d` and `gt_sem_seg_3d`.
-            rescale (bool): Whether to rescale the results.
-                Defaults to True.
 
         Returns:
             list[:obj:`Det3DDataSample`]: Detection results of the
-            input samples. Each Det3DDataSample usually contain
+            input images. Each Det3DDataSample usually contain
             'pred_instances_3d'. And the ``pred_instances_3d`` usually
             contains following keys.
 
@@ -259,11 +300,48 @@ class Embodied3DDetector(BaseModel):
                 - bboxes_3d (Tensor): Contains a tensor with shape
                     (num_instances, C) where C >=7.
         """
-        x = self.extract_feat(batch_inputs_dict, batch_data_samples)
+        x, valid_preds = self.extract_feat(batch_inputs_dict,
+                                           batch_data_samples)
+        # For indoor datasets ImVoxelNet uses ImVoxelHead that handles
+        # mask of visible voxels.
+        if self.coord_type in ('DEPTH', 'CAMERA') and self.use_valid_mask:
+            x += (valid_preds, )
+
         results_list = self.bbox_head.predict(x, batch_data_samples, **kwargs)
-        predictions = self.add_pred_to_datasample(batch_data_samples,
-                                                  results_list)
+        predictions = self.add_occupancy_to_data_sample(
+            batch_data_samples, results_list)
         return predictions
+
+    def add_occupancy_to_data_sample(self, data_samples: SampleList, pred):
+        for i, data_sample in enumerate(data_samples):
+            data_sample.pred_occupancy = pred[i]
+        return data_samples
+
+    def _forward(self, batch_inputs_dict: dict, batch_data_samples: SampleList,
+                 *args, **kwargs) -> Tuple[List[torch.Tensor]]:
+        """Network forward process. Usually includes backbone, neck and head
+        forward without any post-processing.
+
+        Args:
+            batch_inputs_dict (dict): The model input dict which include
+                the 'imgs' key.
+
+                    - imgs (torch.Tensor, optional): Image of each sample.
+            batch_data_samples (List[:obj:`Det3DDataSample`]): The Data
+                Samples. It usually includes information such as
+                `gt_instance_3d`, `gt_panoptic_seg_3d` and `gt_sem_seg_3d`.
+
+        Returns:
+            tuple[list]: A tuple of features from ``bbox_head`` forward.
+        """
+        x, valid_preds = self.extract_feat(batch_inputs_dict,
+                                           batch_data_samples)
+        # For indoor datasets ImVoxelNet uses ImVoxelHead that handles
+        # mask of visible voxels.
+        if self.coord_type in ('DEPTH', 'CAMERA') and self.use_valid_mask:
+            x += (valid_preds, )
+        results = self.bbox_head.forward(x)
+        return results
 
     def forward(self,
                 inputs: Union[dict, List[dict]],
@@ -314,46 +392,6 @@ class Embodied3DDetector(BaseModel):
         else:
             raise RuntimeError(f'Invalid mode "{mode}". '
                                'Only supports loss, predict and tensor mode')
-
-    def _forward(self,
-                 batch_inputs_dict: dict,
-                 batch_data_samples: Optional[List] = None,
-                 **kwargs) -> Tuple[List[torch.Tensor]]:
-        """Network forward process. Usually includes backbone, neck and head
-        forward without any post-processing.
-
-         Args:
-            batch_inputs_dict (dict): The model input dict which include
-                'points', 'img' keys.
-
-                    - points (list[torch.Tensor]): Point cloud of each sample.
-                    - imgs (torch.Tensor, optional): Image of each sample.
-
-            batch_data_samples (List[:obj:`Det3DDataSample`]): The Data
-                Samples. It usually includes information such as
-                `gt_instance_3d`, `gt_panoptic_seg_3d` and `gt_sem_seg_3d`.
-
-        Returns:
-            tuple[list]: A tuple of features from ``bbox_head`` forward.
-        """
-        x = self.extract_feat(batch_inputs_dict, batch_data_samples)
-        results = self.bbox_head.forward(x)
-        return results
-
-    @property
-    def with_neck(self):
-        """Whether the detector has a 2D backbone."""
-        return hasattr(self, 'neck') and self.neck is not None
-
-    @property
-    def with_neck_3d(self):
-        """Whether the detector has a 3D neck."""
-        return hasattr(self, 'neck_3d') and self.neck_3d is not None
-
-    @property
-    def with_neck_lidar(self):
-        """Whether the detector has a 2D backbone."""
-        return hasattr(self, 'neck_lidar') and self.neck_lidar is not None
 
     def add_pred_to_datasample(
         self,

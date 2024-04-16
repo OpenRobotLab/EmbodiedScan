@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 from mmcv.transforms import BaseTransform
@@ -219,4 +219,65 @@ class PointSample(BaseTransform):
         repr_str += f' sample_range={self.sample_range},'
         repr_str += f' replace={self.replace})'
 
+        return repr_str
+
+
+@TRANSFORMS.register_module()
+class PointsRangeFilter(BaseTransform):
+    """Filter points by the range.
+
+    Required Keys:
+
+    - points
+    - pts_instance_mask (optional)
+
+    Modified Keys:
+
+    - points
+    - pts_instance_mask (optional)
+
+    Args:
+        point_cloud_range (list[float]): Point cloud range.
+    """
+
+    def __init__(self, point_cloud_range: List[float]) -> None:
+        self.pcd_range = np.array(point_cloud_range, dtype=np.float32)
+
+    def transform(self, input_dict: dict) -> dict:
+        """Transform function to filter points by the range.
+
+        Args:
+            input_dict (dict): Result dict from loading pipeline.
+
+        Returns:
+            dict: Results after filtering, 'points', 'pts_instance_mask'
+            and 'pts_semantic_mask' keys are updated in the result dict.
+        """
+        points = input_dict['points']
+        points_mask = points.in_range_3d(self.pcd_range)
+        clean_points = points[points_mask]
+        if len(clean_points) < 100:
+            print('Warning: <100 points after PointsRangeFilter and',
+                  'so we keep the original points!')
+        else:
+            input_dict['points'] = clean_points
+            points_mask = points_mask.numpy()
+
+            pts_instance_mask = input_dict.get('pts_instance_mask', None)
+            pts_semantic_mask = input_dict.get('pts_semantic_mask', None)
+
+            if pts_instance_mask is not None:
+                input_dict['pts_instance_mask'] = pts_instance_mask[
+                    points_mask]
+
+            if pts_semantic_mask is not None:
+                input_dict['pts_semantic_mask'] = pts_semantic_mask[
+                    points_mask]
+
+        return input_dict
+
+    def __repr__(self) -> str:
+        """str: Return a string that describes the module."""
+        repr_str = self.__class__.__name__
+        repr_str += f'(point_cloud_range={self.pcd_range.tolist()})'
         return repr_str

@@ -31,12 +31,10 @@ class SparseFeatureFusionSingleStage3DDetector(BaseModel):
 
     Args:
         backbone (dict): Config dict of detector's backbone.
-        backbone_lidar (dict): Config dict of detector's lidar backbone.
+        backbone_3d (dict): Config dict of detector's 3D backbone.
         bbox_head (dict): Config dict of box head.
         neck (dict, optional): Config dict of neck. Defaults to None.
         neck_3d (dict, optional): Config dict of 3D neck. Defaults to None.
-        neck_lidar (dict, optional): Config dict of lidar neck.
-            Defaults to None.
         coord_type (str): Type of Box coordinates. Defaults to CAMERA.
         train_cfg (dict, optional): Config dict of training hyper-parameters.
             Defaults to None.
@@ -45,7 +43,7 @@ class SparseFeatureFusionSingleStage3DDetector(BaseModel):
         data_preprocessor (dict or ConfigDict, optional): The pre-process
             config of :class:`BaseDataPreprocessor`.  it usually includes,
                 ``pad_size_divisor``, ``pad_value``, ``mean`` and ``std``.
-        use_xyz_feat (bool, optional): Whether to use xyz features.
+        use_xyz_feat (bool): Whether to use xyz features.
             Defaults to False.
         init_cfg (dict or ConfigDict, optional): the config to control the
             initialization. Defaults to None.
@@ -54,11 +52,10 @@ class SparseFeatureFusionSingleStage3DDetector(BaseModel):
 
     def __init__(self,
                  backbone: ConfigType,
-                 backbone_lidar: ConfigType,
+                 backbone_3d: ConfigType,
                  bbox_head: ConfigType,
                  neck: ConfigType = None,
                  neck_3d: ConfigType = None,
-                 neck_lidar: ConfigType = None,
                  coord_type: str = 'CAMERA',
                  train_cfg: Optional[ConfigType] = None,
                  test_cfg: Optional[ConfigType] = None,
@@ -68,13 +65,11 @@ class SparseFeatureFusionSingleStage3DDetector(BaseModel):
         super().__init__(data_preprocessor=data_preprocessor,
                          init_cfg=init_cfg)
         self.backbone = MODELS.build(backbone)
-        self.backbone_lidar = MODELS.build(backbone_lidar)
+        self.backbone_3d = MODELS.build(backbone_3d)
         if neck is not None:
             self.neck = MODELS.build(neck)
         if neck_3d is not None:
             self.neck_3d = MODELS.build(neck_3d)
-        if neck_lidar is not None:
-            self.neck_lidar = MODELS.build(neck_lidar)
         bbox_head.update(train_cfg=train_cfg)
         bbox_head.update(test_cfg=test_cfg)
         self.bbox_head = MODELS.build(bbox_head)
@@ -121,7 +116,7 @@ class SparseFeatureFusionSingleStage3DDetector(BaseModel):
                 device=points[0].device)
 
         x = ME.SparseTensor(coordinates=coordinates, features=features)
-        x = self.backbone_lidar(x)
+        x = self.backbone_3d(x)
         num_levels = len(x)  # 4 levels
         num_samples = len(x[0].decomposed_coordinates)
 
@@ -223,8 +218,6 @@ class SparseFeatureFusionSingleStage3DDetector(BaseModel):
                 coordinate_manager=x[level_idx].coordinate_manager)
             x[level_idx] = ME.cat(x[level_idx], img_x)
 
-        if self.with_neck_lidar:
-            x = self.neck_lidar(x)
         return x
 
     def loss(self, batch_inputs_dict: dict, batch_data_samples: SampleList,
@@ -370,11 +363,6 @@ class SparseFeatureFusionSingleStage3DDetector(BaseModel):
     def with_neck_3d(self):
         """Whether the detector has a 3D neck."""
         return hasattr(self, 'neck_3d') and self.neck_3d is not None
-
-    @property
-    def with_neck_lidar(self):
-        """Whether the detector has a 2D backbone."""
-        return hasattr(self, 'neck_lidar') and self.neck_lidar is not None
 
     def add_pred_to_datasample(
         self,

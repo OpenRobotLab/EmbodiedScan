@@ -33,7 +33,7 @@ model = dict(
         norm_eval=True,
         init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet50'),
         style='pytorch'),
-    backbone_lidar=dict(type='MinkResNet', in_channels=3, depth=34),
+    backbone_3d=dict(type='MinkResNet', in_channels=3, depth=34),
     use_xyz_feat=True,
     bbox_head=dict(type='FCAF3DHeadRotMat',
                    in_channels=(128, 256, 512, 1024),
