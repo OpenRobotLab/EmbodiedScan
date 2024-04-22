@@ -44,11 +44,14 @@ def _9dof_to_box(box, label=None, color_selector=None, color=None):
     """Convert 9-DoF box from array/tensor to open3d.OrientedBoundingBox.
 
     Args:
-        box (numpy.ndarray or torch.Tensor): 9-DoF box with shape (9,)
-        label (int): Label of the box
-        color_selector (ColorSelector): Color selector for boxes
-        color (tuple): Color of the box.
+        box (numpy.ndarray or torch.Tensor): 9-DoF box with shape (9,).
+        label (int, optional): Label of the box. Defaults to None.
+        color_selector (:obj:`ColorSelector`): Color selector for boxes.
+            Defaults to None.
+        color (tuple[int]): Color of the box.
             You can directly specify the color.
+            If you do, the color_selector and label will be ignored.
+            Defaults to None.
     """
     if isinstance(box, list):
         box = np.array(box)
@@ -78,7 +81,7 @@ def nms_filter(pred_results, iou_thr=0.15, score_thr=0.075, topk_per_class=10):
     visualization.
 
     Args:
-        pred_results (mmengine.structures.instance_data.InstanceData):
+        pred_results (:obj:`InstanceData`):
             Results predicted by the model
         iou_thr (float): IoU thresholds for NMS. Defaults to 0.15.
         score_thr (float): Score thresholds.
@@ -131,8 +134,9 @@ def draw_camera(camera_pose, camera_size=0.5, return_points=False):
             Defaults to False.
 
     Returns:
-        if return_points is True, return the points of the camera cone.
-        Otherwise, return the camera cone as an open3d.LineSet.
+        numpy.ndarray | :obj:`LineSet`:
+            if return_points is True, return the points of the camera cone.
+            Otherwise, return the camera cone as an open3d.LineSet.
     """
     # camera_pose : 4*4 camera to world
     point = np.array([[0, 0, 0], [-camera_size, -camera_size, camera_size * 2],

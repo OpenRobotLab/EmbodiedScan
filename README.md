@@ -195,7 +195,7 @@ python tools/test.py configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9d
 
 ### Using Visualizer during inference
 
-We provide EmbodiedBaseVisualizer to visualize the output of models during inference. Please refer to the [guide](embodiedscan/visualizer/README.md) for detail.
+We provide EmbodiedScanBaseVisualizer to visualize the output of models during inference. Please refer to the [guide](embodiedscan/visualizer/README.md) for detail.
 
 ### Inference and Submit your Results
 

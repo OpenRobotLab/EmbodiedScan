@@ -14,14 +14,16 @@ except ImportError:
 
 
 @VISUALIZERS.register_module()
-class EmbodiedBaseVisualizer(Visualizer):
-    """Embodiedscan BaseVisualizer. Method to visualize 3D scenes and Euler
+class EmbodiedScanBaseVisualizer(Visualizer):
+    """EmbodiedScan Base Visualizer. Method to visualize 3D scenes and Euler
     boxes.
 
     Args:
         name (str): Name of the visualizer. Default to 'visualizer'.
-        save_dir (str): Directory to save visualizations.
-        vis_backends (list[ConfigType]): List of visualization backends to use.
+        save_dir (str, optional): Directory to save visualizations.
+            Defaults to None.
+        vis_backends (list[ConfigType], optional):
+            List of visualization backends to use. Defaluts to None.
     """
 
     def __init__(self,
@@ -67,12 +69,15 @@ class EmbodiedBaseVisualizer(Visualizer):
         return filepath
 
     @master_only
-    def visual_scene(self, data_samples, class_filter=None, nms_args=dict()):
+    def visualize_scene(self,
+                        data_samples,
+                        class_filter=None,
+                        nms_args=dict()):
         """Visualize the 3D scene with 3D boxes.
 
         Args:
             data_samples (list[Det3DDataSample]): The output of the model.
-            class_filter (int or None): Class filter for visualization.
+            class_filter (int, optional): Class filter for visualization.
                 Default to None to show all classes.
             nms_args (dict): NMS arguments for filtering boxes.
                 Default to dict(iou_thr = 0.15,

@@ -1,3 +1,3 @@
-from .base_visualizer import EmbodiedBaseVisualizer
+from .base_visualizer import EmbodiedScanBaseVisualizer
 
-__all__ = ['EmbodiedBaseVisualizer']
+__all__ = ['EmbodiedScanBaseVisualizer']
