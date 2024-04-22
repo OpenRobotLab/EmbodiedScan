@@ -19,7 +19,7 @@ class EmbodiedScanBaseVisualizer(Visualizer):
     boxes.
 
     Args:
-        name (str): Name of the visualizer. Default to 'visualizer'.
+        name (str): Name of the visualizer. Defaults to 'visualizer'.
         save_dir (str, optional): Directory to save visualizations.
             Defaults to None.
         vis_backends (list[ConfigType], optional):
@@ -72,17 +72,20 @@ class EmbodiedScanBaseVisualizer(Visualizer):
     def visualize_scene(self,
                         data_samples,
                         class_filter=None,
-                        nms_args=dict()):
+                        nms_args=dict(iou_thr=0.15,
+                                      score_thr=0.075,
+                                      topk_per_class=10)):
         """Visualize the 3D scene with 3D boxes.
 
         Args:
-            data_samples (list[Det3DDataSample]): The output of the model.
+            data_samples (list[:obj:`Det3DDataSample`]):
+                The output of the model.
             class_filter (int, optional): Class filter for visualization.
                 Default to None to show all classes.
             nms_args (dict): NMS arguments for filtering boxes.
-                Default to dict(iou_thr = 0.15,
-                                score_thr = 0.075,
-                                topk_per_class = 10)
+                Defaults to dict(iou_thr = 0.15,
+                                 score_thr = 0.075,
+                                 topk_per_class = 10)
         """
         assert len(data_samples) == 1
         data_sample = data_samples[0]

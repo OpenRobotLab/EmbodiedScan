@@ -82,16 +82,17 @@ def nms_filter(pred_results, iou_thr=0.15, score_thr=0.075, topk_per_class=10):
 
     Args:
         pred_results (:obj:`InstanceData`):
-            Results predicted by the model
+            Results predicted by the model.
         iou_thr (float): IoU thresholds for NMS. Defaults to 0.15.
         score_thr (float): Score thresholds.
             Instances with scores below thresholds will not be kept.
             Defaults to 0.075.
         topk_per_class (int): Number of instances kept per category.
+            Defaults to 10.
 
     Returns:
-        boxes (numpy.ndarray[float]): filtered instances, shape (N,9)
-        labels (numpy.ndarray[int]): filtered labels, shape (N,)
+        numpy.ndarray[float], np.ndarray[int]:
+            Filtered boxes with shape (N, 9) and labels with shape (N,).
     """
     boxes = pred_results.bboxes_3d
     boxes_tensor = boxes.tensor.cpu().numpy()
