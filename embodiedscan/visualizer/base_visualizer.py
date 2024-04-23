@@ -85,7 +85,7 @@ class EmbodiedScanBaseVisualizer(Visualizer):
             nms_args (dict): NMS arguments for filtering boxes.
                 Defaults to dict(iou_thr = 0.15,
                                  score_thr = 0.075,
-                                 topk_per_class = 10)
+                                 topk_per_class = 10).
         """
         assert len(data_samples) == 1
         data_sample = data_samples[0]

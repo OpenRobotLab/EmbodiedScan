@@ -44,11 +44,12 @@ def _9dof_to_box(box, label=None, color_selector=None, color=None):
     """Convert 9-DoF box from array/tensor to open3d.OrientedBoundingBox.
 
     Args:
-        box (numpy.ndarray or torch.Tensor): 9-DoF box with shape (9,).
+        box (numpy.ndarray|torch.Tensor|List[float]):
+            9-DoF box with shape (9,).
         label (int, optional): Label of the box. Defaults to None.
-        color_selector (:obj:`ColorSelector`): Color selector for boxes.
-            Defaults to None.
-        color (tuple[int]): Color of the box.
+        color_selector (:obj:`ColorSelector`, optional):
+            Color selector for boxes. Defaults to None.
+        color (tuple[int], optional): Color of the box.
             You can directly specify the color.
             If you do, the color_selector and label will be ignored.
             Defaults to None.
