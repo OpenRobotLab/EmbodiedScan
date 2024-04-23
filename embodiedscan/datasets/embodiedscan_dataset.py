@@ -105,6 +105,7 @@ class EmbodiedScanDataset(BaseDataset):
         """
         info['box_type_3d'] = self.box_type_3d
         info['axis_align_matrix'] = self._get_axis_align_matrix(info)
+        info['scan_id'] = info['sample_idx']
         ann_dataset = info['sample_idx'].split('/')[0]
         if ann_dataset == 'matterport3d':
             info['depth_shift'] = 4000.0

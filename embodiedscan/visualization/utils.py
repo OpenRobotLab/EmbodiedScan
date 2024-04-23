@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import open3d as o3d
+from torch import Tensor
 
 from .line_mesh import LineMesh
 
@@ -39,9 +40,24 @@ def _box_add_thickness(box, thickness):
     return results
 
 
-def _9dof_to_box(box, label, color_selector):
+def _9dof_to_box(box, label=None, color_selector=None, color=None):
+    """Convert 9-DoF box from array/tensor to open3d.OrientedBoundingBox.
+
+    Args:
+        box (numpy.ndarray|torch.Tensor|List[float]):
+            9-DoF box with shape (9,).
+        label (int, optional): Label of the box. Defaults to None.
+        color_selector (:obj:`ColorSelector`, optional):
+            Color selector for boxes. Defaults to None.
+        color (tuple[int], optional): Color of the box.
+            You can directly specify the color.
+            If you do, the color_selector and label will be ignored.
+            Defaults to None.
+    """
     if isinstance(box, list):
         box = np.array(box)
+    if isinstance(box, Tensor):
+        box = box.cpu().numpy()
     center = box[:3].reshape(3, 1)
     scale = box[3:6].reshape(3, 1)
     rot = box[6:].reshape(3, 1)
@@ -49,13 +65,81 @@ def _9dof_to_box(box, label, color_selector):
         rot)
     geo = o3d.geometry.OrientedBoundingBox(center, rot_mat, scale)
 
-    color = color_selector.get_color(label)
-    color = [x / 255.0 for x in color]
-    geo.color = color
+    if color is not None:
+        geo.color = [x / 255.0 for x in color]
+        return geo
+
+    if label is not None and color_selector is not None:
+        color = color_selector.get_color(label)
+        color = [x / 255.0 for x in color]
+        geo.color = color
     return geo
 
 
+def nms_filter(pred_results, iou_thr=0.15, score_thr=0.075, topk_per_class=10):
+    """Non-Maximum Suppression for 3D Euler boxes. Additionally, only the top-k
+    boxes will be kept for each category to avoid redundant boxes in the
+    visualization.
+
+    Args:
+        pred_results (:obj:`InstanceData`):
+            Results predicted by the model.
+        iou_thr (float): IoU thresholds for NMS. Defaults to 0.15.
+        score_thr (float): Score thresholds.
+            Instances with scores below thresholds will not be kept.
+            Defaults to 0.075.
+        topk_per_class (int): Number of instances kept per category.
+            Defaults to 10.
+
+    Returns:
+        numpy.ndarray[float], np.ndarray[int]:
+            Filtered boxes with shape (N, 9) and labels with shape (N,).
+    """
+    boxes = pred_results.bboxes_3d
+    boxes_tensor = boxes.tensor.cpu().numpy()
+    iou = boxes.overlaps(boxes, boxes, eps=1e-5)
+    score = pred_results.scores_3d.cpu().numpy()
+    label = pred_results.labels_3d.cpu().numpy()
+    selected_per_class = dict()
+
+    n = boxes_tensor.shape[0]
+    idx = list(range(n))
+    idx.sort(key=lambda x: score[x], reverse=True)
+    selected_idx = []
+    for i in idx:
+        if selected_per_class.get(label[i], 0) >= topk_per_class:
+            continue
+        if score[i] < score_thr:
+            continue
+        bo = False
+        for j in selected_idx:
+            if iou[i][j] > iou_thr:
+                bo = True
+                break
+        if not bo:
+            selected_idx.append(i)
+            if label[i] not in selected_per_class:
+                selected_per_class[label[i]] = 1
+            else:
+                selected_per_class[label[i]] += 1
+
+    return boxes_tensor[selected_idx], label[selected_idx]
+
+
 def draw_camera(camera_pose, camera_size=0.5, return_points=False):
+    """Draw the camera pose in the form of a cone.
+
+    Args:
+        camera_pose (numpy.ndarray): 4x4 camera pose from camera to world.
+        camera_size (float): Size of the camera cone. Defaults to 0.5.
+        return_points (bool): Whether to return the points of the camera cone.
+            Defaults to False.
+
+    Returns:
+        numpy.ndarray | :obj:`LineSet`:
+            if return_points is True, return the points of the camera cone.
+            Otherwise, return the camera cone as an open3d.LineSet.
+    """
     # camera_pose : 4*4 camera to world
     point = np.array([[0, 0, 0], [-camera_size, -camera_size, camera_size * 2],
                       [camera_size, -camera_size, camera_size * 2],
