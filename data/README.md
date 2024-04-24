@@ -28,10 +28,14 @@ data
 ├── embodiedscan_occupancy
 ├── embodiedscan_infos_train.pkl
 ├── embodiedscan_infos_val.pkl
-├── embodiedscan_infos_train_full_vg.json
-├── embodiedscan_infos_val_full_vg.json
-├── embodiedscan_infos_train_mini_vg.json
-├── embodiedscan_infos_val_mini_vg.json
+├── embodiedscan_infos_test.pkl
+├── embodiedscan_infos_train_vg.json
+├── embodiedscan_infos_val_vg.json
+├── embodiedscan_infos_test_vg.json
+├── embodiedscan_infos_train_mini_vg.json (mini set)
+├── embodiedscan_infos_val_mini_vg.json (mini set)
+├── embodiedscan_infos_train_vg_all.json (w/ complex prompts)
+├── embodiedscan_infos_val_vg_all.json (w/ complex prompts)
 ```
 
 5. Enter the project root directory, extract images by running
