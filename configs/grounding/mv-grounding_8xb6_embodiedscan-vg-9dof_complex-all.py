@@ -133,8 +133,8 @@ test_pipeline = [
 
 # TODO: to determine a reasonable batch size
 train_dataloader = dict(
-    batch_size=12,
-    num_workers=12,
+    batch_size=6,
+    num_workers=6,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
     dataset=dict(type='RepeatDataset',
@@ -149,8 +149,8 @@ train_dataloader = dict(
                               filter_empty_gt=True,
                               box_type_3d='Euler-Depth')))
 
-val_dataloader = dict(batch_size=12,
-                      num_workers=12,
+val_dataloader = dict(batch_size=6,
+                      num_workers=6,
                       persistent_workers=True,
                       drop_last=False,
                       sampler=dict(type='DefaultSampler', shuffle=False),
@@ -164,8 +164,8 @@ val_dataloader = dict(batch_size=12,
                                    filter_empty_gt=True,
                                    box_type_3d='Euler-Depth'))
 
-test_dataloader = dict(batch_size=12,
-                       num_workers=12,
+test_dataloader = dict(batch_size=6,
+                       num_workers=6,
                        persistent_workers=True,
                        drop_last=False,
                        sampler=dict(type='DefaultSampler', shuffle=False),
