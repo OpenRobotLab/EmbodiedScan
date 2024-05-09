@@ -171,6 +171,7 @@ class AggregateMultiViewPoints(BaseTransform):
 
 @TRANSFORMS.register_module()
 class ConstructMultiSweeps(BaseTransform):
+    """Construct N multi-view frames to 1-N continuous sweeps."""
 
     def __init__(self):
         super().__init__()
@@ -238,6 +239,33 @@ class ConstructMultiSweeps(BaseTransform):
 
         if 'visible_occupancy_masks' in results:
             results['gt_occupancy_masks'] = batch_gt_occupancy_masks
+            if 'eval_ann_info' in results:
+                results['eval_ann_info']['gt_occupancy_masks'] = results[
+                    'gt_occupancy_masks']
+
+        return results
+
+
+@TRANSFORMS.register_module()
+class ConstructMultiViewMasks:
+    """Construct multi-view masks to only keep visible results.
+
+    Only used for the occupancy prediction task temporarily.
+    """
+
+    def __call__(self, results):
+
+        if 'visible_occupancy_masks' in results:
+            visible_occupancy_masks = results['visible_occupancy_masks']
+            cumulated_masks = visible_occupancy_masks[0]
+
+        for idx in range(1, len(results['img']) - 1):
+            if 'visible_occupancy_masks' in results:
+                cumulated_masks = np.logical_or(cumulated_masks,
+                                                visible_occupancy_masks[idx])
+
+        if 'visible_occupancy_masks' in results:
+            results['gt_occupancy_masks'] = cumulated_masks
             if 'eval_ann_info' in results:
                 results['eval_ann_info']['gt_occupancy_masks'] = results[
                     'gt_occupancy_masks']

@@ -81,6 +81,8 @@ Building upon this database, we introduce a baseline framework named <b>Embodied
 
 ## 🔥 News
 
+- \[2024-04\] We release all the baselines with pretrained models and logs. Welcome to try and play with them on our demo data! Note that we rename some keys in the multi-view 3D detection and visual grounding model. Please re-download the pretrained models if you just use our code for inference.
+- \[2024-03\] The challenge test server is also online [here](https://huggingface.co/spaces/AGC2024/visual-grounding-2024). Looking forward to your strong submissions!
 - \[2024-03\] We first release the data and baselines for the challenge. Please fill in the [form](https://docs.google.com/forms/d/e/1FAIpQLScUXEDTksGiqHZp31j7Zp7zlCNV7p_08uViwP_Nbzfn3g6hhw/viewform?usp=sf_link) to apply for downloading the data and try our baselines. Welcome any feedback!
 - \[2024-02\] We will co-organize [Autonomous Grand Challenge](https://opendrivelab.com/challenge2024/) in CVPR 2024. Welcome to try the Multi-View 3D Visual Grounding track! We will release more details about the challenge with the baseline after the Chinese New Year.
 - \[2023-12\] We release the [paper](./assets/EmbodiedScan.pdf) of EmbodiedScan. Please check the [webpage](https://tai-wang.github.io/embodiedscan) and view our demos!
@@ -134,8 +136,6 @@ BTW, from our experience, it is easier to encounter problems when installing the
 ### Data Preparation
 
 Please refer to the [guide](data/README.md) for downloading and organization.
-
-We will update the authorization approach and release remaining data afterward. Please stay tuned.
 
 ### Tutorial
 
@@ -214,7 +214,7 @@ Finally, to pack the prediction file into the submission format, please modify t
 python tools/submit_results.py
 ```
 
-Then you can submit the resulting pkl file to the test server (to go live by the end of March) and wait for the lottery :)
+Then you can submit the resulting pkl file to the test server and wait for the lottery :)
 
 We also provide a sample script `tools/eval_script.py` for evaluating the submission file and you can check it by yourself to ensure your submitted file has the correct format.
 
@@ -228,17 +228,55 @@ Note that the performance is a little different from the results provided in the
 
 | Method | Input | AP@0.25 | AR@0.25 | AP@0.5 | AR@0.5 | Download |
 |:------:|:-----:|:-------:|:-------:|:------:|:------:|:------:|
-| [Baseline](configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py) | RGB-D | 15.22  | 52.23  | 8.13  | 26.66 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-3ddet.pth), [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-3ddet.log) |
+| [Baseline](configs/detection/mv-det3d_8xb4_embodiedscan-3d-284class-9dof.py) | RGB-D | 15.22  | 52.23  | 8.13  | 26.66 | [Model](https://download.openmmlab.com/mim-example/embodiedscan/mv-3ddet.pth), [Log](https://download.openmmlab.com/mim-example/embodiedscan/mv-3ddet.log) |
+
+#### Continuous 3D Detection
+
+| Method | Input | AP@0.25 | AR@0.25 | AP@0.5 | AR@0.5 | Download |
+|:------:|:-----:|:-------:|:-------:|:------:|:------:|:------:|
+| [Baseline](configs/detection/cont-det3d_8xb1_embodiedscan-3d-284class-9dof.py) | RGB-D | 17.83  | 47.53  | 9.04  | 23.04 | [Model](https://download.openmmlab.com/mim-example/embodiedscan/cont-3ddet.pth), [Log](https://download.openmmlab.com/mim-example/embodiedscan/cont-3ddet.log) |
 
 #### Multi-View 3D Visual Grounding
 
 | Method |AP@0.25| AP@0.5| Download |
 |:------:|:-----:|:-------:|:------:|
-| [Baseline-Mini](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof.py) | 33.59 | 14.40 | [Model](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding.pth), [Log](https://download.openxlab.org.cn/models/wangtai/EmbodiedScan/weight/mv-grounding.log) |
+| [Baseline-Mini](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof.py) | 33.59 | 14.40 | [Model](https://download.openmmlab.com/mim-example/embodiedscan/mv-grounding.pth), [Log](https://download.openmmlab.com/mim-example/embodiedscan/mv-grounding.log) |
 | [Baseline-Mini (w/ FCAF box coder)](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof_fcaf-coder.py) | - | - | - |
-| [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | - | - | - |
+| [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | 36.78 | 15.97 | [Model](https://download.openmmlab.com/mim-example/embodiedscan/mv-grounding-full.pth), [Log](https://download.openmmlab.com/mim-example/embodiedscan/mv-grounding-full.log) |
 
-Please see the [paper](./assets/EmbodiedScan.pdf) for more details of our two benchmarks, fundamental 3D perception and language-grounded benchmarks. This dataset is still scaling up and the benchmark is being polished and extended. Please stay tuned for our recent updates.
+Note: As mentioned in the paper, due to much more instances annotated with our new tools and pipelines, we concatenate several simple prompts as more complex ones to ensure those prompts to be more accurate without potential ambiguity. The above table is the benchmark without complex prompts using the initial version of visual grounding data.
+
+We found such data is much less than the main part though, it can boost the multi-modal model's performance a lot. Meanwhile, whether to include these data in the validation set is not much important. We provide the updated benchmark as below and update a version of visual grounding data via emails to the community.
+
+| Method | train | val | AP@0.25| AP@0.5| Download |
+|:------:|:-----:|:---:|:------:|:-----:|:--------:|
+| [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | w/o complex | w/o complex | 36.78 | 15.97 | [Model](https://download.openmmlab.com/mim-example/embodiedscan/mv-grounding-full.pth), [Log](https://download.openmmlab.com/mim-example/embodiedscan/mv-grounding-full.log) |
+| [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | w/ complex | w/o complex | 39.26 | 18.86 |[Model](https://download.openmmlab.com/mim-example/embodiedscan/mv-grounding-complex.pth), [Log](https://download.openmmlab.com/mim-example/embodiedscan/mv-grounding-complex.log) |
+| [Baseline-Full](configs/grounding/mv-grounding_8xb12_embodiedscan-vg-9dof-full.py) | w/ complex | w/ complex | 39.21 | 18.84 |[Model](https://download.openmmlab.com/mim-example/embodiedscan/mv-grounding-complex.pth), [Log](https://download.openmmlab.com/mim-example/embodiedscan/mv-grounding-complex.log) |
+
+#### Multi-View Occupancy Prediction
+
+| Method | Input | mIoU | Download |
+|:------:|:-----:|:----:|:--------:|
+| [Baseline](configs/occupancy/mv-occ_8xb1_embodiedscan-occ-80class.py) | RGB-D | 21.28 | [Log](https://download.openmmlab.com/mim-example/embodiedscan/mv-occ.log) |
+
+#### Continuous Occupancy Prediction
+
+| Method | Input | mIoU | Download |
+|:------:|:-----:|:----:|:--------:|
+| [Baseline](configs/occupancy/cont-occ_8xb1_embodiedscan-occ-80class.py) | RGB-D | 22.92 | [Log](https://download.openmmlab.com/mim-example/embodiedscan/cont-occ.log) |
+
+Because the occupancy prediction models are a little large, we save them via OpenXLab and do not provide direct download links here. To download these checkpoints on OpenXLab, please run the following commands:
+
+```bash
+# If you did not install LFS before
+git lfs install
+# git clone EmbodiedScan model repo via
+git clone https://code.openxlab.org.cn/wangtai/EmbodiedScan.git
+# Then you can cd EmbodiedScan to get all the pretrained models
+```
+
+Please see the [paper](./assets/EmbodiedScan.pdf) for more details of our benchmarks. This dataset is still scaling up and the benchmark is being polished and extended. Please stay tuned for our recent updates.
 
 ## 📝 TODO List
 
@@ -248,7 +286,8 @@ Please see the [paper](./assets/EmbodiedScan.pdf) for more details of our two be
 - \[ \] Polish dataset APIs and related codes.
 - \[x\] Release Embodied Perceptron pretrained models.
 - \[x\] Release multi-modal datasets and codes.
-- \[x\] Release codes for baselines and benchmarks.
+- \[x\] Release codes for our baselines and benchmarks.
+- \[ \] Release codes for all the other methods.
 - \[ \] Full release and further updates.
 
 ## 🔗 Citation

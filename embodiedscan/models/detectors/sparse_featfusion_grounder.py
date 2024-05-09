@@ -33,9 +33,15 @@ class SparseFeatureFusion3DGrounder(BaseModel):
 
     Args:
         backbone (dict): Config dict of detector's backbone.
-        neck (dict, optional): Config dict of neck. Defaults to None.
+        backbone_3d (dict): Config dict of detector's 3D backbone.
         bbox_head (dict, optional): Config dict of box head. Defaults to None.
-        max_num_entities (int, optional): The maximum number of entities.
+        neck (dict, optional): Config dict of neck. Defaults to None.
+        neck_3d (dict, optional): Config dict of 3D neck. Defaults to None.
+        decoder (dict, optional): Config dict of decoder. Defaults to None.
+        voxel_size (float): Voxel size for spatial quantization.
+            Defaults to 0.01.
+        num_queries (float): Number of object queries. Defaults to 512.
+        max_num_entities (int): The maximum number of entities.
             Defaults to 256.
         train_cfg (dict, optional): Config dict of training hyper-parameters.
             Defaults to None.
@@ -44,6 +50,8 @@ class SparseFeatureFusion3DGrounder(BaseModel):
         data_preprocessor (dict or ConfigDict, optional): The pre-process
             config of :class:`BaseDataPreprocessor`.  it usually includes,
                 ``pad_size_divisor``, ``pad_value``, ``mean`` and ``std``.
+        use_xyz_feat (bool): Whether to use xyz features.
+            Defaults to False.
         init_cfg (dict or ConfigDict, optional): the config to control the
             initialization. Defaults to None.
     """
@@ -51,11 +59,10 @@ class SparseFeatureFusion3DGrounder(BaseModel):
 
     def __init__(self,
                  backbone: ConfigType,
-                 backbone_lidar: ConfigType,
+                 backbone_3d: ConfigType,
                  bbox_head: ConfigType,
                  neck: ConfigType = None,
                  neck_3d: ConfigType = None,
-                 neck_lidar: ConfigType = None,
                  decoder: ConfigType = None,
                  voxel_size: float = 0.01,
                  num_queries: int = 512,
@@ -69,13 +76,11 @@ class SparseFeatureFusion3DGrounder(BaseModel):
         super().__init__(data_preprocessor=data_preprocessor,
                          init_cfg=init_cfg)
         self.backbone = MODELS.build(backbone)
-        self.backbone_lidar = MODELS.build(backbone_lidar)
+        self.backbone_3d = MODELS.build(backbone_3d)
         if neck is not None:
             self.neck = MODELS.build(neck)
         if neck_3d is not None:
             self.neck_3d = MODELS.build(neck_3d)
-        if neck_lidar is not None:
-            self.neck_lidar = MODELS.build(neck_lidar)
         bbox_head.update(train_cfg=train_cfg)
         bbox_head.update(test_cfg=test_cfg)
         self.bbox_head = MODELS.build(bbox_head)
@@ -116,11 +121,6 @@ class SparseFeatureFusion3DGrounder(BaseModel):
     def with_neck_3d(self):
         """Whether the detector has a 3D neck."""
         return hasattr(self, 'neck_3d') and self.neck_3d is not None
-
-    @property
-    def with_neck_lidar(self):
-        """Whether the detector has a 2D backbone."""
-        return hasattr(self, 'neck_lidar') and self.neck_lidar is not None
 
     def convert_sparse_feature(self, x: List[Tensor], batch_size: int):
         """Convert SparseTensor to pytorch tensor.
@@ -201,7 +201,7 @@ class SparseFeatureFusion3DGrounder(BaseModel):
 
         x = ME.SparseTensor(coordinates=coordinates, features=features)
 
-        x = self.backbone_lidar(x)
+        x = self.backbone_3d(x)
         num_levels = len(x)
         num_samples = len(x[0].decomposed_coordinates)
 
@@ -300,9 +300,6 @@ class SparseFeatureFusion3DGrounder(BaseModel):
                 coordinate_map_key=x[level_idx].coordinate_map_key,
                 coordinate_manager=x[level_idx].coordinate_manager)
             x[level_idx] = ME.cat(x[level_idx], img_x)
-
-        if self.with_neck_lidar:
-            x = self.neck_lidar(x)
 
         # channel mapper feature of different level to the fixed number
         feats, scores, coords = self.neck_3d(x, batch_size)

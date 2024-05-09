@@ -133,8 +133,8 @@ test_pipeline = [
 
 # TODO: to determine a reasonable batch size
 train_dataloader = dict(
-    batch_size=12,
-    num_workers=12,
+    batch_size=6,
+    num_workers=6,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
     dataset=dict(type='RepeatDataset',
@@ -142,34 +142,48 @@ train_dataloader = dict(
                  dataset=dict(type=dataset_type,
                               data_root=data_root,
                               ann_file='embodiedscan_infos_train.pkl',
-                              vg_file='embodiedscan_train_vg.json',
+                              vg_file='embodiedscan_train_vg_all.json',
                               metainfo=metainfo,
                               pipeline=train_pipeline,
                               test_mode=False,
                               filter_empty_gt=True,
                               box_type_3d='Euler-Depth')))
 
-val_dataloader = dict(batch_size=12,
-                      num_workers=12,
+val_dataloader = dict(batch_size=6,
+                      num_workers=6,
                       persistent_workers=True,
                       drop_last=False,
                       sampler=dict(type='DefaultSampler', shuffle=False),
                       dataset=dict(type=dataset_type,
                                    data_root=data_root,
                                    ann_file='embodiedscan_infos_val.pkl',
-                                   vg_file='embodiedscan_val_vg.json',
+                                   vg_file='embodiedscan_val_vg_all.json',
                                    metainfo=metainfo,
                                    pipeline=test_pipeline,
                                    test_mode=True,
                                    filter_empty_gt=True,
                                    box_type_3d='Euler-Depth'))
-test_dataloader = val_dataloader
+
+test_dataloader = dict(batch_size=6,
+                       num_workers=6,
+                       persistent_workers=True,
+                       drop_last=False,
+                       sampler=dict(type='DefaultSampler', shuffle=False),
+                       dataset=dict(type=dataset_type,
+                                    data_root=data_root,
+                                    ann_file='embodiedscan_infos_test.pkl',
+                                    vg_file='embodiedscan_test_vg_all.json',
+                                    metainfo=metainfo,
+                                    pipeline=test_pipeline,
+                                    test_mode=True,
+                                    filter_empty_gt=True,
+                                    box_type_3d='Euler-Depth'))
 
 val_evaluator = dict(type='GroundingMetric')
-test_evaluator = val_evaluator
+test_evaluator = dict(type='GroundingMetric', format_only=True)
 
 # training schedule for 1x
-train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=12, val_interval=3)
+train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=12, val_interval=12)
 val_cfg = dict(type='ValLoop')
 test_cfg = dict(type='TestLoop')
 

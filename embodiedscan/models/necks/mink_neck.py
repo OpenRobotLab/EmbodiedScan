@@ -19,9 +19,9 @@ from embodiedscan.registry import MODELS
 
 @MODELS.register_module()
 class MinkNeck(BaseModule):
-    """MinkEngine based 3D Neck.
+    """MinkEngine based 3D sparse conv neck.
 
-    Actually here we store both the sparse 3D FPN and a head. The neck and
+    Actually here we implement both the sparse 3D FPN and a head. The neck and
     the head can not be simply separated as pruning score on the i-th level
     of FPN requires classification scores from i+1-th level of the head.
 
@@ -29,21 +29,8 @@ class MinkNeck(BaseModule):
         num_classes (int): Number of classes.
         in_channels (tuple(int)): Number of channels in input tensors.
         out_channels (int): Number of channels in the neck output tensors.
-        num_reg_outs (int): Number of regression layer channels.
         voxel_size (float): Voxel size in meters.
         pts_prune_threshold (int): Pruning threshold on each feature level.
-        pts_assign_threshold (int): Box to location assigner parameter.
-            Assigner selects the maximum feature level with more locations
-            inside the box than pts_assign_threshold.
-        pts_center_threshold (int): Box to location assigner parameter.
-            After feature level for the box is determined, assigner selects
-            pts_center_threshold locations closest to the box center.
-        center_loss (dict): Config of centerness loss. Defaults to
-            dict(type='mmdet.CrossEntropyLoss', use_sigmoid=True).
-        bbox_loss (dict): Config of bbox loss. Defaults to
-            dict(type='AxisAlignedIoULoss').
-        cls_loss (dict): Config of classification loss. Defaults to
-            dict = dict(type='mmdet.FocalLoss').
         train_cfg (dict, optional): Config for train stage. Defaults to None.
         test_cfg (dict, optional): Config for test stage. Defaults to None.
         init_cfg (dict, optional): Config for weight initialization.
@@ -119,7 +106,6 @@ class MinkNeck(BaseModule):
         Args:
             in_channels (tuple[int]): Number of channels in input tensors.
             out_channels (int): Number of channels in the neck output tensors.
-            num_reg_outs (int): Number of regression layer channels.
             num_classes (int): Number of classes.
         """
         # neck layers
@@ -203,7 +189,6 @@ class MinkNeck(BaseModule):
 
         Args:
             x (SparseTensor): Per level neck output tensor.
-            scale (mmcv.cnn.Scale): Per level multiplication weight.
 
         Returns:
             tuple[Tensor]: Per level head predictions.
@@ -234,11 +219,16 @@ class MinkNeck(BaseModule):
             feats (list[list[Tensor]]): Feats for all
                 scenes. The first list contains predictions from different
                 levels. The second list contains predictions in a mini-batch.
+            scores (list[list[Tensor]]): Scores for all
+                scenes. The first list contains predictions from different
+                levels. The second list contains predictions in a mini-batch.
             points (list[list[Tensor]]): Final location coordinates for all
                 scenes. The first list contains predictions from different
                 levels. The second list contains predictions in a mini-batch.
+            batch_size (int): Batch size.
 
         Returns:
+            tuple[list[Tensor]]: Batch of features, scores and points lists.
         """
         batch_feats_list = []
         batch_scores_list = []

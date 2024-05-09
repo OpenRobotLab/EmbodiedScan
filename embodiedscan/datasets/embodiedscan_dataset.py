@@ -1,6 +1,5 @@
 import os
 import warnings
-from copy import deepcopy
 from typing import Callable, List, Optional, Union
 
 import mmengine
@@ -146,10 +145,14 @@ class EmbodiedScanDataset(BaseDataset):
 
         if not self.test_mode:
             info['ann_info'] = self.parse_ann_info(info)
+            # Filter info with empty occupancy gts
+            if self.filter_empty_gt:
+                if 'gt_occupancy' in info['ann_info']:
+                    if info['ann_info']['gt_occupancy'].shape[0] == 0:
+                        return None
         if self.test_mode and self.load_eval_anns:
-            eval_ann_info = self.parse_ann_info(info)
-            info['eval_ann_info'] = self._remove_dontcare(eval_ann_info)
-            info['ann_info'] = deepcopy(info['eval_ann_info'])
+            info['ann_info'] = self.parse_ann_info(info)
+            info['eval_ann_info'] = self._remove_dontcare(info['ann_info'])
 
         return info
 
@@ -341,6 +344,9 @@ class EmbodiedScanDataset(BaseDataset):
                 # For image tasks, `data_info` should information if single
                 # image, such as dict(img_path='xxx', width=360, ...)
                 data_list.append(data_info)
+            elif data_info is None:
+                # When the data_info has empty anns, data_info=None
+                pass
             elif isinstance(data_info, list):
                 # For video tasks, `data_info` could contain image
                 # information of multiple frames, such as
