@@ -204,6 +204,14 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
         angle = matrix_to_euler_angles(final, 'ZXY')
 
         self.tensor = torch.cat([points_trans, size, angle], dim=-1)
+    
+    def scale(self, scale_factor: float) -> None:
+        """Scale the box with horizontal and vertical scaling factors.
+
+        Args:
+            scale_factors (float): Scale factors to scale the boxes.
+        """
+        self.tensor[:, :6] *= scale_factor
 
     def rotate(self, angle, points=None):
         """Rotate boxes with points (optional) with the given angle or rotation
