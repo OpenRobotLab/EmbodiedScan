@@ -224,7 +224,7 @@ class EulerInstance3DBoxes(BaseInstance3DBoxes):
             angle = self.tensor.new_tensor(angle)
 
         if angle.numel() == 1:  # only given yaw angle for rotation
-            angle = self.tensor.new_tensor([0., 0., angle])
+            angle = self.tensor.new_tensor([angle, 0., 0.])
             rot_matrix = euler_angles_to_matrix(angle, 'ZXY')
         elif angle.numel() == 3:
             rot_matrix = euler_angles_to_matrix(angle, 'ZXY')
