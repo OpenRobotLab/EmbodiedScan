@@ -138,6 +138,7 @@ class MultiView3DGroundingDataset(BaseDataset):
                  remove_dontcare: bool = False,
                  test_mode: bool = False,
                  load_eval_anns: bool = True,
+                 tokens_positive_rebuild: bool = False,
                  **kwargs) -> None:
 
         if 'classes' in metainfo:
@@ -148,6 +149,7 @@ class MultiView3DGroundingDataset(BaseDataset):
         self.filter_empty_gt = filter_empty_gt
         self.remove_dontcare = remove_dontcare
         self.load_eval_anns = load_eval_anns
+        self.tokens_positive_rebuild = tokens_positive_rebuild
 
         super().__init__(data_root=data_root,
                          ann_file=ann_file,
@@ -324,18 +326,54 @@ class MultiView3DGroundingDataset(BaseDataset):
             labels = ann_info['gt_labels_3d']  # all box labels in the scan
             bboxes = ann_info['gt_bboxes_3d']  # BaseInstanceBboxes
             if 'target_id' in anno:  # w/ ground truths
-                language_info.update({'target_id': int(anno['target_id'])})
+                language_info.update({'target_id': anno['target_id']})
                 # obtain all objects sharing the same category with
                 # the target object, the num of such objects <= 32
                 object_ids = ann_info['bbox_id']  # numpy array
-                object_ind = np.where(
-                    object_ids == language_info['target_id'])[0]
-                if len(object_ind) != 1:
-                    continue
-                language_anno_info['gt_bboxes_3d'] = bboxes[object_ind]
-                language_anno_info['gt_labels_3d'] = labels[object_ind]
+                if isinstance(anno['target_id'], int):
+                    object_ind = np.where(
+                        object_ids == language_info['target_id'])[0]
+                    if len(object_ind) != 1:
+                        continue
+                    language_anno_info['gt_bboxes_3d'] = bboxes[object_ind]
+                    language_anno_info['gt_labels_3d'] = labels[object_ind]
+                    if 'tokens_positive' in anno:
+                        # to be removed after the info being updated
+                        if self.tokens_positive_rebuild:
+                            anno['tokens_positive'] = [[
+                                anno['text'].find(part),
+                                anno['text'].find(part) + len(part)
+                            ] for part in anno['target'].split()]
+                        language_info['tokens_positive'] = [
+                            anno['tokens_positive']
+                        ]
+                elif isinstance(anno['target_id'], List):
+                    object_indices = []
+                    keep_indices = []
+                    is_mapping_unique = True
+                    for idx, target_id in enumerate(
+                            language_info['target_id']):
+                        object_ind = np.where(object_ids == target_id)[0]
+                        if len(object_ind) != 1:
+                            is_mapping_unique = False
+                            break
+                        keep_indices.append(idx)
+                        object_indices.append(object_ind[0])
+                    if not is_mapping_unique:
+                        continue
+                    else:
+                        language_anno_info['gt_bboxes_3d'] = bboxes[
+                            object_indices]
+                        language_anno_info['gt_labels_3d'] = labels[
+                            object_indices]
+                        if 'tokens_positive' in anno:
+                            language_info['tokens_positive'] = [[
+                                anno['tokens_positive'][idx]
+                            ] for idx in keep_indices]
+                else:
+                    raise NotImplementedError
                 # include other optional keys
-                optional_keys = ['distractor_ids', 'tokens_positive']
+                optional_keys = ['distractor_ids']
                 for key in optional_keys:
                     if key in anno:
                         language_info.update({key: anno[key]})
