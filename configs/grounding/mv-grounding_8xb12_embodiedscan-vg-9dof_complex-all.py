@@ -133,7 +133,7 @@ test_pipeline = [
 
 # TODO: to determine a reasonable batch size
 train_dataloader = dict(
-    batch_size=6,
+    batch_size=12,
     num_workers=6,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
@@ -147,9 +147,10 @@ train_dataloader = dict(
                               pipeline=train_pipeline,
                               test_mode=False,
                               filter_empty_gt=True,
-                              box_type_3d='Euler-Depth')))
+                              box_type_3d='Euler-Depth',
+                              tokens_positive_rebuild=True)))
 
-val_dataloader = dict(batch_size=6,
+val_dataloader = dict(batch_size=12,
                       num_workers=6,
                       persistent_workers=True,
                       drop_last=False,
@@ -162,9 +163,10 @@ val_dataloader = dict(batch_size=6,
                                    pipeline=test_pipeline,
                                    test_mode=True,
                                    filter_empty_gt=True,
-                                   box_type_3d='Euler-Depth'))
+                                   box_type_3d='Euler-Depth',
+                                   tokens_positive_rebuild=True))
 
-test_dataloader = dict(batch_size=6,
+test_dataloader = dict(batch_size=12,
                        num_workers=6,
                        persistent_workers=True,
                        drop_last=False,
@@ -177,7 +179,8 @@ test_dataloader = dict(batch_size=6,
                                     pipeline=test_pipeline,
                                     test_mode=True,
                                     filter_empty_gt=True,
-                                    box_type_3d='Euler-Depth'))
+                                    box_type_3d='Euler-Depth',
+                                    tokens_positive_rebuild=True))
 
 val_evaluator = dict(type='GroundingMetric')
 test_evaluator = dict(type='GroundingMetric', format_only=True)

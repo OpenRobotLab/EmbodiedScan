@@ -89,7 +89,10 @@ class SparseFeatureFusion3DGrounder(BaseModel):
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
         self.num_queries = num_queries
-        self.max_num_entities = max_num_entities
+        if hasattr(self.bbox_head.contrastive_cfg, 'max_text_len'):
+            self.max_num_entities = self.bbox_head.contrastive_cfg.max_text_len
+        else:
+            self.max_num_entities = max_num_entities
         if ME is None:
             raise ImportError(
                 'Please follow `getting_started.md` to install MinkowskiEngine.`'  # noqa: E501
@@ -486,7 +489,9 @@ class SparseFeatureFusion3DGrounder(BaseModel):
         for i, data_samples in enumerate(batch_data_samples):
             positive_map = positive_maps[i].to(
                 batch_inputs_dict['points']
-                [0].device).bool().float().unsqueeze(0)  # (1, max_text_length)
+                [0].device).bool().float()  # (1, max_text_length)
+            if not isinstance(positive_maps, List):
+                positive_map = positive_map.unsqueeze(0)
             text_token_mask = text_dict['text_token_mask'][
                 i]  # (max_text_length)
             data_samples.gt_instances_3d.positive_maps = positive_map
@@ -527,11 +532,6 @@ class SparseFeatureFusion3DGrounder(BaseModel):
             tokens_positive = [[[0, 1]]
                                for _ in range(len(batch_data_samples))]
         positive_maps = self.get_positive_map(tokenized, tokens_positive)
-        positive_maps = [
-            positive_map.to(batch_inputs_dict['points']
-                            [0].device).bool().float().unsqueeze(0)
-            for positive_map in positive_maps
-        ]  # each positive_map: (1, max_text_length)
 
         encoded_text = self.text_encoder(**tokenized)
         text_feats = self.text_feat_map(encoded_text.last_hidden_state)
@@ -543,13 +543,18 @@ class SparseFeatureFusion3DGrounder(BaseModel):
         # because its the opposite in pytorch transformer
         # text_dict['tokenized'] = tokenized
         for i, data_samples in enumerate(batch_data_samples):
+            positive_map = positive_maps[i].to(
+                batch_inputs_dict['points']
+                [0].device).bool().float()  # (1, max_text_length)
+            if not isinstance(positive_maps, List):
+                positive_map = positive_map.unsqueeze(0)
             text_token_mask = text_dict['text_token_mask'][
                 i]  # (max_text_length)
-            data_samples.gt_instances_3d.positive_maps = positive_maps[i]
+            data_samples.gt_instances_3d.positive_maps = positive_map
             # (1, max_text_length)
             data_samples.gt_instances_3d.text_token_mask = \
                 text_token_mask.unsqueeze(0).repeat(
-                    len(positive_maps[i]), 1)
+                    len(positive_map), 1)
 
         head_inputs_dict = self.forward_transformer(point_feats, scores,
                                                     point_xyz, text_dict,
@@ -562,7 +567,8 @@ class SparseFeatureFusion3DGrounder(BaseModel):
             data_sample.pred_instances_3d = pred_instances_3d
         return batch_data_samples
 
-    def create_positive_map(self, tokenized, tokens_positive: list) -> Tensor:
+    def create_positive_map(self, tokenized, tokens_positive,
+                            batch_idx) -> Tensor:
         """construct a map such that positive_map[i,j] = True
         if box i is associated to token j
 
@@ -584,24 +590,26 @@ class SparseFeatureFusion3DGrounder(BaseModel):
         for j, tok_list in enumerate(tokens_positive):
             for (beg, end) in tok_list:
                 try:
-                    beg_pos = tokenized.char_to_token(beg)
-                    end_pos = tokenized.char_to_token(end - 1)
+                    beg_pos = tokenized.char_to_token(batch_idx, beg)
+                    end_pos = tokenized.char_to_token(batch_idx, end - 1)
                 except Exception as e:
                     print('beg:', beg, 'end:', end)
                     print('token_positive:', tokens_positive)
                     raise e
                 if beg_pos is None:
                     try:
-                        beg_pos = tokenized.char_to_token(beg + 1)
+                        beg_pos = tokenized.char_to_token(batch_idx, beg + 1)
                         if beg_pos is None:
-                            beg_pos = tokenized.char_to_token(beg + 2)
+                            beg_pos = tokenized.char_to_token(
+                                batch_idx, beg + 2)
                     except Exception:
                         beg_pos = None
                 if end_pos is None:
                     try:
-                        end_pos = tokenized.char_to_token(end - 2)
+                        end_pos = tokenized.char_to_token(batch_idx, end - 2)
                         if end_pos is None:
-                            end_pos = tokenized.char_to_token(end - 3)
+                            end_pos = tokenized.char_to_token(
+                                batch_idx, end - 3)
                     except Exception:
                         end_pos = None
                 if beg_pos is None or end_pos is None:
@@ -613,8 +621,13 @@ class SparseFeatureFusion3DGrounder(BaseModel):
         return positive_map / (positive_map.sum(-1)[:, None] + 1e-6)
 
     def get_positive_map(self, tokenized, tokens_positive):
-        positive_map = self.create_positive_map(tokenized, tokens_positive)
-        return positive_map
+        # each data sample can contain a single box or multiple grounding boxes
+        # Unify the single and multi grounding box cases
+        positive_maps = []
+        for idx, tp in enumerate(tokens_positive):
+            positive_map = self.create_positive_map(tokenized, tp, idx)
+            positive_maps.append(positive_map)
+        return positive_maps
 
     def forward(self,
                 inputs: Union[dict, List[dict]],

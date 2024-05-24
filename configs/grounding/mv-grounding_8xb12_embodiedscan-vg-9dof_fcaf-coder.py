@@ -148,7 +148,8 @@ train_dataloader = dict(
                               pipeline=train_pipeline,
                               test_mode=False,
                               filter_empty_gt=True,
-                              box_type_3d='Euler-Depth')))
+                              box_type_3d='Euler-Depth',
+                              tokens_positive_rebuild=True)))
 
 val_dataloader = dict(batch_size=12,
                       num_workers=12,
@@ -163,7 +164,8 @@ val_dataloader = dict(batch_size=12,
                                    pipeline=test_pipeline,
                                    test_mode=True,
                                    filter_empty_gt=True,
-                                   box_type_3d='Euler-Depth'))
+                                   box_type_3d='Euler-Depth',
+                                   tokens_positive_rebuild=True))
 test_dataloader = val_dataloader
 
 val_evaluator = dict(type='GroundingMetric')
