@@ -1,46 +1,10 @@
 <br>
 <p align="center">
 <h1 align="center"><strong>EmbodiedScan: A Holistic Multi-Modal 3D Perception Suite Towards Embodied AI</strong></h1>
-  <p align="center">
-    <a href='https://tai-wang.github.io/' target='_blank'>Tai Wang*</a>&emsp;
-    <a href='https://scholar.google.com/citations?user=-zT1NKwAAAAJ&hl=zh-CN' target='_blank'>Xiaohan Mao*</a>&emsp;
-    <a href='https://scholar.google.com/citations?user=QabwS_wAAAAJ&hl=zh-CN' target='_blank'>Chenming Zhu*</a>&emsp;
-    <a href='https://runsenxu.com/' target='_blank'>Runsen Xu</a>&emsp;
-    <a href='https://openreview.net/profile?id=~Ruiyuan_Lyu1' target='_blank'>Ruiyuan Lyu</a>&emsp;
-    <a href='https://openreview.net/profile?id=~Peisen_Li1' target='_blank'>Peisen Li</a>&emsp;
-    <a href='https://xiao-chen.tech/' target='_blank'>Xiao Chen</a>&emsp;
-    <br>
-    <a href='http://zhangwenwei.cn/' target='_blank'>Wenwei Zhang</a>&emsp;
-    <a href='https://chenkai.site/' target='_blank'>Kai Chen</a>&emsp;
-    <a href='https://tianfan.info/' target='_blank'>Tianfan Xue</a>&emsp;
-    <a href='https://xh-liu.github.io/' target='_blank'>Xihui Liu</a>&emsp;
-    <a href='https://www.mvig.org/' target='_blank'>Cewu Lu</a>&emsp;
-    <a href='http://dahua.site/' target='_blank'>Dahua Lin</a>&emsp;
-    <a href='https://oceanpang.github.io/' target='_blank'>Jiangmiao Pang</a>&emsp;
-    <br>
-    Shanghai AI Laboratory&emsp;Shanghai Jiao Tong University&emsp;The University of Hong Kong
-    <br>
-    The Chinese University of Hong Kong&emsp;Tsinghua University
-  </p>
-</p>
 
-<!-- <p align="center">
-  <a href="https://arxiv.org/abs/2312.16170" target='_blank'>
-    <img src="https://img.shields.io/badge/arXiv-2312.16170-blue?">
-  </a>
-  <a href="./assets/EmbodiedScan.pdf" target='_blank'>
-    <img src="https://img.shields.io/badge/Paper-📖-blue?">
-  </a>
-  <a href="https://tai-wang.github.io/embodiedscan" target='_blank'>
-    <img src="https://img.shields.io/badge/Project-&#x1F680-blue">
-  </a>
-</p> -->
+This repository contains EmbodiedScan-series works for holistic multi-modal 3D perception, currently including [EmbodiedScan](https://tai-wang.github.io/embodiedscan/) & [MMScan](https://tai-wang.github.io/mmscan/).
 
 <div id="top" align="center">
-
-[![arXiv](https://img.shields.io/badge/arXiv-2312.16170-blue)](https://arxiv.org/abs/2312.16170)
-[![](https://img.shields.io/badge/Paper-%F0%9F%93%96-blue)](./assets/EmbodiedScan.pdf)
-[![](https://img.shields.io/badge/Project-%F0%9F%9A%80-blue)](https://tai-wang.github.io/embodiedscan)
 
 </div>
 
@@ -81,6 +45,7 @@ Building upon this database, we introduce a baseline framework named <b>Embodied
 
 ## 🔥 News
 
+- \[2024-06\] The report of our follow-up work with the most-ever hierarchical grounded language annotations, [MMScan](https://tai-wang.github.io/mmscan/), has been released. Welcome to talk with us about EmbodiedScan and MMScan at Seattle, CVPR 2024!
 - \[2024-04\] We release all the baselines with pretrained models and logs. Welcome to try and play with them on our demo data! Note that we rename some keys in the multi-view 3D detection and visual grounding model. Please re-download the pretrained models if you just use our code for inference.
 - \[2024-03\] The challenge test server is also online [here](https://huggingface.co/spaces/AGC2024/visual-grounding-2024). Looking forward to your strong submissions!
 - \[2024-03\] We first release the data and baselines for the challenge. Please fill in the [form](https://docs.google.com/forms/d/e/1FAIpQLScUXEDTksGiqHZp31j7Zp7zlCNV7p_08uViwP_Nbzfn3g6hhw/viewform?usp=sf_link) to apply for downloading the data and try our baselines. Welcome any feedback!
@@ -297,17 +262,24 @@ Please see the [paper](./assets/EmbodiedScan.pdf) for more details of our benchm
 - \[x\] Release codes for our baselines and benchmarks.
 - \[ \] Release codes for all the other methods.
 - \[ \] Full release and further updates.
+- \[ \] Release MMScan data and codes.
 
 ## 🔗 Citation
 
 If you find our work helpful, please cite:
 
 ```bibtex
-@inproceedings{wang2023embodiedscan,
+@inproceedings{embodiedscan,
     title={EmbodiedScan: A Holistic Multi-Modal 3D Perception Suite Towards Embodied AI},
     author={Wang, Tai and Mao, Xiaohan and Zhu, Chenming and Xu, Runsen and Lyu, Ruiyuan and Li, Peisen and Chen, Xiao and Zhang, Wenwei and Chen, Kai and Xue, Tianfan and Liu, Xihui and Lu, Cewu and Lin, Dahua and Pang, Jiangmiao},
     year={2024},
     booktitle={IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+}
+@inproceedings{mmscan,
+    title={MMScan: A Multi-Modal 3D Scene Dataset with Hierarchical Grounded Language Annotations},
+    author={Lyu, Ruiyuan and Wang, Tai and Lin, Jingli and Yang, Shuai and Mao, Xiaohan and Chen, Yilun and Xu, Runsen and Huang, Haifeng and Zhu, Chenming and Lin, Dahua and Pang, Jiangmiao},
+    year={2024},
+    booktitle={arXiv},
 }
 ```
 
