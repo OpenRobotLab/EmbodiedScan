@@ -342,13 +342,14 @@ class ContinuousOccupancyDrawer:
         vis.destroy_window()
         vis.close()
 
+
 class ContinuousPredictionOccupancyDrawer:
     """Visualization tool for Continuous Occupancy Prediction task.
 
     This class serves as the API for visualizing Continuous 3D Object
     Detection task.
 
-    This class is used to render the model's Occupancy Prediction 
+    This class is used to render the model's Occupancy Prediction
     since the model will have a separate prediction for each frame.
 
     Args:
@@ -373,10 +374,14 @@ class ContinuousPredictionOccupancyDrawer:
         self.idx = start_idx
         self.camera = None
 
-        self.point_cloud_range = [-3.2, -3.2, -1.28 + 0.5, 3.2, 3.2, 1.28 + 0.5]
+        self.point_cloud_range = [
+            -3.2, -3.2, -1.28 + 0.5, 3.2, 3.2, 1.28 + 0.5
+        ]
         self.occ_size = [40, 40, 16]
 
-        self.visible_grid = np.zeros([len(self.scene['images'])] + self.occ_size, dtype=bool)
+        self.visible_grid = np.zeros([len(self.scene['images'])] +
+                                     self.occ_size,
+                                     dtype=bool)
         self.grid_size = 0.16
         self.points = []
 
@@ -391,31 +396,45 @@ class ContinuousPredictionOccupancyDrawer:
         print('Loading RGB-D images...')
         for image_idx, image in enumerate(self.scene['images']):
             img_path = image['img_path']
-            img_path = os.path.join(self.dir, img_path[img_path.find('/') + 1:])
+            img_path = os.path.join(self.dir,
+                                    img_path[img_path.find('/') + 1:])
             depth_path = image['depth_path']
-            depth_path = os.path.join(self.dir, depth_path[depth_path.find('/') + 1:])
+            depth_path = os.path.join(self.dir,
+                                      depth_path[depth_path.find('/') + 1:])
             rgb = cv2.imread(img_path)[:, :, ::-1]
             depth = cv2.imread(depth_path, cv2.IMREAD_UNCHANGED)
             depth = depth.astype(np.float32) / 1000.0
             height, width = rgb.shape[:2]
-            global2cam = np.linalg.inv(self.scene['axis_align_matrix'] @ image['cam2global'])
+            global2cam = np.linalg.inv(
+                self.scene['axis_align_matrix'] @ image['cam2global'])
             cam2img = image['cam2img']
 
             pred_occupancy = image['pred_occupancy']  # shape (40, 40, 16)
-            
-            x, y, z = np.meshgrid(np.arange(self.occ_size[0]), np.arange(self.occ_size[1]), np.arange(self.occ_size[2]), indexing='ij')
+
+            x, y, z = np.meshgrid(np.arange(self.occ_size[0]),
+                                  np.arange(self.occ_size[1]),
+                                  np.arange(self.occ_size[2]),
+                                  indexing='ij')
             x, y, z = x.flatten(), y.flatten(), z.flatten()
-            points_3d = np.stack([x, y, z], axis=-1).reshape(-1, 3) * self.grid_size + np.array(self.point_cloud_range[:3]) + self.grid_size / 2.0
-            points_3d = np.concatenate([points_3d, np.ones((points_3d.shape[0], 1))], axis=-1).reshape(-1,4)
+            points_3d = np.stack([x, y, z], axis=-1).reshape(
+                -1, 3) * self.grid_size + np.array(
+                    self.point_cloud_range[:3]) + self.grid_size / 2.0
+            points_3d = np.concatenate(
+                [points_3d, np.ones(
+                    (points_3d.shape[0], 1))], axis=-1).reshape(-1, 4)
             points = (cam2img @ global2cam @ points_3d.T).T
             ans = points[:, 2] > 0
             points = points / points[:, 2, None]
-            ans = ans & (points[:, 0] >= 0) & (points[:, 0] < width) & (points[:, 1] >= 0) & (points[:, 1] < height)
+            ans = ans & (points[:, 0] >= 0) & (points[:, 0] < width) & (
+                points[:, 1] >= 0) & (points[:, 1] < height)
             self.visible_grid[image_idx] = ans.reshape(self.occ_size)
             if image_idx > 0:
-                self.visible_grid[image_idx] = np.logical_or(self.visible_grid[image_idx], self.visible_grid[image_idx - 1])
-            
-            ans = self.visible_grid[image_idx].flatten() & (pred_occupancy.flatten() > 0) # 
+                self.visible_grid[image_idx] = np.logical_or(
+                    self.visible_grid[image_idx],
+                    self.visible_grid[image_idx - 1])
+
+            ans = self.visible_grid[image_idx].flatten() & (
+                pred_occupancy.flatten() > 0)  #
             points_3d = points_3d[ans]
             pred_occupancy = pred_occupancy.flatten()[ans]
             res = np.zeros((points_3d.shape[0], 6))
@@ -423,7 +442,11 @@ class ContinuousPredictionOccupancyDrawer:
                 self.points.append(res)
                 continue
             res[:, :3] = points_3d[:, :3]
-            res[:, 3:] = [self.color_selector.get_color(self.classes[self.id_to_index[label_id]]) for label_id in pred_occupancy]
+            res[:, 3:] = [
+                self.color_selector.get_color(
+                    self.classes[self.id_to_index[label_id]])
+                for label_id in pred_occupancy
+            ]
             res[:, 3:] /= 255.0
             self.points.append(res)
 
@@ -462,10 +485,8 @@ class ContinuousPredictionOccupancyDrawer:
         extrinsic = self.scene['axis_align_matrix'] @ img['cam2global']
 
         pcd = o3d.geometry.PointCloud()
-        pcd.points = o3d.utility.Vector3dVector(
-            self.points[self.idx][:, :3])
-        pcd.colors = o3d.utility.Vector3dVector(
-            self.points[self.idx][:, 3:])
+        pcd.points = o3d.utility.Vector3dVector(self.points[self.idx][:, :3])
+        pcd.colors = o3d.utility.Vector3dVector(self.points[self.idx][:, 3:])
         voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(
             pcd, voxel_size=self.grid_size)
 

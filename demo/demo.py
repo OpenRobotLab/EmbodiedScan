@@ -167,9 +167,8 @@ def main(args):
             gt_bboxes_3d=np.zeros((0, 9), dtype=np.float32),
             gt_labels_3d=np.zeros((0, ), dtype=np.int64),
             visible_instance_masks=[[] for i in range(len(poses))],
-            gt_occupancy=np.zeros((0,4), dtype=np.int64),
-            visible_occupancy_masks=[[] for i in range(len(poses))]
-        ))
+            gt_occupancy=np.zeros((0, 4), dtype=np.int64),
+            visible_occupancy_masks=[[] for i in range(len(poses))]))
     n_frames = len(poses)
     data = []
     for i in range(1, n_frames):
@@ -213,8 +212,8 @@ def main(args):
     # collect results and construct data for visualization
     is_occupancy = ('pred_occupancy' in results[0])
     if is_occupancy:
-        classes = ['empty'] + classes   # 0 = empty for occupancy
-    
+        classes = ['empty'] + classes  # 0 = empty for occupancy
+
     filtered_results = []
     if not is_occupancy:
         for i in range(len(results)):
@@ -260,8 +259,8 @@ def main(args):
         for i in range(len(results)):
             cam_name = pseudo_ann['images'][i]['img_path'].split('/')[-1][:-4]
             visualizer.show_image(f'demo/{args.scene}',
-                                camera_name=cam_name,
-                                render_box=True)
+                                  camera_name=cam_name,
+                                  render_box=True)
     else:
         visualizer.render_continuous_occupancy_prediction(f'demo/{args.scene}')
 

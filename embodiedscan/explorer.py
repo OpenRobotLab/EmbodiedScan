@@ -7,7 +7,8 @@ import open3d as o3d
 
 from embodiedscan.visualization.color_selector import ColorMap
 from embodiedscan.visualization.continuous_drawer import (
-    ContinuousDrawer, ContinuousOccupancyDrawer, ContinuousPredictionOccupancyDrawer)
+    ContinuousDrawer, ContinuousOccupancyDrawer,
+    ContinuousPredictionOccupancyDrawer)
 from embodiedscan.visualization.img_drawer import ImageDrawer
 from embodiedscan.visualization.utils import _9dof_to_box, _box_add_thickness
 
@@ -381,9 +382,12 @@ class EmbodiedScanExplorer:
                                            self.id_to_index,
                                            self.color_selector, start_idx)
         drawer.begin()
-    
-    def render_continuous_occupancy_prediction(self, scene_name, start_cam=None):
-        """Render occupancy prediction with continuous ego-centric observations.
+
+    def render_continuous_occupancy_prediction(self,
+                                               scene_name,
+                                               start_cam=None):
+        """Render occupancy prediction with continuous ego-centric
+        observations.
 
         Args:
             scene_name (str): Scene name.
@@ -427,10 +431,9 @@ class EmbodiedScanExplorer:
             print('No such scene')
             return
 
-        drawer = ContinuousPredictionOccupancyDrawer(dataset, self.data_root[dataset],
-                                           selected_scene, self.classes,
-                                           self.id_to_index,
-                                           self.color_selector, start_idx)
+        drawer = ContinuousPredictionOccupancyDrawer(
+            dataset, self.data_root[dataset], selected_scene, self.classes,
+            self.id_to_index, self.color_selector, start_idx)
         drawer.begin()
 
     def render_occupancy(self, scene_name):
