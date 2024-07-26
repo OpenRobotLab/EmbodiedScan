@@ -14,7 +14,7 @@ from mmengine.registry import init_default_scope
 from mmengine.runner import load_checkpoint
 from scipy.spatial.transform import Rotation as R
 
-from embodiedscan.explorer import EmbodiedScanExplorer
+# from embodiedscan.explorer import EmbodiedScanExplorer
 from embodiedscan.registry import DATASETS, MODELS
 from embodiedscan.structures import get_box_type
 
@@ -166,7 +166,10 @@ def main(args):
         ann_info=dict(  # empty annotation
             gt_bboxes_3d=np.zeros((0, 9), dtype=np.float32),
             gt_labels_3d=np.zeros((0, ), dtype=np.int64),
-            visible_instance_masks=[[] for i in range(len(poses))]))
+            visible_instance_masks=[[] for i in range(len(poses))],
+            gt_occupancy=np.zeros((0,4), dtype=np.int64),
+            visible_occupancy_masks=[[] for i in range(len(poses))]
+        ))
     n_frames = len(poses)
     data = []
     for i in range(1, n_frames):
@@ -208,10 +211,19 @@ def main(args):
     torch.cuda.empty_cache()
 
     # collect results and construct data for visualization
+    is_occupancy = ('pred_occupancy' in results[0])
+    if is_occupancy:
+        classes = ['empty'] + classes   # 0 = empty for occupancy
+    
     filtered_results = []
-    for i in range(len(results)):
-        boxes, labels = nms_filter(results[i].pred_instances_3d)
-        filtered_results.append((boxes, labels))
+    if not is_occupancy:
+        for i in range(len(results)):
+            boxes, labels = nms_filter(results[i].pred_instances_3d)
+            filtered_results.append((boxes, labels))
+    else:
+        for i in range(len(results)):
+            pred_occ = results[i].pred_occupancy.cpu().numpy()
+            filtered_results.append(pred_occ)
 
     selected_image = [
         info['img_path'].index(img_path)
@@ -226,12 +238,15 @@ def main(args):
     for i in range(len(results)):
         image_ann = info['images'][selected_image[i]]
         image_ann['visible_instance_ids'] = []
-        boxes, labels = filtered_results[i]
-        for j in range(boxes.shape[0]):
-            pseudo_ann['instances'].append(
-                dict(bbox_3d=boxes[j], bbox_label_3d=labels[j]))
-            instance_id = len(pseudo_ann['instances']) - 1
-            image_ann['visible_instance_ids'].append(instance_id)
+        if is_occupancy:
+            image_ann['pred_occupancy'] = filtered_results[i]
+        else:
+            boxes, labels = filtered_results[i]
+            for j in range(boxes.shape[0]):
+                pseudo_ann['instances'].append(
+                    dict(bbox_3d=boxes[j], bbox_label_3d=labels[j]))
+                instance_id = len(pseudo_ann['instances']) - 1
+                image_ann['visible_instance_ids'].append(instance_id)
         pseudo_ann['images'].append(image_ann)
 
     metainfo = {'categories': classes}
@@ -240,12 +255,15 @@ def main(args):
     # visualization
     visualizer = EmbodiedScanExplorer(data_root={'demo': args.root_dir},
                                       ann_file=[packed_pseudo_ann])
-    visualizer.render_continuous_scene(f'demo/{args.scene}')
-    for i in range(len(results)):
-        cam_name = pseudo_ann['images'][i]['img_path'].split('/')[-1][:-4]
-        visualizer.show_image(f'demo/{args.scene}',
-                              camera_name=cam_name,
-                              render_box=True)
+    if not is_occupancy:
+        visualizer.render_continuous_scene(f'demo/{args.scene}')
+        for i in range(len(results)):
+            cam_name = pseudo_ann['images'][i]['img_path'].split('/')[-1][:-4]
+            visualizer.show_image(f'demo/{args.scene}',
+                                camera_name=cam_name,
+                                render_box=True)
+    else:
+        visualizer.render_continuous_occupancy_prediction(f'demo/{args.scene}')
 
 
 if __name__ == '__main__':
