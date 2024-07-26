@@ -394,8 +394,6 @@ class ContinuousPredictionOccupancyDrawer:
             img_path = os.path.join(self.dir, img_path[img_path.find('/') + 1:])
             depth_path = image['depth_path']
             depth_path = os.path.join(self.dir, depth_path[depth_path.find('/') + 1:])
-            import shutil
-            shutil.copyfile(img_path, f'tmp/{image_idx}.jpg')
             rgb = cv2.imread(img_path)[:, :, ::-1]
             depth = cv2.imread(depth_path, cv2.IMREAD_UNCHANGED)
             depth = depth.astype(np.float32) / 1000.0

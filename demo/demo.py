@@ -14,7 +14,7 @@ from mmengine.registry import init_default_scope
 from mmengine.runner import load_checkpoint
 from scipy.spatial.transform import Rotation as R
 
-# from embodiedscan.explorer import EmbodiedScanExplorer
+from embodiedscan.explorer import EmbodiedScanExplorer
 from embodiedscan.registry import DATASETS, MODELS
 from embodiedscan.structures import get_box_type
 
