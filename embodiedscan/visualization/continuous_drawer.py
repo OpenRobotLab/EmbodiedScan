@@ -341,3 +341,181 @@ class ContinuousOccupancyDrawer:
         vis.clear_geometries()
         vis.destroy_window()
         vis.close()
+
+
+class ContinuousPredictionOccupancyDrawer:
+    """Visualization tool for Continuous Occupancy Prediction task.
+
+    This class serves as the API for visualizing Continuous 3D Object
+    Detection task.
+
+    This class is used to render the model's Occupancy Prediction
+    since the model will have a separate prediction for each frame.
+
+    Args:
+        dataset (str): Name of composed raw dataset, one of
+            scannet/3rscan/matterport3d.
+        dir (str): Root path of the dataset.
+        scene (dict): Annotation of the selected scene.
+        classes (list): Class information.
+        id_to_index (dict): Mapping class id to the index of class names.
+        color_selector (ColorMap): ColorMap for visualization.
+        start_idx (int) : Index of the frame which the task starts.
+    """
+
+    def __init__(self, dataset, dir, scene, classes, id_to_index,
+                 color_selector, start_idx):
+        self.dir = dir
+        self.dataset = dataset
+        self.scene = scene
+        self.classes = classes
+        self.id_to_index = id_to_index
+        self.color_selector = color_selector
+        self.idx = start_idx
+        self.camera = None
+
+        self.point_cloud_range = [
+            -3.2, -3.2, -1.28 + 0.5, 3.2, 3.2, 1.28 + 0.5
+        ]
+        self.occ_size = [40, 40, 16]
+
+        self.visible_grid = np.zeros([len(self.scene['images'])] +
+                                     self.occ_size,
+                                     dtype=bool)
+        self.grid_size = 0.16
+        self.points = []
+
+        self.vis = o3d.visualization.VisualizerWithKeyCallback()
+        self.vis.register_key_callback(262, self.draw_next)  # Right Arrow
+        self.vis.register_key_callback(ord('D'), self.draw_next)
+        self.vis.register_key_callback(ord('N'), self.draw_next)
+        self.vis.register_key_callback(256, self.close)
+
+    def begin(self):
+        """Some preparations before starting the rendering."""
+        print('Loading RGB-D images...')
+        for image_idx, image in enumerate(self.scene['images']):
+            img_path = image['img_path']
+            img_path = os.path.join(self.dir,
+                                    img_path[img_path.find('/') + 1:])
+            depth_path = image['depth_path']
+            depth_path = os.path.join(self.dir,
+                                      depth_path[depth_path.find('/') + 1:])
+            rgb = cv2.imread(img_path)[:, :, ::-1]
+            depth = cv2.imread(depth_path, cv2.IMREAD_UNCHANGED)
+            depth = depth.astype(np.float32) / 1000.0
+            height, width = rgb.shape[:2]
+            global2cam = np.linalg.inv(
+                self.scene['axis_align_matrix'] @ image['cam2global'])
+            cam2img = image['cam2img']
+
+            pred_occupancy = image['pred_occupancy']  # shape (40, 40, 16)
+
+            x, y, z = np.meshgrid(np.arange(self.occ_size[0]),
+                                  np.arange(self.occ_size[1]),
+                                  np.arange(self.occ_size[2]),
+                                  indexing='ij')
+            x, y, z = x.flatten(), y.flatten(), z.flatten()
+            points_3d = np.stack([x, y, z], axis=-1).reshape(
+                -1, 3) * self.grid_size + np.array(
+                    self.point_cloud_range[:3]) + self.grid_size / 2.0
+            points_3d = np.concatenate(
+                [points_3d, np.ones(
+                    (points_3d.shape[0], 1))], axis=-1).reshape(-1, 4)
+            points = (cam2img @ global2cam @ points_3d.T).T
+            ans = points[:, 2] > 0
+            points = points / points[:, 2, None]
+            ans = ans & (points[:, 0] >= 0) & (points[:, 0] < width) & (
+                points[:, 1] >= 0) & (points[:, 1] < height)
+            self.visible_grid[image_idx] = ans.reshape(self.occ_size)
+            if image_idx > 0:
+                self.visible_grid[image_idx] = np.logical_or(
+                    self.visible_grid[image_idx],
+                    self.visible_grid[image_idx - 1])
+
+            ans = self.visible_grid[image_idx].flatten() & (
+                pred_occupancy.flatten() > 0)  #
+            points_3d = points_3d[ans]
+            pred_occupancy = pred_occupancy.flatten()[ans]
+            res = np.zeros((points_3d.shape[0], 6))
+            if len(points_3d) == 0:
+                self.points.append(res)
+                continue
+            res[:, :3] = points_3d[:, :3]
+            res[:, 3:] = [
+                self.color_selector.get_color(
+                    self.classes[self.id_to_index[label_id]])
+                for label_id in pred_occupancy
+            ]
+            res[:, 3:] /= 255.0
+            self.points.append(res)
+
+        print('Press N/D/Right Arrow to draw next frame.')
+        print('Press Q to close the window and quit.')
+        print("When you've rendered a lot of frames, the exit can become",
+              'very slow because the program needs time to free up space.')
+        print('You can also press Esc to close window immediately,',
+              'which may result in a segmentation fault.')
+
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(self.points[-1][:, :3])
+        pcd.colors = o3d.utility.Vector3dVector(self.points[-1][:, 3:])
+        voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(
+            pcd, voxel_size=self.grid_size)
+        frame = o3d.geometry.TriangleMesh.create_coordinate_frame()
+        self.vis.create_window()
+        self.vis.add_geometry(voxel_grid)
+        self.vis.add_geometry(frame)
+        ctr = self.vis.get_view_control()
+        self.view_param = ctr.convert_to_pinhole_camera_parameters()
+        self.voxel_grid = voxel_grid
+        self.draw_next(self.vis)
+
+    def draw_next(self, vis):
+        """Render the next frame.
+
+        Args:
+            vis (open3d.visualization.VisualizerWithKeyCallback): Visualizer.
+        """
+        if self.idx >= len(self.scene['images']):
+            print('No more images')
+            return
+
+        img = self.scene['images'][self.idx]
+        extrinsic = self.scene['axis_align_matrix'] @ img['cam2global']
+
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(self.points[self.idx][:, :3])
+        pcd.colors = o3d.utility.Vector3dVector(self.points[self.idx][:, 3:])
+        voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(
+            pcd, voxel_size=self.grid_size)
+
+        if self.camera is not None:
+            cam_points = draw_camera(extrinsic, return_points=True)
+            self.camera.points = cam_points
+            vis.update_geometry(self.camera)
+        else:
+            self.camera = draw_camera(extrinsic)
+            vis.add_geometry(self.camera)
+
+        self.voxel_grid.clear()
+        vis.update_geometry(self.voxel_grid)
+        vis.remove_geometry(self.voxel_grid)
+        vis.add_geometry(voxel_grid)
+        self.voxel_grid = voxel_grid
+        self.idx += 1
+        ctr = vis.get_view_control()
+        ctr.convert_from_pinhole_camera_parameters(self.view_param)
+        vis.update_renderer()
+        vis.poll_events()
+        vis.run()
+
+    def close(self, vis):
+        """Close the visualizer.
+
+        Args:
+            vis (open3d.visualization.VisualizerWithKeyCallback): Visualizer.
+        """
+        vis.clear_geometries()
+        vis.destroy_window()
+        vis.close()
