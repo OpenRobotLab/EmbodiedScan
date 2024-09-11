@@ -223,22 +223,33 @@ class EmbodiedScanDataset(BaseDataset):
             mask_filename = os.path.join(self.data_prefix.get('img_path', ''),
                                          ann_dataset, building, 'occupancy',
                                          f'visible_occupancy_{region}.pkl')
+        elif ann_dataset == 'arkitscenes':
+            occ_filename = None
+            mask_filename = None
         else:
             raise NotImplementedError
 
-        gt_occ = np.load(occ_filename)
-        for i in range(gt_occ.shape[0]):
-            cls_id = self.occ_label_mapping[gt_occ[i][3]]
-            if cls_id < 0:
-                cls_id = 255
-            gt_occ[i][3] = cls_id
+        if occ_filename is None:
+            gt_occ = np.zeros((0, 4), dtype=np.int64)
+        else:
+            gt_occ = np.load(occ_filename)
+            for i in range(gt_occ.shape[0]):
+                cls_id = self.occ_label_mapping[gt_occ[i][3]]
+                if cls_id < 0:
+                    cls_id = 255
+                gt_occ[i][3] = cls_id
         ann_info['gt_occupancy'] = gt_occ
 
-        ann_info['visible_occupancy_masks'] = []
-        occ_masks = mmengine.load(mask_filename)
-        for i in range(len(info['images'])):
-            ann_info['visible_occupancy_masks'].append(
-                occ_masks[i]['visible_occupancy'])
+        if mask_filename is None:
+            ann_info['visible_occupancy_masks'] = [
+                [] for i in range(len(info['images']))
+            ]
+        else:
+            ann_info['visible_occupancy_masks'] = []
+            occ_masks = mmengine.load(mask_filename)
+            for i in range(len(info['images'])):
+                ann_info['visible_occupancy_masks'].append(
+                    occ_masks[i]['visible_occupancy'])
 
         ann_info['gt_bboxes_3d'] = self.box_type_3d(
             ann_info['gt_bboxes_3d'],

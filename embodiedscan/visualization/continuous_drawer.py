@@ -69,6 +69,9 @@ class ContinuousDrawer:
         elif dataset == 'matterport3d':
             pcdpath = os.path.join(self.dir, building, 'region_segmentations',
                                    f'{region}.ply')
+        elif dataset == 'arkitscenes':
+            pcdpath = os.path.join(self.dir, building, region,
+                                   f'{region}_3dod_mesh.ply')
         else:
             self.demo = True
             self.drawed_boxes = []
@@ -121,7 +124,9 @@ class ContinuousDrawer:
         if 'depth_cam2img' in img:
             depth_intrinsic = img['depth_cam2img']
         else:
-            depth_intrinsic = self.scene['depth_cam2img']
+            depth_intrinsic = self.scene.get('depth_cam2img', None)
+        if depth_intrinsic is None:
+            depth_intrinsic = intrinsic
         depth_shift = 1000.0
         if self.dataset == 'matterport3d':
             depth_shift = 4000.0

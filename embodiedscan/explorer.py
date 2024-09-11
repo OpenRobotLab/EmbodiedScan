@@ -12,7 +12,7 @@ from embodiedscan.visualization.continuous_drawer import (
 from embodiedscan.visualization.img_drawer import ImageDrawer
 from embodiedscan.visualization.utils import _9dof_to_box, _box_add_thickness
 
-DATASETS = ['scannet', '3rscan', 'matterport3d']
+DATASETS = ['scannet', '3rscan', 'matterport3d', 'arkitscenes']
 
 
 class EmbodiedScanExplorer:
@@ -65,7 +65,7 @@ class EmbodiedScanExplorer:
         if self.verbose:
             print('Dataset root')
             for dataset in DATASETS:
-                print(dataset, ':', self.data_root[dataset])
+                print(dataset, ':', self.data_root.get(dataset, None))
 
         if self.verbose:
             print('Loading')
@@ -118,6 +118,10 @@ class EmbodiedScanExplorer:
                     building, region = splits[1], splits[2]
                     dirpath = os.path.join(self.data_root['matterport3d'],
                                            building)
+                elif dataset == 'arkitscenes':
+                    split, region = splits[1], splits[2]
+                    dirpath = os.path.join(self.data_root['arkitscenes'],
+                                           split, region)
                 else:
                     region = splits[1]
                     dirpath = os.path.join(self.data_root[dataset], region)
@@ -168,6 +172,8 @@ class EmbodiedScanExplorer:
                     elif dataset == 'matterport3d':
                         cam_name = img_path.split(
                             '/')[-1][:-8] + img_path.split('/')[-1][-7:-4]
+                    elif dataset == 'arkitscenes':
+                        cam_name = img_path.split('/')[-1][:-4]
                     else:
                         cam_name = img_path.split('/')[-1][:-4]
                     res.append(cam_name)
@@ -252,6 +258,9 @@ class EmbodiedScanExplorer:
         elif dataset == 'matterport3d':
             filepath = os.path.join(self.data_root['matterport3d'], building,
                                     'region_segmentations', f'{region}.ply')
+        elif dataset == 'arkitscenes':
+            filepath = os.path.join(self.data_root['arkitscenes'], building,
+                                    region, f'{region}_3dod_mesh.ply')
         else:
             raise NotImplementedError
 
@@ -311,6 +320,8 @@ class EmbodiedScanExplorer:
                         elif dataset == 'matterport3d':
                             cam_name = img_path.split(
                                 '/')[-1][:-8] + img_path.split('/')[-1][-7:-4]
+                        elif dataset == 'arkitscenes':
+                            cam_name = img_path.split('/')[-1][:-4]
                         else:
                             cam_name = img_path.split('/')[-1][:-4]
                         if cam_name == start_cam:
