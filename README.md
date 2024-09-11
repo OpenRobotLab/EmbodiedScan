@@ -45,6 +45,7 @@ Building upon this database, we introduce a baseline framework named <b>Embodied
 
 ## 🔥 News
 
+- \[2024-08\] We preliminarily release the [sample data](https://drive.google.com/file/d/1Y1_LOE35NpsnkneYElvNwuuR6-OAbwPm/view?usp=sharing) of [MMScan](https://tai-wang.github.io/mmscan/) and the full release will be ready with ARKitScenes' annotations this month, which will be announced via emails to the community. Please stay tuned!
 - \[2024-06\] The report of our follow-up work with the most-ever hierarchical grounded language annotations, [MMScan](https://tai-wang.github.io/mmscan/), has been released. Welcome to talk with us about EmbodiedScan and MMScan at Seattle, CVPR 2024!
 - \[2024-04\] We release all the baselines with pretrained models and logs. Welcome to try and play with them on our demo data! Note that we rename some keys in the multi-view 3D detection and visual grounding model. Please re-download the pretrained models if you just use our code for inference.
 - \[2024-03\] The challenge test server is also online [here](https://huggingface.co/spaces/AGC2024/visual-grounding-2024). Looking forward to your strong submissions!
