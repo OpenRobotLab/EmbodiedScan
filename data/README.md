@@ -9,7 +9,9 @@ Detailed steps are shown as follows.
 
 3. Download Matterport3D data [HERE](https://github.com/niessner/Matterport). Link or move the folder to this level of directory.
 
-4. Download EmbodiedScan data and extract it here. Currently, please fill in the [form](https://docs.google.com/forms/d/e/1FAIpQLScUXEDTksGiqHZp31j7Zp7zlCNV7p_08uViwP_Nbzfn3g6hhw/viewform?usp=sf_link), and we will reply with the data download link.
+4. Download ARKitScenes data [HERE](https://github.com/apple/ARKitScenes). Link or move the folder to this level of directory.
+
+5. Download EmbodiedScan data and extract it here. Currently, please fill in the [form](https://docs.google.com/forms/d/e/1FAIpQLScUXEDTksGiqHZp31j7Zp7zlCNV7p_08uViwP_Nbzfn3g6hhw/viewform?usp=sf_link), and we will reply with the data download link.
 
 The directory structure should be as below.
 
@@ -25,17 +27,24 @@ data
 ├── matterport3d
 │   ├── <scene_id>
 │   ├── ...
+├── arkitscenes
+│   ├── Training
+│   |   ├── <scene_id>
+│   |   ├── ...
+│   ├── Validation
+│   |   ├── <scene_id>
+│   |   ├── ...
 ├── embodiedscan_occupancy
 ├── embodiedscan_infos_train.pkl
 ├── embodiedscan_infos_val.pkl
 ├── embodiedscan_infos_test.pkl
-├── embodiedscan_infos_train_vg.json
-├── embodiedscan_infos_val_vg.json
-├── embodiedscan_infos_test_vg.json
-├── embodiedscan_infos_train_mini_vg.json (mini set)
-├── embodiedscan_infos_val_mini_vg.json (mini set)
-├── embodiedscan_infos_train_vg_all.json (w/ complex prompts)
-├── embodiedscan_infos_val_vg_all.json (w/ complex prompts)
+├── embodiedscan_train_vg.json
+├── embodiedscan_val_vg.json
+├── embodiedscan_test_vg.json
+├── embodiedscan_train_mini_vg.json (mini set)
+├── embodiedscan_val_mini_vg.json (mini set)
+├── embodiedscan_train_vg_all.json (w/ complex prompts)
+├── embodiedscan_val_vg_all.json (w/ complex prompts)
 ```
 
 5. Enter the project root directory, extract images by running
@@ -68,13 +77,21 @@ data
 ├── matterport3d
 │   ├── <scene_id>
 │   ├── ...
+├── arkitscenes
+│   ├── Training
+│   |   ├── <scene_id>
+│   |   ├── ...
+│   ├── Validation
+│   |   ├── <scene_id>
+│   |   ├── ...
 ├── embodiedscan_occupancy
-├── embodiedscan_infos_train_full.pkl
-├── embodiedscan_infos_val_full.pkl
-├── embodiedscan_infos_train_full_vg.json
-├── embodiedscan_infos_val_full_vg.json
-├── embodiedscan_infos_train_mini_vg.json
-├── embodiedscan_infos_val_mini_vg.json
+├── embodiedscan_infos_train.pkl
+├── embodiedscan_infos_val.pkl
+├── embodiedscan_infos_test.pkl
+├── embodiedscan_train_vg.json
+├── embodiedscan_val_vg.json
+├── embodiedscan_train_mini_vg.json
+├── embodiedscan_val_mini_vg.json
 ```
 
 6. Also extract EmbodiedScan occupancy annotations here by running

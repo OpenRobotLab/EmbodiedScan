@@ -125,6 +125,7 @@ demo/data/*
 data/scannet
 data/3rscan
 data/matterport3d
+data/arkitscenes
 data/*.pkl
 data/*.json
 exps/
