@@ -1,34 +1,60 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
 repos:
+  - repo: https://github.com/myint/docformatter
+    rev: v1.3.1
+    hooks:
+      - id: docformatter
+        args: ["--in-place", "--wrap-descriptions", "79"]
+        exclude: '^models/.*'
+  - repo: https://github.com/ambv/black
+    rev: 23.9.1
+    hooks:
+      - id: black
+        args: [--line-length=79]
+        exclude: '^models/.*'
   - repo: https://github.com/PyCQA/flake8
     rev: 5.0.4
     hooks:
       - id: flake8
+        exclude: '^models/.*'
   - repo: https://github.com/PyCQA/isort
     rev: 5.11.5
     hooks:
       - id: isort
+        exclude: '^models/.*'
   - repo: https://github.com/pre-commit/mirrors-yapf
     rev: v0.32.0
     hooks:
       - id: yapf
+        exclude: '^models/.*'
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
     hooks:
       - id: trailing-whitespace
+        exclude: '^models/.*'
       - id: check-yaml
+        exclude: '^models/.*'
       - id: end-of-file-fixer
+        exclude: '^models/.*'
       - id: requirements-txt-fixer
+        exclude: '^models/.*'
       - id: double-quote-string-fixer
+        exclude: '^models/.*'
       - id: check-merge-conflict
+        exclude: '^models/.*'
       - id: fix-encoding-pragma
         args: ["--remove"]
+        exclude: '^models/.*'
       - id: mixed-line-ending
         args: ["--fix=lf"]
+        exclude: '^models/.*'
   - repo: https://github.com/executablebooks/mdformat
     rev: 0.7.9
     hooks:
       - id: mdformat
         args: [ "--number" ]
+        exclude: '^models/.*'
         additional_dependencies:
           - mdformat_frontmatter
           - linkify-it-py
@@ -37,3 +63,14 @@ repos:
     hooks:
       - id: docformatter
         args: ["--in-place", "--wrap-descriptions", "79"]
+        exclude: '^models/.*'
+  - repo: https://github.com/pre-commit/mirrors-autopep8
+    rev: v1.6.0
+    hooks:
+        - id: autopep8
+          exclude: '^models/.*'
+  - repo: https://github.com/PyCQA/docformatter
+    rev: v1.4  # 确保使用最新的稳定版本号
+    hooks:
+        - id: docformatter
+          args: [--in-place, --wrap-summaries=79, --wrap-descriptions=72]
