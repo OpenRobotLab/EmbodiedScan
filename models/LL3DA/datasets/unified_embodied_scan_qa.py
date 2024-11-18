@@ -17,10 +17,11 @@ from eval_utils.evaluate_mmscan import evaluate
 from transformers import AutoTokenizer
 
 MEAN_COLOR_RGB = np.array([109.8, 97.2, 83.8])
-from mmscan import MMScan
 from utils.box_util import (flip_axis_to_camera_np, flip_axis_to_camera_tensor,
                             get_3d_box_batch_np, get_3d_box_batch_tensor)
 from utils.pc_util import scale_points, shift_scale_points
+
+from mmscan import MMScan
 
 
 class Dataset(ScanNetBaseDataset):
