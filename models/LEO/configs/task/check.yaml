@@ -1,0 +1,31 @@
+# train
+training:
+  lr: 3e-5
+  epochs: 10
+
+leomix:
+  mode: [train]
+  dataset: LeoMix
+  mix:  [embodied_scan_t] # [scan2cap, scanqa, sqa3d, rscan_qa, rscan_plan, rscan_dialog]
+  ratio: 1.0
+  dataset_wrapper: LeoObjPadDatasetWrapper
+  dataset_wrapper_args: ${dataset_wrapper_args}
+  train_dataloader_args: ${dataloader.train}
+  eval_dataloader_args: ${dataloader.eval}
+
+
+# embodied_scan_c:
+#   mode: [val, test]
+#   dataset: LeoEmbodiedScanC
+#   dataset_wrapper: LeoObjPadDatasetWrapper
+#   dataset_wrapper_args: ${dataset_wrapper_args}
+#   eval_dataloader_args: ${dataloader.eval}
+#   evaluator: ScanQAEvaluator
+
+embodied_scan_t:
+  mode: [val, test]
+  dataset: LeoEmbodiedScanTest
+  dataset_wrapper: LeoObjPadDatasetWrapper
+  dataset_wrapper_args: ${dataset_wrapper_args}
+  eval_dataloader_args: ${dataloader.eval}
+  evaluator: ScanQAEvaluator

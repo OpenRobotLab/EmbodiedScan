@@ -1,0 +1,22 @@
+defaults:
+  - backbone: pointnetpp
+
+name: OSE3D
+hidden_dim: 256
+use_spatial_attn: True
+use_embodied_token: True
+fourier_size: 84
+
+spatial_encoder:
+  dim_loc: 6
+  num_attention_heads: 8
+  dim_feedforward: 2048
+  dropout: 0.1
+  activation: gelu
+  spatial_multihead: True
+  spatial_dim: 5   # 1, 4, 5
+  spatial_dist_norm: True
+  spatial_attn_fusion: cond   # cond, mul, bias, ctx, add
+  num_layers: 3
+  obj_loc_encoding: same_all   # same_0, same_all, diff_all
+  pairwise_rel_type: center

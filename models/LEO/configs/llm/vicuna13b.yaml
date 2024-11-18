@@ -1,0 +1,11 @@
+name: Vicuna13B
+cfg_path: TBD
+truncation_side: right
+max_context_len: 256
+max_out_len: 256
+lora:
+  flag: True
+  rank: 16
+  alpha: 16
+  target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+  dropout: 0.0

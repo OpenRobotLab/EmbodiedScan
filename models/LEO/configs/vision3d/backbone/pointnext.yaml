@@ -1,0 +1,23 @@
+net:
+  _target_: model.pointnext.pointnext.PointNext
+  in_channels: 3
+  width: 32
+  num_blocks: [1, 4, 7, 4, 4]
+  strides: [1, 4, 4, 4, 4]
+  block: InvResMLP
+  nsample: 32
+  radius: 0.1
+  conv_args:
+    order: conv-norm-act
+  aggr_args:
+    feature_type: dp_fj
+    reduction: max
+  group_args:
+    NAME: ballquery
+    radius: ${vision3d.backbone.net.radius}
+    nsample: ${vision3d.backbone.net.nsample}
+  sa_layers: 1
+  sa_use_res: False
+
+path: TBD
+freeze: True

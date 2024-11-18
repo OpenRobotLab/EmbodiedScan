@@ -1,0 +1,104 @@
+scan_family_base: scandata #/leo-data/scannet
+rscan_base: scandata/leo-data/3RScan-base
+
+alignment_base: scandata/leo-data/annotations/alignment
+instruction_base: scandata/leo-data/annotations/instruction
+
+embodied_scan_anno_base: ../../data/mmscan_anno
+
+embodied_scan_info_base: ../../data/mmscan_info
+
+max_obj_len: ${dataset_wrapper_args.max_obj_len}
+num_points: 1024
+img_size: [224, 224]
+
+
+# cap3d:
+#   cap3d_root: ${data.alignment_base}/obj_caption
+#   num_points: ${data.num_points}
+
+# obj_scene_cap:
+#   rscan_base: ${data.rscan_base}
+#   scannet_base: ${data.scan_family_base}
+#   anno_dir: ${data.alignment_base}/obj_scene_caption
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+
+# scene_cap:
+#   rscan_base: ${data.rscan_base}
+#   anno_dir: ${data.alignment_base}/scene_caption
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+
+# scan2cap:
+#   scannet_base: ${data.scan_family_base}
+#   anno_dir: ${data.instruction_base}/scan2cap
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+#   pc_type: gt   # overrided from CLI
+#   iou_thres: 0.5
+#   corpus: ${data.instruction_base}/scan2cap/scanrefer_corpus.json
+
+# scanqa:
+#   scannet_base: ${data.scan_family_base}
+#   anno_dir: ${data.instruction_base}/scanqa
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+#   pc_type: gt   # overrided from CLI
+
+# sqa3d:
+#   scannet_base: ${data.scan_family_base}
+#   anno_dir: ${data.instruction_base}/sqa3d
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+#   pc_type: gt   # overrided from CLI
+
+# rscan_qa:
+#   rscan_base: ${data.rscan_base}
+#   anno_dir: ${data.instruction_base}/3rscanqa
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+
+# rscan_plan:
+#   rscan_base: ${data.rscan_base}
+#   anno_dir: ${data.instruction_base}/planning
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+
+# rscan_dialog:
+#   rscan_base: ${data.rscan_base}
+#   anno_dir: ${data.instruction_base}/dialogue
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+
+# mp3d_objnav:
+#   base_dir: ${data.instruction_base}/mp3d_objnav
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+#   max_traj_len: 500
+#   history_length: 4
+#   num_pred: 1
+#   img_size: ${data.img_size}
+#   scene_object_deterministic: True   # if so, the same objects will be sampled for a scene
+
+# cliport:
+#   base_dir: ${data.instruction_base}/cliport
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+#   history_length: 4
+#   img_size: ${data.img_size}
+
+embodied_scan_l:
+  anno_dir: ${data.embodied_scan_anno_base}/QA_jinli # path to mmscan qa folder
+  max_obj_len: ${data.max_obj_len}
+  num_points: ${data.num_points}
+  test_scene_ids: ${data.embodied_scan_info_base}/test_scene_ids.txt
+  pc_type: gt   # overrided from CLI
+
+embodied_scan_c:
+  anno_dir:
+  - "${data.embodied_scan_anno_base}/object_caption.json"
+  - "${data.embodied_scan_anno_base}/region_caption.json"
+  max_obj_len: ${data.max_obj_len}
+  num_points: ${data.num_points}
+  pc_type: gt   # overrided from CLI
