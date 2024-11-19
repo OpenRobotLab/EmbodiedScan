@@ -71,6 +71,13 @@ def clean_answer(data):
 
 
 def normalize_answer(s):
+    """Help to 'normalize' the answer.
+
+    Args:
+        s (str): the raw answer.
+    Returns:
+        str : the processed sentence.
+    """
 
     def remove_articles(text):
         return re.sub(r'\b(a|an|the)\b', ' ', text)
@@ -207,6 +214,13 @@ def qa_prompt_define():
 
 
 def qa_metric_map(eval_type):
+    """Map the class type to the corresponding Abbrev.
+
+    Args:
+        eval_type (str): the class name.
+    Returns:
+        str : the corresponding Abbrev.
+    """
     if 'Attribute_OO' in eval_type:
         target = 'OOa'
     elif 'Space_OO' in eval_type:

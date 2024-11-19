@@ -119,6 +119,11 @@ def em_evaluation(batch_input):
 
 
 class simcse_evaluator:
+    """A class for calculating the simcse similarity score.
+
+    Args:
+        model_path: path to the simcse pretrained model.
+    """
 
     def __init__(self, model_path, eval_bs=500) -> None:
         self.eval_bs = eval_bs
@@ -208,6 +213,11 @@ class simcse_evaluator:
 
 
 class sbert_evaluator:
+    """A class for calculating the sbert similarity score.
+
+    Args:
+        model_path: path to the sbert pretrained model.
+    """
 
     def __init__(self, model_path, eval_bs=500) -> None:
         self.eval_bs = eval_bs

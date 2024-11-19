@@ -45,6 +45,7 @@ class VG_Evaluator:
         self.reset()
 
     def reset(self):
+        """Reset the evaluator, clear the buffer and records."""
         self.save_buffer = []
         self.records = []
         self.category_records = {}

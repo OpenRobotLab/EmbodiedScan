@@ -168,6 +168,14 @@ class id_mapping:
         self.mp3d_mapping_trans = reverse_dict(self.mp3d_mapping)
 
     def forward(self, scan_name):
+        """map forward the original scan names to the new names.
+
+        Args:
+            scan_name (str): the original scan name.
+        Returns:
+            str: the new name.
+        """
+
         if 'matterport3d/' in scan_name:
             scan_, region_ = (
                 self.mp3d_mapping[scan_name.split('/')[1]],
@@ -182,6 +190,13 @@ class id_mapping:
             raise ValueError(f'{scan_name} is not a scan name')
 
     def backward(self, scan_name):
+        """map backward the new names to the original scan names.
+
+        Args:
+            scan_name (str): the new name.
+        Returns:
+            str: the original scan name.
+        """
         if '1mp3d' in scan_name:
             scene1, scene2, region = scan_name.split('_')
             return ('matterport3d/' +

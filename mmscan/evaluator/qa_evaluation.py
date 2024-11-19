@@ -57,6 +57,7 @@ class QA_Evaluator:
         self.reset()
 
     def reset(self):
+        """Reset the evaluator, clear the buffer and records."""
         self.metric_record = {}
         self.save_results = {}
         self.save_buffer = []

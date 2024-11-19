@@ -247,6 +247,14 @@ def euler_iou3d_bbox(center1, size1, rot1, center2, size2, rot2):
 
 
 def box_num(box):
+    """Return the number of boxes in a grounp.
+
+    Args:
+        box (list/tuple, tensor): boxes in a grounp.
+
+    Returns:
+        int : the number
+    """
     if isinstance(box, (list, tuple)):
         return box[0].shape[0]
     else:
@@ -261,6 +269,15 @@ def index_box(boxes, indices):
 
 
 def to_9dof_box(box):
+    """Convert a grounp of bounding boxes represented in [center, size, rot]
+    format to 9 DoF format.
+
+    Args:
+        box (list/tuple, tensor): boxes in a grounp.
+
+    Returns:
+        Tensor : 9 DoF format. (num,9)
+    """
     if isinstance(box, (list, tuple)):
         center, size, rotmat = box
         euler = matrix_to_euler_angles(rotmat, 'ZXY')
