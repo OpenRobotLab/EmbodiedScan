@@ -38,11 +38,11 @@ jobs:
           apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/7fa2af80.pub
       - name: Install system dependencies
         run: apt-get update && apt-get install -y git ffmpeg libturbojpeg
-      - name: Install dependencies and EmbodiedScan
+      - name: Install dependencies and MMScan
         run: python install.py all
       - name: Run unittests and generate coverage report
         run: |
-          coverage run --branch --source embodiedscan -m pytest tests
+          coverage run --branch --source mmscan -m pytest tests
           coverage xml
           coverage report -m
 
@@ -67,10 +67,10 @@ jobs:
           apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/7fa2af80.pub
       - name: Install system dependencies
         run: apt-get update && apt-get install -y git ffmpeg libturbojpeg
-      - name: Install dependencies and EmbodiedScan
+      - name: Install dependencies and MMScan
         run: python install.py all
       - name: Run unittests and generate coverage report
         run: |
-          coverage run --branch --source embodiedscan -m pytest tests
+          coverage run --branch --source mmscan -m pytest tests
           coverage xml
           coverage report -m
