@@ -6,7 +6,7 @@ from tqdm import tqdm
 from mmscan.evaluator.metrics.box_metric import (compute_for_subset,
                                                  get_average_precision,
                                                  get_multi_topk_scores)
-from mmscan.utils.box_utils import euler_iou3d_bbox, euler_to_matrix_np
+from mmscan.utils.box_utils import index_box, to_9dof_box
 
 
 class VG_Evaluator:
@@ -27,6 +27,7 @@ class VG_Evaluator:
     """
 
     def __init__(self, verbose=True) -> None:
+        print('new methods!')
         self.verbose = verbose
         self.eval_metric_type = ['AP', 'AR']
         self.top_k_visible = [1, 3, 5]
@@ -70,17 +71,19 @@ class VG_Evaluator:
             metric_for_single = {}
 
             # (1) len(gt)==0 : skip
-            if len(data_item['gt_bboxes']['center']) == 0:
+            if self.__is_zero__(data_item['gt_bboxes']):
+                print('error!!!')
+
                 continue
 
             # (2) len(pred)==0 : model's wrong
-            if len(data_item['pred_bboxes']['center']) == 0:
+            if self.__is_zero__(data_item['pred_bboxes']):
                 for iou_thr in self.iou_thresholds:
                     metric_for_single[f'AP@{iou_thr}'] = 0
                     for topk in [1, 3, 5, 10]:
                         metric_for_single[f'gTop-{topk}@{iou_thr}'] = 0
 
-                data_item['num_gts'] = len(data_item['gt_bboxes']['center'])
+                data_item['num_gts'] = len(data_item['gt_bboxes'])
                 data_item.update(metric_for_single)
                 self.records.append(data_item)
                 continue
@@ -275,25 +278,22 @@ class VG_Evaluator:
         top_idxs = torch.argsort(pred_scores, descending=True)
         pred_scores = pred_scores[top_idxs]
 
-        pred_center = pred_bboxes['center'][top_idxs]
-        pred_size = pred_bboxes['size'][top_idxs]
-        pred_rot = pred_bboxes['rot'][top_idxs]
+        pred_bboxes = to_9dof_box(index_box(pred_bboxes, top_idxs))
+        gt_bboxes = to_9dof_box(gt_bboxes)
 
-        gt_center = gt_bboxes['center']
-        gt_size = gt_bboxes['size']
-        gt_rot = gt_bboxes['rot']
-
-        # shape (num_pred , num_gt)
-        iou_matrix = euler_iou3d_bbox(pred_center, pred_size, pred_rot,
-                                      gt_center, gt_size, gt_rot)
-
+        iou_matrix = pred_bboxes.overlaps(pred_bboxes,
+                                          gt_bboxes)  # (num_query, num_gt)
         # (3) calculate the TP and NP,
         # preparing for the forward AP/topk calculation
         pred_scores = pred_scores.cpu().numpy()
-        sorted_inds = np.argsort(-pred_scores)
-        iou_array = np.array([iou_matrix[i] for i in sorted_inds])
+        iou_array = iou_matrix.cpu().numpy()
 
         return iou_array, pred_scores
+
+    def __is_zero__(self, box):
+        if isinstance(box, (list, tuple)):
+            return (len(box[0]) == 0)
+        return (len(box) == 0)
 
     def __check_format__(self, raw_input):
         """Check if the input conform with mmscan evaluation format.
@@ -319,25 +319,10 @@ class VG_Evaluator:
             for mode in ['pred_bboxes', 'gt_bboxes']:
                 if (isinstance(raw_input[_index][mode], dict)
                         and 'center' in raw_input[_index][mode]):
-                    continue
-                center_list = []
-                size_list = []
-                angle_list = []
-                rot_list = []
-                for box_index in range(len(raw_input[_index][mode])):
-                    _9_dof_box_ = (
-                        raw_input[_index][mode][box_index].cpu().numpy())
-                    if len(_9_dof_box_.shape) > 1:
-                        _9_dof_box_ = _9_dof_box_[0]
-                    center_list.append(_9_dof_box_[:3])
-                    size_list.append(_9_dof_box_[3:6])
-                    angle_list.append(_9_dof_box_[6:])
-                if len(angle_list) > 0:
-                    rot_list = euler_to_matrix_np(np.array(angle_list))
-                raw_input[_index][mode] = {
-                    'center':
-                    torch.tensor(np.array(center_list)).to(torch.float32),
-                    'size':
-                    torch.tensor(np.array(size_list)).to(torch.float32),
-                    'rot': torch.tensor(np.array(rot_list)).to(torch.float32),
-                }
+                    raw_input[_index][mode] = [
+                        torch.tensor(raw_input[_index][mode]['center']),
+                        torch.tensor(raw_input[_index][mode]['size']).to(
+                            torch.float32),
+                        torch.tensor(raw_input[_index][mode]['rot']).to(
+                            torch.float32)
+                    ]

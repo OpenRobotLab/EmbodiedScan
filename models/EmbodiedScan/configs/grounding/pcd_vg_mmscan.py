@@ -140,7 +140,7 @@ test_dataloader = dict(batch_size=24,
                                     type='MMScanPointCloud3DGroundingDataset',
                                     vg_file=''),
                        drop_last=False,
-                       num_workers=12,
+                       num_workers=4,
                        persistent_workers=True,
                        sampler=dict(shuffle=False, type='DefaultSampler'))
 test_evaluator = dict(type='GroundingMetricMod')
@@ -196,7 +196,7 @@ train_dataloader = dict(batch_size=24,
                             vg_file=''),
                                      times=1,
                                      type='RepeatDataset'),
-                        num_workers=12,
+                        num_workers=4,
                         persistent_workers=True,
                         sampler=dict(shuffle=True, type='DefaultSampler'))
 train_pipeline = [
@@ -249,7 +249,7 @@ val_dataloader = dict(batch_size=24,
                                    type='MMScanPointCloud3DGroundingDataset',
                                    vg_file=' '),
                       drop_last=False,
-                      num_workers=12,
+                      num_workers=4,
                       persistent_workers=True,
                       sampler=dict(shuffle=False, type='DefaultSampler'))
 val_evaluator = dict(type='GroundingMetricMod')

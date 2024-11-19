@@ -1,8 +1,11 @@
 import numpy as np
 import torch
 
+from mmscan.utils.euler_utils import EulerInstance3DBoxes
+
 try:
     from pytorch3d.ops import box3d_overlap
+    from pytorch3d.transforms import matrix_to_euler_angles
 except ImportError:
     box3d_overlap = None
 
@@ -237,7 +240,29 @@ def euler_iou3d_bbox(center1, size1, rot1, center2, size2, rot2):
     corners1 = bbox_to_corners(center1, size1, rot1)
     corners2 = bbox_to_corners(center2, size2, rot2)
     result = euler_iou3d_corners(corners1, corners2)
+
     if torch.cuda.is_available():
         result = result.detach().cpu()
-        torch.cuda.empty_cache()
     return result.numpy()
+
+
+def box_num(box):
+    if isinstance(box, (list, tuple)):
+        return box[0].shape[0]
+    else:
+        return box.shape[0]
+
+
+def index_box(boxes, indices):
+    if isinstance(boxes, (list, tuple)):
+        return [index_box(box, indices) for box in boxes]
+    else:
+        return boxes[indices]
+
+
+def to_9dof_box(box):
+    if isinstance(box, (list, tuple)):
+        center, size, rotmat = box
+        euler = matrix_to_euler_angles(rotmat, 'ZXY')
+        box = torch.concat([center, size, euler], dim=-1)
+    return EulerInstance3DBoxes(box, origin=(0.5, 0.5, 0.5))

@@ -1,3 +1,3 @@
-yapf -r -i embodiedscan/ configs/ tests/ tools/
-isort embodiedscan/ configs/ tests/ tools/
+yapf -r -i mmscan/ data_preparation/
+isort mmscan/ data_preparation/
 flake8 .

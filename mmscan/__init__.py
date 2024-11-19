@@ -1,6 +1,7 @@
 # flake8: noqa
 from mmscan.mmscan import MMScan
 
+print('MMScan module loaded')
 try:
     from mmscan.evaluator.vg_evaluation import VG_Evaluator
 except:

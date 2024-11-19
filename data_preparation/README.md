@@ -12,24 +12,33 @@ Detailed steps are shown as follows.
 4. Organize the file structure. Under `mmscan_data/embodiedscan-split/embodiedscan-v1`, the directory structure should be as below,
    You are recommanded to create a soft link to the raw data folder under `mmsan_data/embodiedscan-split/embodiedscan-v1`.
 
-   Additionally, create a `process_pcd` folder in the same directory to store the results. Similarly, we recommend using a symbolic link, as the total file size might be a little large (approximately 21GB)
-
    ```
-   data
-   ├── scannet
+   data/
+   ├── scannet/
    │   ├── scans
    │   │   ├── <scene_id>
    │   │   ├── ...
-   ├── 3rscan
+   ├── 3rscan/
    │   ├── <scene_id>
    │   ├── ...
-   ├── matterport3d
+   ├── matterport3d/
    │   ├── <scene_id>
    │   ├── ...
-   process_pcd
-   embodiedscan_infos_train.pkl
-   embodiedscan_infos_val.pkl
-   ...
+   ```
+
+   Additionally, create a `process_pcd` folder in the same directory to store the results. Similarly, we recommend using a symbolic link, as the total file size might be a little large (approximately 21GB)
+
+   PS: If you have followed the embodiedscan tutorial to organize the data, you can skip these steps and link or copy the `data` folder to
+   `mmsan_data/embodiedscan-split/embodiedscan-v1`.
+
+   After all the raw data is organized, the directory structure should be as below:
+
+   ```
+   embodiedscan-v1/
+   ├── data/
+   ├── process_pcd/
+   ├── embodiedscan_infos_train.pkl
+   ├── embodiedscan_infos_val.pkl
    ```
 
 5. Read raw files and generate processed point cloud files, by running the following scripts.
