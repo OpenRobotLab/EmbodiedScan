@@ -4,9 +4,10 @@ from typing import Iterator, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import torch
-from torch import Tensor
 from pytorch3d.ops import box3d_overlap
 from pytorch3d.transforms import euler_angles_to_matrix, matrix_to_euler_angles
+from torch import Tensor
+
 
 class BaseInstance3DBoxes:
     """Base class for 3D Boxes.
@@ -183,8 +184,8 @@ class BaseInstance3DBoxes:
         self,
         angle: Union[Tensor, np.ndarray, float],
         points: Optional[Union[Tensor, np.ndarray]] = None
-    ) -> Union[Tuple[Tensor, Tensor], Tuple[np.ndarray, np.ndarray], Tuple[
-             Tensor], None]:
+    ) -> Union[Tuple[Tensor, Tensor], Tuple[np.ndarray, np.ndarray],
+               Tuple[Tensor], None]:
         """Rotate boxes with points (optional) with the given angle or rotation
         matrix.
 
@@ -840,4 +841,3 @@ def rotation_3d_in_euler(points, angles, return_mat=False, clockwise=False):
         return points_new, rot_mat_T
     else:
         return points_new
-
