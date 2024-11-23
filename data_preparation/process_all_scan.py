@@ -14,7 +14,7 @@ from utils.proc_utils import mmengine_track_func
 from utils.scannet_process import process_scannet
 from utils.trscan_process import process_trscan
 
-dict_1 = {}
+es_anno = {}
 
 
 def create_scene_pcd(es_anno, pcd_result):
@@ -23,23 +23,18 @@ def create_scene_pcd(es_anno, pcd_result):
     Args:
         es_anno (dict): The embodiedscan annotation of
             the target scan.
-        pcd_result (tuple) :
-            (1) aliged point clouds coordinates
-                shape (n,3)
-            (2) point clouds color ([0,1])
-                shape (n,3)
-            (3) label (no need here)
+        pcd_result (tuple) : The raw point cloud data of the scan,
+            consisting of:
+            (1) aliged point clouds coordinates with shape (n,3).
+            (2) point clouds color ([0,1]) with shape (n,3).
+            (3) label (no need here).
 
     Returns:
-        tuple :
-            (1) aliged point clouds coordinates
-                shape (n,3)
-            (2) point clouds color ([0,1])
-                shape (n,3)
-            (3) point clouds label (int)
-                shape (n,1)
-            (4) point clouds object id (int)
-                shape (n,1)
+        tuple : The processed point cloud data of the scan, consisting of:
+            (1) aliged point clouds coordinates with shape (n,3).
+            (2) point clouds color ([0,1]) with shape (n,3).
+            (3) point clouds label with shape (n,1).
+            (4) point clouds object id (int) with shape (n,1).
     """
     pc, color, label = pcd_result
     label = np.ones_like(label) * -100
@@ -86,17 +81,21 @@ def process_one_scan(
 ):
     """Process the point clouds of one scan and save in a pth file.
 
-    The pth file is a tuple of:
-        (1) aliged point clouds coordinates
-            shape (n,3)
-        (2) point clouds color ([0,1])
-            shape (n,3)
-        (3) point clouds label (int)
-            shape (n,1)
-        (4) point clouds object id (int)
-            shape (n,1)
+    The pth file is a tuple of nd.array, consisting of:
+        (1) aliged point clouds coordinates with shape (n,3).
+        (2) point clouds color ranging in [0,1] with shape (n,3).
+        (3) point clouds label with shape (n,1).
+        (4) point clouds object id with shape (n,1).
     Args:
-        scan_id (str): the scan id
+        scan_id (str): The scan id.
+        save_root (str): The root path to save the pth file.
+        scannet_root (str): The path of scannet.
+        mp3d_root (str): The path of mp3d.
+        trscan_root (str): The path of 3rscan.
+        scannet_matrix (nd.array): The aligned matrix of scannet.
+        mp3d_matrix (nd.array): The aligned matrix of mp3d.
+        trscan_matrix (nd.array): The aligned matrix of 3rscan.
+        mp3d_mapping (dict): The mapping dict for mp3d scan id.
     """
 
     if os.path.exists(f'{save_root}/{scan_id}.pth'):
@@ -104,11 +103,11 @@ def process_one_scan(
 
     try:
         if 'scene' in scan_id:
-            if 'scannet/' + scan_id not in dict_1:
+            if 'scannet/' + scan_id not in es_anno:
                 return
 
             pcd_info = create_scene_pcd(
-                dict_1['scannet/' + scan_id],
+                es_anno['scannet/' + scan_id],
                 process_scannet(scan_id, scannet_root, scannet_matrix),
             )
 
@@ -118,19 +117,19 @@ def process_one_scan(
                 'region' + scan_id.split('_region')[1],
             )
             mapping_name = f'matterport3d/{raw_scan_id}/{region_id}'
-            if mapping_name not in dict_1:
+            if mapping_name not in es_anno:
                 return
 
             pcd_info = create_scene_pcd(
-                dict_1[mapping_name],
+                es_anno[mapping_name],
                 process_mp3d(scan_id, mp3d_root, mp3d_matrix, mp3d_mapping),
             )
 
         else:
-            if '3rscan/' + scan_id not in dict_1:
+            if '3rscan/' + scan_id not in es_anno:
                 return
             pcd_info = create_scene_pcd(
-                dict_1['3rscan/' + scan_id],
+                es_anno['3rscan/' + scan_id],
                 process_trscan(scan_id, trscan_root, trscan_matrix),
             )
 
@@ -182,8 +181,8 @@ if __name__ == '__main__':
 
     TYPE2INT = np.load(args.train_pkl_path,
                        allow_pickle=True)['metainfo']['categories']
-    dict_1.update(read_annotation_pickle(args.train_pkl_path))
-    dict_1.update(read_annotation_pickle(args.val_pkl_path))
+    es_anno.update(read_annotation_pickle(args.train_pkl_path))
+    es_anno.update(read_annotation_pickle(args.val_pkl_path))
 
     # loading the required scan id
     with open(f'{args.meta_path}/all_scan.json', 'r') as f:

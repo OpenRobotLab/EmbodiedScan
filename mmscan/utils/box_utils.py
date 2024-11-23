@@ -156,7 +156,7 @@ def normalize_box(scene_pcd, embodied_scan_bbox):
     return bbox
 
 
-def __9dof_to_6dof__(pcd_data, bbox_):
+def from_9dof_to_6dof(pcd_data, bbox_):
     # that's a kind of loss of information, so we don't recommend
     return normalize_box(pcd_data, bbox_)
 
@@ -228,7 +228,7 @@ def euler_iou3d_bbox(center1, size1, rot1, center2, size2, rot2):
         rot1 (Tensor): rot matrix of grounp2.
 
     Returns:
-        numpy.ndarray: (n, m)the 3D IoU
+        numpy.ndarray: (n, m) the 3D IoU.
     """
     if torch.cuda.is_available():
         center1 = center1.cuda()
@@ -250,10 +250,10 @@ def box_num(box):
     """Return the number of boxes in a grounp.
 
     Args:
-        box (list/tuple, tensor): boxes in a grounp.
+        box (list/tuple, tensor): Boxes in a grounp.
 
     Returns:
-        int : the number
+        int : The number of boxes.
     """
     if isinstance(box, (list, tuple)):
         return box[0].shape[0]

@@ -10,12 +10,11 @@ from mmscan.utils.box_utils import index_box, to_9dof_box
 
 
 class VG_Evaluator:
-    """Evaluator for MMScan Visual Grounding benchmark.
+    """Evaluator for MMScan Visual Grounding benchmark. The evaluation metric
+    includes "AP","AP_C","AR","gTop-k".
 
     Attributes:
-        eval_metric: All the evaluation metric, includes
-            "AP","AP_C","AR","gTop-k"
-        save_buffer(list[dict]): Save the buffer of Inputs
+        save_buffer(list[dict]): Save the buffer of Inputs.
 
         records(list[dict]): Metric results for each sample
 
@@ -27,7 +26,7 @@ class VG_Evaluator:
     """
 
     def __init__(self, verbose=True) -> None:
-        print('new methods!')
+
         self.verbose = verbose
         self.eval_metric_type = ['AP', 'AR']
         self.top_k_visible = [1, 3, 5]
@@ -55,7 +54,7 @@ class VG_Evaluator:
 
         Args:
             raw_batch_input (list[dict]):
-            a batch of the raw original input
+                Batch of the raw original input.
         """
         self.__check_format__(raw_batch_input)
         self.save_buffer.extend(raw_batch_input)
@@ -73,8 +72,6 @@ class VG_Evaluator:
 
             # (1) len(gt)==0 : skip
             if self.__is_zero__(data_item['gt_bboxes']):
-                print('error!!!')
-
                 continue
 
             # (2) len(pred)==0 : model's wrong
@@ -144,9 +141,9 @@ class VG_Evaluator:
     def collect_result(self):
         """Collect the result from the evaluation process.
 
-        Stores them based on some subclass.
+        Stores them based on their subclass.
         Returns:
-             category_results(dict): Average results per category
+             category_results(dict): Average results per category.
         """
         category_results = {}
         category_results['overall'] = {}
@@ -186,7 +183,7 @@ class VG_Evaluator:
         """Showing the result table.
 
         Returns:
-            table(str): the metric result table
+            table(str): The metric result table.
         """
         assert len(self.category_records) > 0, 'No result yet.'
         self.category_records = {
@@ -246,10 +243,10 @@ class VG_Evaluator:
         """Mapping the subclass name to the category name.
 
         Args:
-            sub_class (str): the subclass name in the original samples
+            sub_class (str): The subclass name in the original samples.
 
         Returns:
-            category (str): the category name.
+            category (str): The category name.
         """
         sub_class = sub_class.lower()
         sub_class = sub_class.replace('single', 'sngl')
@@ -265,10 +262,10 @@ class VG_Evaluator:
         """Calculate some information needed for eavl.
 
         Args:
-             data_item (dict): the subclass name in the original samples
+             data_item (dict): The subclass name in the original samples.
         Returns:
              nd.array, int, int :
-                the iou array sorted by the confidence,
+                The iou array sorted by the confidence and the
                 number of predictions, number of gts.
         """
 
@@ -297,13 +294,15 @@ class VG_Evaluator:
         return (len(box) == 0)
 
     def __check_format__(self, raw_input):
-        """Check if the input conform with mmscan evaluation format.
+        """Check if the input conform with mmscan evaluation format. Transform
+        the input box format.
 
-        transform 9 DoF box to ('center'/'size'/'rot_matrix')
+        Args:
+            raw_input (list[dict]): The input of VG evaluator.
         """
         assert isinstance(
             raw_input,
-            list), 'The input of MMScan evaluator should be a list of dict. '
+            list), 'The input of VG evaluator should be a list of dict. '
         raw_input = raw_input
 
         for _index in tqdm(range(len(raw_input))):

@@ -18,7 +18,7 @@ def process_scannet(scan_id, data_root, scannet_matrix):
     r = np.asarray(data_color.elements[0].data['red'])
     g = np.asarray(data_color.elements[0].data['green'])
     b = np.asarray(data_color.elements[0].data['blue'])
-    pc_color = (np.stack([r, g, b], axis=1) / 256.0).astype(np.float32)
+    pc_color = (np.stack([r, g, b], axis=1) / 255.0).astype(np.float32)
     axis_align_matrix = scannet_matrix[scan_id]
     pts = np.ones((pc.shape[0], 4), dtype=pc.dtype)
     pts[:, :3] = pc

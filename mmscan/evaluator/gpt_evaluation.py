@@ -53,9 +53,9 @@ class GPT_Evaluator:
                 The system prompt inputted into GPT.
             user_content_grounps (list[str]) :
                 The user content inputted into GPT.
-            max_tokens (int) : max tokens, default 1000.
+            max_tokens (int) : Max tokens. Defaults to 1000.
         Returns:
-            dict : the json-format result.
+            dict : The json-format result.
         """
 
         messages = []
@@ -77,13 +77,11 @@ class GPT_Evaluator:
         """Employ the GPT evaluator.
 
         Args:
-            QA_sample_dict (str) :
-                The system prompt inputted into GPT.
-            user_content_grounps (list[str]) :
-                The user content inputted into GPT.
-            max_tokens (int) : max tokens, default 1000.
-        Returns:
-            dict : the json-format result.
+            QA_sample_dict (str) : The QA sample dict with
+                [gt, pred, question] as values.
+            thread_index (int) : The index of the thread.
+            tmp_path (str) : The path to store the
+                tmp-stored json files.
         """
 
         system_prompt, ex_instance = qa_prompt_define()
@@ -137,7 +135,7 @@ class GPT_Evaluator:
             tmp_path (str) :
                 The path to store the tmp-stored json files.
         Returns:
-            dict : the evaluation result.
+            dict : The evaluation result.
         """
 
         eval_dict = {metric: [] for metric in self.qa_metric}
@@ -174,12 +172,12 @@ class GPT_Evaluator:
 
         Args:
             raw_batch_input (list[dict]) :
-                the batch of results wanted to evaluate
+                The batch of results wanted to evaluate
             num_threads (int) : The number of the threadings.
                 Defaults to 1.
             tmp_path (str) : The temporay path to store the json files.
         Returns:
-            dict : the evaluation result.
+            dict : The evaluation result.
         """
 
         # (1) Update the results and store in the dict.
@@ -235,7 +233,10 @@ class GPT_Evaluator:
         to be checked, should be a list of dict. Every item with the keys:
 
         ["ID","question","pred",""gt"] pred is a list with one one element. gt
-        is a list with >=1 elements. "ID" should be unique!!!!
+        is a list with >=1 elements. "ID" should be unique.
+
+        Args:
+            raw_input (list[dict]) : The input to be checked.
         """
         assert isinstance(
             raw_input,

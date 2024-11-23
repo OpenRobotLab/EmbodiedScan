@@ -240,7 +240,7 @@ def train(args):
     # }
 
     # dataloader
-    train_dataset, train_dataloader = get_dataloader(args, 'train', DC, True)
+    train_dataset, train_dataloader = get_dataloader(args, 'train', DC, False)
     val_dataset, val_dataloader = get_dataloader(args, 'val', DC, False)
     dataloader = {'train': train_dataloader, 'val': val_dataloader}
 

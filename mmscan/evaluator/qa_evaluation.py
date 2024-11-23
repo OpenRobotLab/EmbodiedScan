@@ -7,16 +7,16 @@ from mmscan.utils.lang_utils import special_token_filter
 
 
 class QA_Evaluator:
-    """tradition metrics for QA and Caption evaluation , consists the
+    """Tradition metrics for QA and Caption evaluation , consists the
     implements of.
 
        [EM, BLEU, METEOR, ROUGE, CIDEr, SPICE, SIMCSE, SBERT]
-       SIMCSE, SBERT is speacial metrics and needed GPU tools.
+       SIMCSE, SBERT is speacial metrics and needed GPU.
 
     Attributes:
-        save_buffer(list[dict]): Save the buffer of Inputs
-        records(list[dict]): Metric results for each sample
-        metric_record(dict): Metric results for each category
+        save_buffer(list[dict]): Save the buffer of Inputs.
+        records(list[dict]): Metric results for each sample.
+        metric_record(dict): Metric results for each category.
             (average of all samples with the same category)
     Args:
         model_config(dict): The model config for special metric evaluation.
@@ -67,18 +67,18 @@ class QA_Evaluator:
         """Update a batch of results to the buffer, and then filtering and
         truncating. each item is expected to be a dict with keys.
 
-        ["index", "ID","question","pred",""gt"]
+        ["index", "ID","question","pred","gt"]
 
         1. pred is a list with one one element.
         2. gt is a list with >=1 elements.
-        3. "ID" should be unique!!!!
+        3. "ID" should be unique.
 
         Args:
             batch_input (list[dict]):
-            a batch of the raw original input
+                Batch of the raw original input.
         Returns:
             Dict: {"EM":EM metric for this batch,
-            "refined_EM":refined EM metric for this batch}
+                "refined_EM":Refined EM metric for this batch}
         """
 
         self.__check_format__(batch_input)
@@ -112,7 +112,7 @@ class QA_Evaluator:
         """Start the evaluation process.
 
         Returns:
-            dict: the metrics
+            dict: The results of the evaluation.
         """
 
         # (1) exact match evaluation
@@ -170,18 +170,16 @@ class QA_Evaluator:
 
     def __check_format__(self, raw_input):
         """Check if the input conform with mmscan evaluation format.
-        Args:
-            The input to be checked, should be a list of dict.
-            Every item with the keys:
-            ["index", "ID","question","pred",""gt"]
-            pred is a list with one one element.
-            gt is a list with >=1 elements.
-            "ID" should be unique!!!!
 
+        Every item with the keys ["index", "ID","question","pred","gt"],
+            'pred' is a list with one one element, 'gt' is a list
+            with >=1 elements. "ID" should be unique.
+        Args:
+            raw_input (list[dict]): The input to be checked.
         """
         assert isinstance(
             raw_input,
-            list), 'The input of MMScan evaluator should be a list of dict. '
+            list), 'The input of QA evaluator should be a list of dict. '
 
         for _index in range(len(raw_input)):
             if 'index' not in raw_input[_index]:

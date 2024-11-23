@@ -9,7 +9,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-from mmscan.utils.box_utils import __9dof_to_6dof__
+from mmscan.utils.box_utils import from_9dof_to_6dof
 from mmscan.utils.data_io import id_mapping, load_json, read_annotation_pickle
 from mmscan.utils.task_utils import anno_token_flatten
 
@@ -215,7 +215,7 @@ class MMScan(Dataset):
                         Input bounding boxes, 9 DoF.
 
         Args:
-            index_ (int): the index
+            index_ (int): The index.
         Returns:
             dict: The sample item corresponding to the index.
         """
@@ -279,7 +279,7 @@ class MMScan(Dataset):
         """Getting all database about the scan from embodeidscan.
 
         Args:
-            table_name (str): type of the expected data.
+            table_name (str): The ype of the expected data.
             scan_idx (str): The scan id to get the data.
         Returns:
             The data corresponding to the table_name and scan_idx.
@@ -387,9 +387,9 @@ class MMScan(Dataset):
         labels and the center of the scan.
 
         Args:
-            scan_idx (str): the scan ID.
+            scan_idx (str): ID of the scan.
         Returns:
-            dict : corresponding scan information.
+            dict : The corresponding scan information.
         """
 
         assert (scan_idx in self.embodiedscan_anno.keys()
@@ -422,10 +422,9 @@ class MMScan(Dataset):
         bounding boxes in format of [ID: {"bbox":bbox, "type":type},...].
 
         Args:
-            scan_idx (str): the scan ID.
+            scan_idx (str): ID of the scan.
         Returns:
-            dict : corresponding bounding boxes
-            information.
+            dict : The corresponding bounding boxes information.
         """
         assert (scan_idx in self.embodiedscan_anno.keys()
                 ), 'Scan {} is not in {} split'.format(scan_idx, self.split)
@@ -447,10 +446,10 @@ class MMScan(Dataset):
         extrinsics, image paths(both rgb & depth) and the visible object ids.
 
         Args:
-            scan_idx (str): the scan ID.
+            scan_idx (str): ID of the scan.
         Returns:
-            list[dict] : corresponding information
-            for each camera.
+            list[dict] :The corresponding bounding boxes information
+                for each camera.
         """
         assert (scan_idx in self.embodiedscan_anno.keys()
                 ), 'Scan {} is not in {} split'.format(scan_idx, self.split)
@@ -491,14 +490,14 @@ class MMScan(Dataset):
                 The transformed 6DOF bounding box.
         """
 
-        return __9dof_to_6dof__(pcd, box_9dof)
+        return from_9dof_to_6dof(pcd, box_9dof)
 
     def __downsample_annos__(self, annos: List[dict], ratio: float):
         """downsample the annotations with a given ratio.
 
         Args:
-            annos (list[dict]): the original annotations.
-            ratio (float): the ratio to downsample.
+            annos (list[dict]): The original annotations.
+            ratio (float): The ratio to downsample.
         Returns:
             list[dict] : The result.
         """

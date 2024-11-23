@@ -1,4 +1,6 @@
-## Visual Grounding Models
+## 3D Visual Grounding Models
+
+These are 3D visual grounding models adapted for the mmscan-devkit. Currently, two models have been released: EmbodiedScan and ScanRefer.
 
 ### Scanrefer
 
@@ -22,31 +24,33 @@
 
 ### EmbodiedScan
 
-1. Follow the [EmbodiedScan](https://github.com/OpenRobotLab/EmbodiedScan/blob/main/README.md) to setup the Env. You need not load the datasets!
+1. Follow the [EmbodiedScan](https://github.com/OpenRobotLab/EmbodiedScan/blob/main/README.md) to setup the Env. Download the [Multi-View 3D Detection model's weights](https://download.openmmlab.com/mim-example/embodiedscan/mv-3ddet.pth) and change the "load_from" path in the config file under `configs/grounding` to the path where the weights are saved.
 
 2. Install MMScan API.
 
-3. Run the following command to train Scanrefer (multiple GPU):
+3. Run the following command to train EmbodiedScan (multiple GPU):
 
    ```bash
    # Single GPU training
-   python tools/train.py configs/grounding/pcd_vg_mmscan.py --work-dir=path/to/save
+   python tools/train.py configs/grounding/pcd_4xb24_mmscan_vg_num256.py --work-dir=path/to/save
 
    # Multiple GPU training
-   python tools/train.py configs/grounding/pcd_vg_mmscan.py --work-dir=path/to/save --launcher="pytorch"
+   python tools/train.py configs/grounding/pcd_4xb24_mmscan_vg_num256.py --work-dir=path/to/save --launcher="pytorch"
    ```
 
-4. Run the following command to evaluate Scanrefer (multiple GPU):
+4. Run the following command to evaluate EmbodiedScan (multiple GPU):
 
    ```bash
    # Single GPU testing
-   python tools/test.py configs/grounding/pcd_vg_mmscan.py path/to/load_pth
+   python tools/test.py configs/grounding/pcd_4xb24_mmscan_vg_num256.py path/to/load_pth
 
    # Multiple GPU testing
-   python tools/test.py configs/grounding/pcd_vg_mmscan.py path/to/load_pth --launcher="pytorch"
+   python tools/test.py configs/grounding/pcd_4xb24_mmscan_vg_num256.py path/to/load_pth --launcher="pytorch"
    ```
 
-## Question Answering Models
+## 3D Question Answering Models
+
+These are 3D question answering models adapted for the mmscan-devkit. Currently, two models have been released: LL3DA and LEO.
 
 ### LL3DA
 
@@ -79,7 +83,6 @@
    python eval_utils/evaluate_gpt.py --file path/to/qa_pred_gt_val.json
    --tmp_path path/to/tmp  --api_key your_api_key --eval_size -1
    --nproc 4
-
    ```
 
 ### LEO
@@ -113,7 +116,6 @@
    python evaluator/GPT_eval.py --file path/to/test_embodied_scan_l_complete.json
    --tmp_path path/to/tmp  --api_key your_api_key --eval_size -1
    --nproc 4
-
    ```
 
 PS : It is possible that LEO may encounter an "NaN" error in the MultiHeadAttentionSpatial module due to the training setup when training more epoches. ( no problem for 4GPU one epoch)

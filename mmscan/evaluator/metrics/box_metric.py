@@ -13,6 +13,7 @@ def average_precision(recalls, precisions, mode='area'):
         mode (str): 'area' or '11points', 'area' means calculating the area
             under precision-recall curve, '11points' means calculating
             the average precision of recalls at [0, 0.1, ..., 1]
+            Defaults to 'area'.
 
     Returns:
         float or np.ndarray: Calculated average precision.
@@ -57,7 +58,8 @@ def get_f1_scores(iou_matrix, iou_threshold):
 
     Args:
         iou_matrix (ndarray/tensor):
-            the iou matrix of the predictions and ground truths (shape n*m)
+            The iou matrix of the predictions and ground truths with
+                shape (num_preds , num_gts)
         iou_threshold (float): 0.25/0.5
 
     Returns:
@@ -93,7 +95,7 @@ def __get_fp_tp_array__(iou_array, iou_threshold):
     Args:
         iou_array (ndarray/tensor):
             the iou matrix of the predictions and ground truths
-            (shape len(preds)*len(gts))
+            (shape num_preds, num_gts)
         iou_threshold (float): 0.25/0.5
 
     Returns:

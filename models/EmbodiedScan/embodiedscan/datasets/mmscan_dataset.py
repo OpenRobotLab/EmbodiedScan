@@ -149,7 +149,7 @@ class MMScanPointCloud3DGroundingDataset(BaseDataset):
         self.mmscan_loader = MMScan(version='v1',
                                     split='val' if test_mode else 'train',
                                     task='MMScan-VG',
-                                    ratio=0.1)
+                                    ratio=0.2)
 
         if 'classes' in metainfo:
             if metainfo['classes'] == 'all':
