@@ -9,11 +9,10 @@ Detailed steps are shown as follows.
 
 3. Download Matterport3D data [HERE](https://github.com/niessner/Matterport). Link or move the folder to this level of directory.
 
-4. Organize the file structure. Under `mmscan_data/embodiedscan-split`, the directory structure should be as below,
-   You are recommanded to create a soft link to the raw data folder under `mmsan_data/embodiedscan-split`.
+4. Organize the file structure. You are recommanded to create a soft link to the raw data folder under `mmsan_data/embodiedscan-split/data`.
 
    ```
-   data/
+   mmsan_data/embodiedscan-split/data/
    ├── scannet/
    │   ├── scans
    │   │   ├── <scene_id>
@@ -26,7 +25,7 @@ Detailed steps are shown as follows.
    │   ├── ...
    ```
 
-   Additionally, create a `process_pcd` folder in the same directory to store the results. Similarly, we recommend using a symbolic link, as the total file size might be a little large (approximately 21GB)
+   Additionally, create a `process_pcd` folder under `mmsan_data/embodiedscan-split` to store the results. Similarly, we recommend using a symbolic link, as the total file size might be a little large (approximately 21GB)
 
    PS: If you have followed the embodiedscan tutorial to organize the data, you can skip these steps and link or copy the `data` folder to
    `mmsan_data/embodiedscan-split`.
@@ -34,10 +33,14 @@ Detailed steps are shown as follows.
    After all the raw data is organized, the directory structure should be as below:
 
    ```
-   embodiedscan-split/
-   ├── data/
-   ├── process_pcd/
-   ├── embodiedscan-v1/
+   mmscan_data
+   ├── embodiedscan-split/
+   │   ├── data/
+   │   ├── process_pcd/
+   │   ├── embodiedscan-v1/
+   │   ├── embodiedscan-v2/   
+   ├── MMScan-beta-release
+
    ```
 
 5. Read raw files and generate processed point cloud files, by running the following scripts.

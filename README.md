@@ -81,12 +81,16 @@ existing benchmarks and in-the-wild evaluation.
 
 1. Download the Embodiedscan and MMScan annotation. (Fill in the [form](https://docs.google.com/forms/d/e/1FAIpQLScUXEDTksGiqHZp31j7Zp7zlCNV7p_08uViwP_Nbzfn3g6hhw/viewform) to apply for downloading)
 
-   Unzip the files and put them under `mmscan_data/`.
+   Create a folder `mmscan_data/` and then unzip the files. For the first zip file, put `embodiedscan` under `mmscan_data/embodiedscan-split` and rename it to `embodiedscan-v1`. For the second zip file, put `MMScan-beta-release` under `mmscan_data/MMScan-beta-release` and `embodiedscan-v2` under `mmscan_data/embodiedscan-split`.
+   
+   The directory structure should be as below:
 
    ```
    mmscan_data
    ├── embodiedscan-split
-   ├── MMScan-beta-release
+   │   ├──embodiedscan-v1/   # EmbodiedScan v1 data in 'embodiedscan.zip'
+   │   ├──embodiedscan-v2/   # EmbodiedScan v2 data in 'embodiedscan-v2-beta.zip'
+   ├── MMScan-beta-release   # MMScan veta data in 'embodiedscan-v2-beta.zip'
    ```
 
 2. Prepare the point clouds files.
