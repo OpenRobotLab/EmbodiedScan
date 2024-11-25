@@ -1,8 +1,13 @@
+from typing import Dict, Tuple, Union
+
 import numpy as np
+import torch
 from scipy.optimize import linear_sum_assignment
 
 
-def average_precision(recalls, precisions, mode='area'):
+def average_precision(recalls: np.ndarray,
+                      precisions: np.ndarray,
+                      mode: str = 'area') -> np.ndarray:
     """Calculate average precision (for single or multiple scales).
 
     Args:
@@ -16,7 +21,7 @@ def average_precision(recalls, precisions, mode='area'):
             Defaults to 'area'.
 
     Returns:
-        float or np.ndarray: Calculated average precision.
+        np.ndarray: Calculated average precision.
     """
     if recalls.ndim == 1:
         recalls = recalls[np.newaxis, :]
@@ -53,7 +58,8 @@ def average_precision(recalls, precisions, mode='area'):
     return ap
 
 
-def get_f1_scores(iou_matrix, iou_threshold):
+def get_f1_scores(iou_matrix: Union[np.ndarray, torch.tensor],
+                  iou_threshold) -> float:
     """Refer to the algorithm in Multi3DRefer to compute the F1 score.
 
     Args:
@@ -89,7 +95,9 @@ def get_f1_scores(iou_matrix, iou_threshold):
     return f1_score
 
 
-def __get_fp_tp_array__(iou_array, iou_threshold):
+def __get_fp_tp_array__(iou_array: Union[np.ndarray, torch.tensor],
+                        iou_threshold: float) \
+                        -> Tuple[np.ndarray, np.ndarray]:
     """Compute the False-positive and True-positive array for each prediction.
 
     Args:
@@ -130,7 +138,21 @@ def __get_fp_tp_array__(iou_array, iou_threshold):
     return fp_thr, tp_thr
 
 
-def compute_for_subset(subset_results, iou_thr):
+def subset_get_average_precision(subset_results: dict,
+                                 iou_thr: float)\
+                                 -> Tuple[np.ndarray, np.ndarray]:
+    """Return the average precision and max recall for a given iou array,
+    "subset" version while the num_gt of each sample may differ.
+
+    Args:
+        subset_results (dict):
+            The results, consisting of scores, sample_indices, ious.
+            sample_indices means which sample the prediction belongs to.
+        iou_threshold (float): 0.25/0.5
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: the average precision and max recall.
+    """
     confidences = subset_results['scores']
     sample_indices = subset_results['sample_indices']
     ious = subset_results['ious']
@@ -178,7 +200,19 @@ def compute_for_subset(subset_results, iou_thr):
     return average_precision(recall, precision), np.max(recall)
 
 
-def get_average_precision(iou_array, iou_threshold):
+def get_average_precision(iou_array: np.ndarray, iou_threshold: float) \
+        -> Tuple[np.ndarray, np.ndarray]:
+    """Return the average precision and max recall for a given iou array.
+
+    Args:
+        iou_array (ndarray/tensor):
+            The iou matrix of the predictions and ground truths
+            (shape len(preds)*len(gts))
+        iou_threshold (float): 0.25/0.5
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: the average precision and max recall.
+    """
     fp, tp = __get_fp_tp_array__(iou_array, iou_threshold)
     fp_cum = np.cumsum(fp)
     tp_cum = np.cumsum(tp)
@@ -188,7 +222,9 @@ def get_average_precision(iou_array, iou_threshold):
     return average_precision(recall, precision), np.max(recall)
 
 
-def get_multi_topk_scores(iou_array, iou_threshold, mode='sigma'):
+def get_multi_topk_scores(iou_array: Union[np.ndarray, torch.tensor],
+                          iou_threshold: float,
+                          mode: str = 'sigma') -> Dict[str, float]:
     """
     Compute the multi-topk metric, we provide two modes.
     "simple": 1/N *Hit(min(N*k,len(pred)))
@@ -205,7 +241,7 @@ def get_multi_topk_scores(iou_array, iou_threshold, mode='sigma'):
                 Default to 'sigma'.
 
     Returns:
-        float : the score
+        Dict[str,float]: the score of multi-topk metric.
     """
 
     assert mode in ['sigma', 'simple']

@@ -1,11 +1,13 @@
+from typing import List, Tuple
+
 import numpy as np
 import torch
 from terminaltables import AsciiTable
 from tqdm import tqdm
 
-from mmscan.evaluator.metrics.box_metric import (compute_for_subset,
-                                                 get_average_precision,
-                                                 get_multi_topk_scores)
+from mmscan.evaluator.metrics.box_metric import (get_average_precision,
+                                                 get_multi_topk_scores,
+                                                 subset_get_average_precision)
 from mmscan.utils.box_utils import index_box, to_9dof_box
 
 
@@ -25,7 +27,7 @@ class VG_Evaluator:
             Defaults to True.
     """
 
-    def __init__(self, verbose=True) -> None:
+    def __init__(self, verbose: bool = True) -> None:
 
         self.verbose = verbose
         self.eval_metric_type = ['AP', 'AR']
@@ -43,13 +45,13 @@ class VG_Evaluator:
 
         self.reset()
 
-    def reset(self):
+    def reset(self) -> None:
         """Reset the evaluator, clear the buffer and records."""
         self.save_buffer = []
         self.records = []
         self.category_records = {}
 
-    def update(self, raw_batch_input):
+    def update(self, raw_batch_input: List[dict]) -> None:
         """Update a batch of results to the buffer.
 
         Args:
@@ -59,10 +61,12 @@ class VG_Evaluator:
         self.__check_format__(raw_batch_input)
         self.save_buffer.extend(raw_batch_input)
 
-    def start_evaluation(self):
+    def start_evaluation(self) -> dict:
         """This function is used to start the evaluation process.
 
         It will iterate over the saved buffer and evaluate each item.
+        Returns:
+             category_records(dict): Metric results per category.
         """
 
         category_collect = {}
@@ -125,8 +129,8 @@ class VG_Evaluator:
                 self.category_records['overall'][f'AR_C@{iou_thr}'] = 0
 
                 for category in category_collect:
-                    AP_C, AR_C = compute_for_subset(category_collect[category],
-                                                    iou_thr)
+                    AP_C, AR_C = subset_get_average_precision(
+                        category_collect[category], iou_thr)
                     self.category_records[category][f'AP_C@{iou_thr}'] = AP_C
                     self.category_records[category][f'AR_C@{iou_thr}'] = AR_C
                     self.category_records['overall'][f'AP_C@{iou_thr}'] += (
@@ -138,7 +142,7 @@ class VG_Evaluator:
 
         return self.category_records
 
-    def collect_result(self):
+    def collect_result(self) -> dict:
         """Collect the result from the evaluation process.
 
         Stores them based on their subclass.
@@ -179,7 +183,7 @@ class VG_Evaluator:
 
         return category_results
 
-    def print_result(self):
+    def print_result(self) -> str:
         """Showing the result table.
 
         Returns:
@@ -239,7 +243,7 @@ class VG_Evaluator:
 
         return table.table
 
-    def __category_mapping__(self, sub_class):
+    def __category_mapping__(self, sub_class: str) -> str:
         """Mapping the subclass name to the category name.
 
         Args:
@@ -258,15 +262,16 @@ class VG_Evaluator:
             sub_class = 'vg_sngl_attr'
         return sub_class
 
-    def __calculate_iou_array_(self, data_item):
+    def __calculate_iou_array_(
+            self, data_item: dict) -> Tuple[np.ndarray, np.ndarray]:
         """Calculate some information needed for eavl.
 
         Args:
              data_item (dict): The subclass name in the original samples.
         Returns:
-             nd.array, int, int :
+             nd.array, nd.array :
                 The iou array sorted by the confidence and the
-                number of predictions, number of gts.
+                confidence scores.
         """
 
         pred_bboxes = data_item['pred_bboxes']
@@ -293,7 +298,7 @@ class VG_Evaluator:
             return (len(box[0]) == 0)
         return (len(box) == 0)
 
-    def __check_format__(self, raw_input):
+    def __check_format__(self, raw_input: List[dict]) -> None:
         """Check if the input conform with mmscan evaluation format. Transform
         the input box format.
 

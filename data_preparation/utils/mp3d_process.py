@@ -2,7 +2,20 @@ import numpy as np
 from plyfile import PlyData
 
 
-def process_mp3d(new_scan_id, data_root, axis_align_matrix_dict, mapping):
+def process_mp3d(new_scan_id: str, data_root: str,
+                 axis_align_matrix_dict: dict, mapping: dict):
+    """Process matterport3d data.
+
+    Args:
+        scan_id (str): ID of the matterport3d scan.
+        data_root (str): Root directory of the matterport3d dataset.
+        axis_align_matrix_dict (dict): Dict of axis alignment matrices
+            for each scan.
+        mapping (dict) : Dict of mapping names.
+
+    Returns:
+        tuple : point_xyz and point_rgb infos.
+    """
     axis_align_matrix = axis_align_matrix_dict[new_scan_id]
 
     scan_id, region_id = (

@@ -1,3 +1,5 @@
+from typing import List, Union
+
 import numpy as np
 import torch
 
@@ -68,7 +70,7 @@ def euler_angles_to_matrix(euler_angles: np.ndarray,
     return np.matmul(np.matmul(matrices[0], matrices[1]), matrices[2])
 
 
-def euler_to_matrix_np(euler):
+def euler_to_matrix_np(euler: np.ndarray) -> np.ndarray:
     """Convert rotations given as Euler angles in radians to rotation matrices.
 
     Args:
@@ -246,29 +248,25 @@ def euler_iou3d_bbox(center1, size1, rot1, center2, size2, rot2):
     return result.numpy()
 
 
-def box_num(box):
-    """Return the number of boxes in a grounp.
+def index_box(boxes: List[torch.tensor],
+              indices: Union[List[torch.tensor], torch.tensor])\
+            -> Union[List[torch.tensor], torch.tensor]:
+    """Convert a grounp of bounding boxes represented in [center, size, rot]
+    format to 9 DoF format.
 
     Args:
-        box (list/tuple, tensor): Boxes in a grounp.
+        box (list/tuple, tensor): boxes in a grounp.
 
     Returns:
-        int : The number of boxes.
+        Tensor : 9 DoF format. (num,9)
     """
-    if isinstance(box, (list, tuple)):
-        return box[0].shape[0]
-    else:
-        return box.shape[0]
-
-
-def index_box(boxes, indices):
     if isinstance(boxes, (list, tuple)):
         return [index_box(box, indices) for box in boxes]
     else:
         return boxes[indices]
 
 
-def to_9dof_box(box):
+def to_9dof_box(box: List[torch.tensor]):
     """Convert a grounp of bounding boxes represented in [center, size, rot]
     format to 9 DoF format.
 

@@ -5,7 +5,18 @@ import torch
 from pytorch3d.io import load_obj
 
 
-def process_trscan(scan_id, data_root, axis_align):
+def process_trscan(scan_id: str, data_root: str, axis_align: dict):
+    """Process 3rscan data.
+
+    Args:
+        scan_id (str): ID of the 3rscan scan.
+        data_root (str): Root directory of the 3rscan dataset.
+        axis_align (dict): Dict of axis alignment matrices
+            for each scan.
+
+    Returns:
+        tuple : point_xyz and point_rgb infos.
+    """
     axis_align_matrix = axis_align[scan_id]
 
     lidar_obj_path = os.path.join(data_root, scan_id, 'mesh.refined.v2.obj')

@@ -154,9 +154,11 @@ class id_mapping:
     """We rename the scan for consistency.
 
     This class is used to map the original scan names to the new names.
+    Args:
+        mp3d_mapping_path (str): the path of the mp3d mapping file.
     """
 
-    def __init__(self, mp3d_mapping_path):
+    def __init__(self, mp3d_mapping_path: str):
 
         def reverse_dict(mapping):
             re_mapping = {mapping[k]: k for k in mapping.keys()}
@@ -167,7 +169,7 @@ class id_mapping:
 
         self.mp3d_mapping_trans = reverse_dict(self.mp3d_mapping)
 
-    def forward(self, scan_name):
+    def forward(self, scan_name: str):
         """map forward the original scan names to the new names.
 
         Args:
@@ -189,7 +191,7 @@ class id_mapping:
         else:
             raise ValueError(f'{scan_name} is not a scan name')
 
-    def backward(self, scan_name):
+    def backward(self, scan_name: str):
         """map backward the new names to the original scan names.
 
         Args:

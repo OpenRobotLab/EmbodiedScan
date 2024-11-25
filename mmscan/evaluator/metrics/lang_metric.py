@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import List, Tuple
 
 import torch
 from pycocoevalcap.bleu.bleu import Bleu
@@ -24,7 +25,7 @@ def to_coco(kvs, keys):
     return res
 
 
-def coco_evaluate(batch_input):
+def coco_evaluate(batch_input: List[dict]) -> Tuple[dict, dict]:
     """Calculate the extract matching score for each item.
     Args:
         batch_input(list[dict]):
@@ -72,7 +73,7 @@ def coco_evaluate(batch_input):
     return final_scores, final_list
 
 
-def em_evaluation(batch_input):
+def em_evaluation(batch_input: List[dict]) -> Tuple[list, list]:
     """Calculate the extract matching score for each item.
     Args:
         batch_input(list[dict]):
@@ -125,14 +126,15 @@ class simcse_evaluator:
         model_path: path to the simcse pretrained model.
     """
 
-    def __init__(self, model_path, eval_bs=500) -> None:
+    def __init__(self, model_path: str, eval_bs: int = 500) -> None:
         self.eval_bs = eval_bs
         if len(model_path) == 0:
             model_path = 'princeton-nlp/sup-simcse-roberta-large'
         self.simcse_tokenizer = AutoTokenizer.from_pretrained(model_path)
         self.simcse_model = AutoModel.from_pretrained(model_path).to('cuda')
 
-    def __batch_evaluation__(self, all_pred, all_gt, gt_count):
+    def __batch_evaluation__(self, all_pred: List[str], all_gt: List[str],
+                             gt_count: List[int]) -> List[float]:
         """Using Sentence Embeddings to calculate similarity between pred/gt in
         a batch.
 
@@ -180,7 +182,7 @@ class simcse_evaluator:
         torch.cuda.empty_cache()
         return all_simcse_sim
 
-    def evaluation(self, batch_input):
+    def evaluation(self, batch_input: List[dict]) -> List[float]:
         """Calculate the simcse similarity score for each item.
         Args:
             batch_input(list[dict]):
@@ -219,13 +221,14 @@ class sbert_evaluator:
         model_path: path to the sbert pretrained model.
     """
 
-    def __init__(self, model_path, eval_bs=500) -> None:
+    def __init__(self, model_path: str, eval_bs: int = 500) -> None:
         self.eval_bs = eval_bs
         if len(model_path) == 0:
             model_path = 'all-mpnet-base-v2'
         self.sbert_model = SentenceTransformer(model_path, device='cuda')
 
-    def __batch_evaluation__(self, all_pred, all_gt, gt_count):
+    def __batch_evaluation__(self, all_pred: List[str], all_gt: List[str],
+                             gt_count: List[int]) -> List[float]:
         """Using Sentence-BERT to calculate similarity between pred/gt in a
         batch.
 
@@ -264,7 +267,7 @@ class sbert_evaluator:
         torch.cuda.empty_cache()
         return all_sbert_sim
 
-    def evaluation(self, batch_input):
+    def evaluation(self, batch_input: List[dict]) -> List[float]:
         """Calculate the simcse similarity score for each item.
         Args:
             batch_input(list[dict]):

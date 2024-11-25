@@ -1,4 +1,7 @@
-def anno_token_flatten(samples, keep_only_one=True):
+from typing import List
+
+
+def anno_token_flatten(samples: List[dict], keep_only_one: bool = True):
     """Flatten the annotation tokens for each target in a 3d visual grounding
     sample.
 

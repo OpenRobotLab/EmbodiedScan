@@ -1,3 +1,5 @@
+from typing import List
+
 import torch
 
 from mmscan.evaluator.metrics.lang_metric import (coco_evaluate, em_evaluation,
@@ -27,7 +29,10 @@ class QA_Evaluator:
             Defaults to True.
     """
 
-    def __init__(self, model_config={}, max_length=256, verbose=True) -> None:
+    def __init__(self,
+                 model_config: dict = {},
+                 max_length: int = 256,
+                 verbose: bool = True) -> None:
         self.eval_bs = 500
         self.verbose = verbose
         self.max_length = max_length
@@ -56,14 +61,14 @@ class QA_Evaluator:
 
         self.reset()
 
-    def reset(self):
+    def reset(self) -> None:
         """Reset the evaluator, clear the buffer and records."""
         self.metric_record = {}
         self.save_results = {}
         self.save_buffer = []
         self.records = []
 
-    def update(self, batch_input):
+    def update(self, batch_input: List[dict]) -> dict:
         """Update a batch of results to the buffer, and then filtering and
         truncating. each item is expected to be a dict with keys.
 
@@ -108,7 +113,7 @@ class QA_Evaluator:
             'refined_EM': sum(refine_EM_) / len(refine_EM_),
         }
 
-    def start_evaluation(self):
+    def start_evaluation(self) -> dict:
         """Start the evaluation process.
 
         Returns:
@@ -168,7 +173,7 @@ class QA_Evaluator:
 
         return eval_dict
 
-    def __check_format__(self, raw_input):
+    def __check_format__(self, raw_input: List[dict]) -> None:
         """Check if the input conform with mmscan evaluation format.
 
         Every item with the keys ["index", "ID","question","pred","gt"],

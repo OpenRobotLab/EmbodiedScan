@@ -3,7 +3,7 @@ import os.path as osp
 import sys
 import time
 from copy import deepcopy
-from typing import List
+from typing import List, Union
 
 import numpy as np
 import torch
@@ -55,7 +55,7 @@ class MMScan(Dataset):
         verbose: bool = False,
         check_mode: bool = False,
         token_flatten: bool = True,
-    ):
+    ) -> None:
         """Initialize the database, prepare the embodeidscan annotation."""
         super(MMScan, self).__init__()
         self.version = version
@@ -148,7 +148,7 @@ class MMScan(Dataset):
                 '\nLoading {} split for the {} task, using {} seconds.'.format(
                     self.split, self.task, end - start))
 
-    def __getitem__(self, index_):
+    def __getitem__(self, index_: int) -> dict:
         """Return the sample item corresponding to the index. The item
         contains:
 
@@ -245,7 +245,7 @@ class MMScan(Dataset):
 
         return data_dict
 
-    def __len__(self):
+    def __len__(self) -> int:
         assert self.task is not None, 'Please set the task first!'
         return len(self.mmscan_collect['anno'])
 
@@ -267,7 +267,7 @@ class MMScan(Dataset):
         return self.mmscan_scan_id
 
     @property
-    def samples(self):
+    def samples(self) -> List[dict]:
         """
         Returns:
             list[dict]: All samples in the MMScan language task.
@@ -297,7 +297,7 @@ class MMScan(Dataset):
         else:
             return self.embodiedscan_anno[scan_idx][table_name]
 
-    def data_collect(self) -> dict:
+    def data_collect(self):
         """Collect MMScan Samples.
 
         Store the collected samples in `self.MMScan_collect`. For MMScan QA
@@ -325,7 +325,7 @@ class MMScan(Dataset):
         else:
             raise NotImplementedError
 
-    def __filter_lang_anno__(self, samples):
+    def __filter_lang_anno__(self, samples: List[dict]) -> List[dict]:
         """Check and  the annotation is valid or not.
 
         Args:
@@ -343,7 +343,7 @@ class MMScan(Dataset):
                 filtered_samples.append(sample)
         return filtered_samples
 
-    def __check_lang_anno__(self, sample) -> bool:
+    def __check_lang_anno__(self, sample: dict) -> bool:
         """Check if the item of the annotation is valid or not.
 
         Args:
@@ -369,7 +369,7 @@ class MMScan(Dataset):
 
         return True
 
-    def __load_base_anno__(self, pkl_path) -> dict:
+    def __load_base_anno__(self, pkl_path: str) -> dict:
         """Load the embodiedscan pkl file, it will return the embodiedscan
         annotations of all scans in the corresponding split.
 
@@ -381,7 +381,7 @@ class MMScan(Dataset):
         """
         return read_annotation_pickle(pkl_path, show_progress=self.verbose)
 
-    def __process_pcd_info__(self, scan_idx: str):
+    def __process_pcd_info__(self, scan_idx: str) -> dict:
         """Retrieve the corresponding scan information based on the input scan
         ID, including original data, point clouds, object pointclouds, instance
         labels and the center of the scan.
@@ -416,7 +416,7 @@ class MMScan(Dataset):
         scan_info['class_labels'] = np.array(class_labels)
         return scan_info
 
-    def __process_box_info__(self, scan_idx: str):
+    def __process_box_info__(self, scan_idx: str) -> dict:
         """Retrieve the corresponding bounding boxes information based on the
         input scan ID. For each object, this function will return its ID, type,
         bounding boxes in format of [ID: {"bbox":bbox, "type":type},...].
@@ -440,7 +440,7 @@ class MMScan(Dataset):
             for i in range(len(object_ids))
         }
 
-    def __process_img_info__(self, scan_idx: str):
+    def __process_img_info__(self, scan_idx: str) -> List[dict]:
         """Retrieve the corresponding camera information based on the input
         scan ID. For each camera, this function will return its intrinsics,
         extrinsics, image paths(both rgb & depth) and the visible object ids.
@@ -476,7 +476,9 @@ class MMScan(Dataset):
             img_info_list.append(item)
         return img_info_list
 
-    def down_9dof_to_6dof(self, pcd, box_9dof) -> np.ndarray:
+    def down_9dof_to_6dof(
+            self, pcd: Union[np.ndarray, torch.Tensor],
+            box_9dof: Union[np.ndarray, torch.Tensor]) -> np.ndarray:
         """Transform the 9DOF bounding box to 6DOF bounding box. Find the
         minimum bounding boxes to cover all the point clouds.
 
@@ -492,7 +494,8 @@ class MMScan(Dataset):
 
         return from_9dof_to_6dof(pcd, box_9dof)
 
-    def __downsample_annos__(self, annos: List[dict], ratio: float):
+    def __downsample_annos__(self, annos: List[dict],
+                             ratio: float) -> List[dict]:
         """downsample the annotations with a given ratio.
 
         Args:

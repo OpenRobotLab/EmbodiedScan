@@ -4,7 +4,18 @@ import numpy as np
 from plyfile import PlyData
 
 
-def process_scannet(scan_id, data_root, scannet_matrix):
+def process_scannet(scan_id: str, data_root: str, scannet_matrix: dict):
+    """Process scannet data.
+
+    Args:
+        scan_id (str): ID of the scannet scan.
+        data_root (str): Root directory of the scannet dataset.
+        scannet_matrix (dict): Dict of axis alignment matrices
+            for each scan.
+
+    Returns:
+        tuple : point_xyz and point_rgb infos.
+    """
     scan_ply_path = os.path.join(f'{data_root}/scans', scan_id,
                                  scan_id + '_vh_clean_2.labels.ply')
     data_color = PlyData.read(

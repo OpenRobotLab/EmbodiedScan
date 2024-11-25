@@ -1,6 +1,7 @@
 import json
 import random
 import threading
+from typing import List
 
 from openai import OpenAI
 from tqdm import tqdm
@@ -23,10 +24,10 @@ class GPT_Evaluator:
     """
 
     def __init__(self,
-                 eval_size=-1,
-                 api_key='',
-                 model='gpt-4o-mini',
-                 verbose=False):
+                 eval_size: int = -1,
+                 api_key: str = '',
+                 model: str = 'gpt-4o-mini',
+                 verbose: bool = False):
         self.eval_size = eval_size
         self.API_key = api_key
         self.model = model
@@ -43,9 +44,9 @@ class GPT_Evaluator:
         ]
 
     def normal_query(self,
-                     system_prompt,
-                     user_content_groups,
-                     max_tokens=1000):
+                     system_prompt: str,
+                     user_content_groups: List[str],
+                     max_tokens: int = 1000) -> dict:
         """Calling the GPT api, return the results in the format of json.
 
         Args:
@@ -73,11 +74,12 @@ class GPT_Evaluator:
         response = json.loads(response.choices[0].message.content)
         return response
 
-    def qa_evaluation(self, QA_sample_dict, thread_index, tmp_path):
+    def qa_evaluation(self, QA_sample_dict: List[dict], thread_index: int,
+                      tmp_path: str) -> None:
         """Employ the GPT evaluator.
 
         Args:
-            QA_sample_dict (str) : The QA sample dict with
+            QA_sample_dict (List[dict]) : The QA sample dict with
                 [gt, pred, question] as values.
             thread_index (int) : The index of the thread.
             tmp_path (str) : The path to store the
@@ -126,7 +128,7 @@ class GPT_Evaluator:
         ) as f:
             json.dump(gpt_eval_results, f, indent=4)
 
-    def qa_collection(self, num_threads, tmp_path):
+    def qa_collection(self, num_threads: int, tmp_path: str) -> dict:
         """Collect the gpt-eval results from the tmp-stored json files.
 
         Args:
@@ -167,7 +169,10 @@ class GPT_Evaluator:
 
         return eval_dict
 
-    def load_and_eval(self, raw_batch_input, num_threads=1, tmp_path='./'):
+    def load_and_eval(self,
+                      raw_batch_input: List[dict],
+                      num_threads: int = 1,
+                      tmp_path: str = './') -> dict:
         """Load the batch of results and evaluate.
 
         Args:

@@ -5,14 +5,14 @@ import torch
 from plyfile import PlyData
 
 
-def read_mesh_vertices_rgb(filename):
+def read_mesh_vertices_rgb(filename: str) -> np.ndarray:
     """Read XYZ and RGB for each vertex.
 
     Args:
         filename(str): The name of the mesh vertices file.
 
     Returns:
-        Vertices. Note that RGB values are in 0-255.
+        np.ndarray: Note that RGB values are in 0-255.
     """
     assert os.path.isfile(filename)
     with open(filename, 'rb') as f:
@@ -28,16 +28,18 @@ def read_mesh_vertices_rgb(filename):
     return vertices
 
 
-def is_inside_box(points, center, size, rotation_mat):
+def is_inside_box(points: np.ndarray, center: np.ndarray, size: np.ndarray,
+                  rotation_mat: np.ndarray) -> np.ndarray:
     """Check if points are inside a 3D bounding box.
 
     Args:
-        points: 3D points, numpy array of shape (n, 3).
-        center: center of the box, numpy array of shape (3, ).
-        size: size of the box, numpy array of shape (3, ).
-        rotation_mat: rotation matrix of the box, numpy array of shape (3, 3).
+        points(np.ndarray): 3D points, numpy array of shape (n, 3).
+        center(np.ndarray): center of the box, numpy array of shape (3, ).
+        size(np.ndarray): size of the box, numpy array of shape (3, ).
+        rotation_mat(np.ndarray): rotation matrix of the box,
+            numpy array of shape (3, 3).
     Returns:
-        Boolean array of shape (n, ) indicating if each point
+        np.ndarray: Boolean array of shape (n, ) indicating if each point
             is inside the box.
     """
     assert points.shape[1] == 3, 'points should be of shape (n, 3)'

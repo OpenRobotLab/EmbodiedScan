@@ -1,6 +1,7 @@
 import json
 import os
 from argparse import ArgumentParser
+from typing import Dict, Tuple
 
 import mmengine
 import numpy as np
@@ -17,20 +18,24 @@ from utils.trscan_process import process_trscan
 es_anno = {}
 
 
-def create_scene_pcd(es_anno, pcd_result):
+def create_scene_pcd(es_anno: dict,
+                     pcd_result: Tuple[np.ndarray, np.ndarray, np.ndarray]) \
+                        -> Tuple[np.ndarray, np.ndarray,
+                                 np.ndarray, np.ndarray]:
     """Adding the embodiedscan-box annotation into the point clouds data.
 
     Args:
         es_anno (dict): The embodiedscan annotation of
             the target scan.
-        pcd_result (tuple) : The raw point cloud data of the scan,
-            consisting of:
+        pcd_result (Tuple [np.ndarray, np.ndarray, np.ndarray) :
+            The raw point cloud data of the scan, consisting of:
             (1) aliged point clouds coordinates with shape (n,3).
             (2) point clouds color ([0,1]) with shape (n,3).
             (3) label (no need here).
 
     Returns:
-        tuple : The processed point cloud data of the scan, consisting of:
+        Tuple [np.ndarray, np.ndarray, np.ndarray, np.ndarray] :
+            The processed point cloud data of the scan, consisting of:
             (1) aliged point clouds coordinates with shape (n,3).
             (2) point clouds color ([0,1]) with shape (n,3).
             (3) point clouds label with shape (n,1).
@@ -69,15 +74,15 @@ def create_scene_pcd(es_anno, pcd_result):
 
 @mmengine_track_func
 def process_one_scan(
-    scan_id,
-    save_root,
-    scannet_root,
-    mp3d_root,
-    trscan_root,
-    scannet_matrix,
-    mp3d_matrix,
-    trscan_matrix,
-    mp3d_mapping,
+    scan_id: str,
+    save_root: str,
+    scannet_root: str,
+    mp3d_root: str,
+    trscan_root: str,
+    scannet_matrix: Dict[str, np.ndarray],
+    mp3d_matrix: Dict[str, np.ndarray],
+    trscan_matrix: Dict[str, np.ndarray],
+    mp3d_mapping: Dict[str, str],
 ):
     """Process the point clouds of one scan and save in a pth file.
 
