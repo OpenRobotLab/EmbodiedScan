@@ -82,7 +82,7 @@ existing benchmarks and in-the-wild evaluation.
 1. Download the Embodiedscan and MMScan annotation. (Fill in the [form](https://docs.google.com/forms/d/e/1FAIpQLScUXEDTksGiqHZp31j7Zp7zlCNV7p_08uViwP_Nbzfn3g6hhw/viewform) to apply for downloading)
 
    Create a folder `mmscan_data/` and then unzip the files. For the first zip file, put `embodiedscan` under `mmscan_data/embodiedscan-split` and rename it to `embodiedscan-v1`. For the second zip file, put `MMScan-beta-release` under `mmscan_data/MMScan-beta-release` and `embodiedscan-v2` under `mmscan_data/embodiedscan-split`.
-   
+
    The directory structure should be as below:
 
    ```
@@ -199,8 +199,8 @@ For the visual grounding task, our evaluator computes multiple metrics including
 Below is an example of how to utilize the Visual Grounding Evaluator:
 
 ```python
-# Initialize the evaluator with verbose output enabled to display progress
-my_evaluator = MMScan_VG_evaluator(verbose=True)
+# Initialize the evaluator with show_results enabled to display results
+my_evaluator = MMScan_VG_evaluator(show_results=True)
 
 # Update the evaluator with the model's output
 my_evaluator.update(model_output)
@@ -253,7 +253,7 @@ The question answering evaluator measures performance using several established 
 
 ```python
 # Initialize evaluator with pre-trained weights for SIMCSE and SBERT
-my_evaluator = MMScan_QA_evaluator(model_config={}, verbose=True)
+my_evaluator = MMScan_QA_evaluator(model_config={}, show_results=True)
 
 # Update evaluator with model output
 my_evaluator.update(model_output)

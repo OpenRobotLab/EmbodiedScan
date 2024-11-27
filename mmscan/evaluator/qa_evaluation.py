@@ -25,16 +25,16 @@ class QA_Evaluator:
             Defaults to {}.
         max_length(int): The maximum length of the input.
             Defaults to 1024.
-        verbose(bool): Whether to print the evaluation results.
+        show_results(bool): Whether to print the evaluation results.
             Defaults to True.
     """
 
     def __init__(self,
                  model_config: dict = {},
                  max_length: int = 256,
-                 verbose: bool = True) -> None:
+                 show_results: bool = True) -> None:
         self.eval_bs = 500
-        self.verbose = verbose
+        self.show_results = show_results
         self.max_length = max_length
         self.special_metric = []
         if 'simcse' in model_config and torch.cuda.is_available():
@@ -168,7 +168,7 @@ class QA_Evaluator:
                 eval_dict[metric] = coco_scores[metric]
         self.metric_record = eval_dict
 
-        if self.verbose:
+        if self.show_results:
             print(eval_dict)
 
         return eval_dict

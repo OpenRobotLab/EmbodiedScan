@@ -1,4 +1,6 @@
 # flake8: noqa
+# refer to LEO: embodied-generalist
+# https://github.com/embodied-generalist/embodied-generalist/blob/477dc44b8b18dbfbe6823c307436d896ec8b062e/data/data_utils.py#L322-L379
 import re
 import string
 

@@ -72,8 +72,14 @@ class GroundingMetricMod(BaseMetric):
             _input = {}
             _input['pred_scores'] = det_anno['target_scores_3d']
             _input['pred_bboxes'] = det_anno['bboxes_3d']
+
             _input['gt_bboxes'] = gt_anno['gt_bboxes_3d']
             _input['subclass'] = gt_anno['sub_class']
+            _input['pred_bboxes'] = torch.stack([euler_box for euler_box in _input['pred_bboxes']])\
+                if len(_input['pred_bboxes']) > 0 else torch.empty(0, 9)
+
+            _input['gt_bboxes'] = torch.stack([euler_box for euler_box in _input['gt_bboxes']]) \
+                if len(_input['gt_bboxes']) > 0 else torch.empty(0, 9)
 
             batch_input.append(_input)
 

@@ -27,11 +27,11 @@ class GPT_Evaluator:
                  eval_size: int = -1,
                  api_key: str = '',
                  model: str = 'gpt-4o-mini',
-                 verbose: bool = False):
+                 show_progress: bool = False):
         self.eval_size = eval_size
         self.API_key = api_key
         self.model = model
-        self.verbose = verbose
+        self.show_progress = show_progress
         self.client = OpenAI(api_key=api_key)
         self.qa_metric = [
             'STa',
@@ -212,7 +212,7 @@ class GPT_Evaluator:
                 ID_: batch_result[ID_]
                 for ID_ in IDs_divide_index[thread_index]
             }
-            if self.verbose:
+            if self.show_progress:
                 print(
                     f'Thread {thread_index} processing {len(QA_sample_dict)}')
             thread = threading.Thread(
@@ -225,7 +225,7 @@ class GPT_Evaluator:
             thread.start()
         for thread in threads:
             thread.join()
-        if self.verbose:
+        if self.show_progress:
             print(f'the results are store under {tmp_path}')
 
         # (3) Collect the results.

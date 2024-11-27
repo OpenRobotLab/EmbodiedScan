@@ -86,7 +86,7 @@ def process_one_scan(
 ):
     """Process the point clouds of one scan and save in a pth file.
 
-    The pth file is a tuple of nd.array, consisting of:
+    The pth file is a tuple of np.ndarray, consisting of:
         (1) aliged point clouds coordinates with shape (n,3).
         (2) point clouds color ranging in [0,1] with shape (n,3).
         (3) point clouds label with shape (n,1).
@@ -97,9 +97,9 @@ def process_one_scan(
         scannet_root (str): The path of scannet.
         mp3d_root (str): The path of mp3d.
         trscan_root (str): The path of 3rscan.
-        scannet_matrix (nd.array): The aligned matrix of scannet.
-        mp3d_matrix (nd.array): The aligned matrix of mp3d.
-        trscan_matrix (nd.array): The aligned matrix of 3rscan.
+        scannet_matrix (np.ndarray): The aligned matrix of scannet.
+        mp3d_matrix (np.ndarray): The aligned matrix of mp3d.
+        trscan_matrix (np.ndarray): The aligned matrix of 3rscan.
         mp3d_mapping (dict): The mapping dict for mp3d scan id.
     """
 

@@ -2233,7 +2233,6 @@ class LeoEmbodiedScanL(LeoBase):
 
         self.MMScan_loader = MMScan(version='v1',
                                     split=split,
-                                    verbose=True,
                                     ratio=1.0 if split == 'train' else 0.1,
                                     task='MMScan-QA')
 

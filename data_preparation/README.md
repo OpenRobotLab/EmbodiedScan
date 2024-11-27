@@ -38,7 +38,7 @@ Detailed steps are shown as follows.
    │   ├── data/
    │   ├── process_pcd/
    │   ├── embodiedscan-v1/
-   │   ├── embodiedscan-v2/   
+   │   ├── embodiedscan-v2/
    ├── MMScan-beta-release
 
    ```

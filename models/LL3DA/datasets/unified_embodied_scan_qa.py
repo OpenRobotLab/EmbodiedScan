@@ -95,7 +95,7 @@ class Dataset(ScanNetBaseDataset):
                                      return_tensors='np')
 
         # downsample for quick evaluation
-        self.MMScan_loader = MMScan(version='v1', split=split_set, verbose=True,\
+        self.MMScan_loader = MMScan(version='v1', split=split_set,\
             task='MMScan-QA', ratio = 0.1 if split_set=='val' else 1.0 )
 
         # only need this for convenient evaluation

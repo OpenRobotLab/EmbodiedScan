@@ -23,13 +23,13 @@ class VG_Evaluator:
         category_records(dict): Metric results for each category
             (average of all samples with the same category)
     Args:
-        verbose(bool): Whether to print the evaluation results.
+        show_results(bool): Whether to print the evaluation results.
             Defaults to True.
     """
 
-    def __init__(self, verbose: bool = True) -> None:
+    def __init__(self, show_results: bool = True) -> None:
 
-        self.verbose = verbose
+        self.show_results = show_results
         self.eval_metric_type = ['AP', 'AR']
         self.top_k_visible = [1, 3, 5]
         self.call_for_category_mode = True
@@ -238,7 +238,7 @@ class VG_Evaluator:
         table = AsciiTable(table_data)
         table.inner_footing_row_border = True
 
-        if self.verbose:
+        if self.show_results:
             print(table.table)
 
         return table.table
@@ -269,7 +269,7 @@ class VG_Evaluator:
         Args:
              data_item (dict): The subclass name in the original samples.
         Returns:
-             nd.array, nd.array :
+             np.ndarray, np.ndarray :
                 The iou array sorted by the confidence and the
                 confidence scores.
         """
