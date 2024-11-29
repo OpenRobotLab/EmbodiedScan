@@ -14,8 +14,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+
 parts/
 sdist/
 var/
@@ -127,7 +126,7 @@ data/3rscan
 data/matterport3d
 data/arkitscenes
 data/*.pkl
-data/*.json
+
 exps/
 todo.md
 
@@ -140,4 +139,3 @@ tools/*.sh
 
 # test submission results
 *.pkl
-*.json
