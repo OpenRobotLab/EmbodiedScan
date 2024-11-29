@@ -18,6 +18,11 @@ from utils.proposal_parser import parse_predictions
 
 from mmscan import QA_Evaluator
 
+model_config = {
+    'simcse': '/mnt/petrelfs/linjingli/mmscan_modelzoo-main/evaluation/pc',
+    'sbert': '/mnt/petrelfs/linjingli/mmscan_modelzoo-main/evaluation/st'
+}
+
 
 def to_mmscan_form(raw_input):
     _input = {}
@@ -39,8 +44,9 @@ def evaluate(
     logout=print,
     curr_train_iter=-1,
 ):
-    """define the mmscan_eval here."""
-    model_config = {'simcse': '', 'sbert': ''}
+
+    # prepare ground truth caption labels
+    print('preparing corpus...')
 
     evaluator = QA_Evaluator(model_config)
 
@@ -130,6 +136,20 @@ def evaluate(
             logout(f'Evaluate {epoch_str}; Batch [{curr_iter}/{num_batches}]; '
                    f'Evaluating on iter: {curr_train_iter}; '
                    f'Iter time {time_delta.avg:0.2f}; Mem {mem_mb:0.2f}MB')
+            if curr_iter % 200 == 0:
+                with open(
+                        os.path.join(args.checkpoint_dir,
+                                     f'qa_pred_gt_val_{curr_iter}.json'),
+                        'w') as f:
+                    pred_gt_val = {}
+                    for index_, scene_object_id_key in enumerate(candidates):
+                        pred_gt_val[scene_object_id_key] = {
+                            'instruction': scene_object_id_key.split('@')[1],
+                            'pred': candidates[scene_object_id_key],
+                            'gt': corpus[scene_object_id_key],
+                        }
+                    json.dump(pred_gt_val, f, indent=4)
+                print(f'save pred_gt_val {curr_iter}')
         barrier()
 
     if is_primary():

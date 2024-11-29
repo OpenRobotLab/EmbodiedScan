@@ -281,19 +281,8 @@ class LeoAgent(nn.Module):
         bs = len(data_dict['prompt_after_obj'])
         if 'obj_tokens' not in data_dict:
 
-            try:
-                data_dict = self.pcd_encoder(data_dict)
-            except:
-                torch.save(
-                    self.state_dict(),
-                    '/mnt/petrelfs/linjingli/tmp/data/big_tmp/model_dict_1028.pth'
-                )
-                torch.save(
-                    data_dict,
-                    '/mnt/petrelfs/linjingli/tmp/data/big_tmp/debug_leo_1028.pt'
-                )
-                import IPython
-                IPython.embed()
+            data_dict = self.pcd_encoder(data_dict)
+
         data_dict['obj_tokens'] = self.pcd_proj(
             data_dict['obj_tokens'].to(device))
         # data_dict['obj_tokens'] = data_dict['obj_tokens'] + self.pcd_type_embed

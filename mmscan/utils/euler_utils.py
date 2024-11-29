@@ -4,8 +4,15 @@ from typing import Iterator, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import torch
-from pytorch3d.ops import box3d_overlap
-from pytorch3d.transforms import euler_angles_to_matrix, matrix_to_euler_angles
+
+try:
+    from pytorch3d.ops import box3d_overlap
+    from pytorch3d.transforms import (euler_angles_to_matrix,
+                                      matrix_to_euler_angles)
+except ImportError:
+    box3d_overlap = None
+    euler_angles_to_matrix = None
+    matrix_to_euler_angles = None
 from torch import Tensor
 
 
