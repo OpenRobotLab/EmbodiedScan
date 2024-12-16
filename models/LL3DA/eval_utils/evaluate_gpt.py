@@ -29,7 +29,7 @@ if __name__ == '__main__':
     ll3da_file_path = args.file
 
     evaluator = GPTEvaluator(eval_size =args.eval_size,\
-        API_key=args.api_key)
+        api_key=args.api_key)
 
     with open(ll3da_file_path, 'r') as f:
         results = json.load(f)

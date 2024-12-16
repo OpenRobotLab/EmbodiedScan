@@ -29,10 +29,9 @@ class GPTEvaluator:
                  model: str = 'gpt-4o-mini',
                  show_progress: bool = False):
         self.eval_size = eval_size
-        self.API_key = api_key
         self.model = model
         self.show_progress = show_progress
-        self.client = OpenAI(api_key=api_key)
+        self.client = OpenAI(api_key)
         self.qa_metric = [
             'STa',
             'STs',
