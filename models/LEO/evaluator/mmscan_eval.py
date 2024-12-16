@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from mmscan import QA_Evaluator
+from mmscan import QuestionAnsweringEvaluator
 
 model_config = {'simcse': '', 'sbert': ''}
 
@@ -12,7 +12,7 @@ from evaluator.build import EVALUATOR_REGISTRY
 class MMScanEvaluator():
 
     def __init__(self, cfg, task_name):
-        self.evaluator = QA_Evaluator(model_config)
+        self.evaluator = QuestionAnsweringEvaluator(model_config)
         self.task_name = task_name
         self.target_metric = 'refined_EM'
         self.best_result = 0.0

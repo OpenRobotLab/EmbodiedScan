@@ -7,7 +7,7 @@ def process_mp3d(new_scan_id: str, data_root: str,
     """Process matterport3d data.
 
     Args:
-        scan_id (str): ID of the matterport3d scan.
+        new_scan_id (str): processed ID of the matterport3d scan.
         data_root (str): Root directory of the matterport3d dataset.
         axis_align_matrix_dict (dict): Dict of axis alignment matrices
             for each scan.

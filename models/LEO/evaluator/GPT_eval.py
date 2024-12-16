@@ -2,7 +2,7 @@ import json
 from argparse import ArgumentParser
 from pathlib import Path
 
-from mmscan import GPT_Evaluator
+from mmscan import GPTEvaluator
 
 if __name__ == '__main__':
     parser = ArgumentParser()
@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     leo_file_path = args.file
 
-    evaluator = GPT_Evaluator(eval_size =args.eval_size,\
+    evaluator = GPTEvaluator(eval_size =args.eval_size,\
         API_key=args.api_key)
 
     with open(leo_file_path, 'r') as f:

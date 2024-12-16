@@ -8,7 +8,7 @@ from mmscan.evaluator.metrics.lang_metric import (coco_evaluate, em_evaluation,
 from mmscan.utils.lang_utils import special_token_filter
 
 
-class QA_Evaluator:
+class QuestionAnsweringEvaluator:
     """Tradition metrics for QA and Caption evaluation , consists the
     implements of.
 
@@ -81,6 +81,7 @@ class QA_Evaluator:
         Args:
             batch_input (list[dict]):
                 Batch of the raw original input.
+
         Returns:
             Dict: {"EM":EM metric for this batch,
                 "refined_EM":Refined EM metric for this batch}

@@ -38,6 +38,7 @@ def is_inside_box(points: np.ndarray, center: np.ndarray, size: np.ndarray,
         size(np.ndarray): size of the box, numpy array of shape (3, ).
         rotation_mat(np.ndarray): rotation matrix of the box,
             numpy array of shape (3, 3).
+
     Returns:
         np.ndarray: Boolean array of shape (n, ) indicating if each point
             is inside the box.
@@ -121,6 +122,7 @@ def euler_to_matrix_np(euler):
 
     Args:
         euler (np.ndarray) : (..., 3)
+
     Returns:
         np.ndarray : (..., 3, 3)
     """

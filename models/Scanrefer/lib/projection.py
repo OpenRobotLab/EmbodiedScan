@@ -1,10 +1,16 @@
-
 import torch
 from torch.autograd import Function
 
 
 class ProjectionHelper():
-    def __init__(self, intrinsic, depth_min, depth_max, image_dims, accuracy, cuda=True):
+
+    def __init__(self,
+                 intrinsic,
+                 depth_min,
+                 depth_max,
+                 image_dims,
+                 accuracy,
+                 cuda=True):
         self.intrinsic = intrinsic
         self.depth_min = depth_min
         self.depth_max = depth_max
@@ -19,7 +25,7 @@ class ProjectionHelper():
         # 2D to 3D coordinates with depth (used in compute_frustum_bounds)
         x = (ux - self.intrinsic[0][2]) / self.intrinsic[0][0]
         y = (uy - self.intrinsic[1][2]) / self.intrinsic[1][1]
-        return torch.Tensor([depth*x, depth*y, depth])
+        return torch.Tensor([depth * x, depth * y, depth])
 
     def skeleton_to_depth(self, p):
         x = (p[0] * self.intrinsic[0][0]) / p[2] + self.intrinsic[0][2]
@@ -31,18 +37,28 @@ class ProjectionHelper():
             corner_points = torch.ones(8, 4).cuda()
         else:
             corner_points = torch.ones(8, 4)
-        
+
         # image to camera
         # depth min
         corner_points[0][:3] = self.depth_to_skeleton(0, 0, self.depth_min)
-        corner_points[1][:3] = self.depth_to_skeleton(self.image_dims[0] - 1, 0, self.depth_min)
-        corner_points[2][:3] = self.depth_to_skeleton(self.image_dims[0] - 1, self.image_dims[1] - 1, self.depth_min)
-        corner_points[3][:3] = self.depth_to_skeleton(0, self.image_dims[1] - 1, self.depth_min)
+        corner_points[1][:3] = self.depth_to_skeleton(self.image_dims[0] - 1,
+                                                      0, self.depth_min)
+        corner_points[2][:3] = self.depth_to_skeleton(self.image_dims[0] - 1,
+                                                      self.image_dims[1] - 1,
+                                                      self.depth_min)
+        corner_points[3][:3] = self.depth_to_skeleton(0,
+                                                      self.image_dims[1] - 1,
+                                                      self.depth_min)
         # depth max
         corner_points[4][:3] = self.depth_to_skeleton(0, 0, self.depth_max)
-        corner_points[5][:3] = self.depth_to_skeleton(self.image_dims[0] - 1, 0, self.depth_max)
-        corner_points[6][:3] = self.depth_to_skeleton(self.image_dims[0] - 1, self.image_dims[1] - 1, self.depth_max)
-        corner_points[7][:3] = self.depth_to_skeleton(0, self.image_dims[1] - 1, self.depth_max)
+        corner_points[5][:3] = self.depth_to_skeleton(self.image_dims[0] - 1,
+                                                      0, self.depth_max)
+        corner_points[6][:3] = self.depth_to_skeleton(self.image_dims[0] - 1,
+                                                      self.image_dims[1] - 1,
+                                                      self.depth_max)
+        corner_points[7][:3] = self.depth_to_skeleton(0,
+                                                      self.image_dims[1] - 1,
+                                                      self.depth_max)
 
         self.corner_points = corner_points
 
@@ -70,9 +86,9 @@ class ProjectionHelper():
         # corner_points[6][:3] = self.depth_to_skeleton(self.image_dims[0] - 1, self.image_dims[1] - 1, self.depth_max).unsqueeze(1)
         # corner_points[7][:3] = self.depth_to_skeleton(0, self.image_dims[1] - 1, self.depth_max).unsqueeze(1)
 
-
         # camera to world
-        corner_coords = torch.bmm(camera_to_world.repeat(8, 1, 1), self.corner_points.unsqueeze(2))
+        corner_coords = torch.bmm(camera_to_world.repeat(8, 1, 1),
+                                  self.corner_points.unsqueeze(2))
 
         return corner_coords
 
@@ -119,7 +135,11 @@ class ProjectionHelper():
 
         return normals
 
-    def points_in_frustum(self, corner_coords, normals, new_pts, return_mask=False):
+    def points_in_frustum(self,
+                          corner_coords,
+                          normals,
+                          new_pts,
+                          return_mask=False):
         """Checks whether new_pts ly in the frustum defined by the coordinates
         of the corners coner_coords.
 
@@ -139,9 +159,15 @@ class ProjectionHelper():
         # for each normal, create a mask for points that lie on the correct side of the plane
         for k, normal in enumerate(normals):
             if k < 3:
-                masks.append(torch.round(torch.mm(point_to_plane1, normal.unsqueeze(1)) * 100) / 100 < 0)
+                masks.append(
+                    torch.round(
+                        torch.mm(point_to_plane1, normal.unsqueeze(1)) * 100) /
+                    100 < 0)
             else:
-                masks.append(torch.round(torch.mm(point_to_plane2, normal.unsqueeze(1)) * 100) / 100 < 0)
+                masks.append(
+                    torch.round(
+                        torch.mm(point_to_plane2, normal.unsqueeze(1)) * 100) /
+                    100 < 0)
         mask = torch.ones(point_to_plane1.shape[0]) > 0
         mask = mask.cuda()
 
@@ -153,8 +179,12 @@ class ProjectionHelper():
             return mask
         else:
             return torch.sum(mask)
-            
-    def points_in_frustum_cpu(self, corner_coords, normals, new_pts, return_mask=False):
+
+    def points_in_frustum_cpu(self,
+                              corner_coords,
+                              normals,
+                              new_pts,
+                              return_mask=False):
         """Checks whether new_pts ly in the frustum defined by the coordinates
         of the corners coner_coords.
 
@@ -174,9 +204,15 @@ class ProjectionHelper():
         # for each normal, create a mask for points that lie on the correct side of the plane
         for k, normal in enumerate(normals):
             if k < 3:
-                masks.append(torch.round(torch.mm(point_to_plane1, normal.unsqueeze(1)) * 100) / 100 < 0)
+                masks.append(
+                    torch.round(
+                        torch.mm(point_to_plane1, normal.unsqueeze(1)) * 100) /
+                    100 < 0)
             else:
-                masks.append(torch.round(torch.mm(point_to_plane2, normal.unsqueeze(1)) * 100) / 100 < 0)
+                masks.append(
+                    torch.round(
+                        torch.mm(point_to_plane2, normal.unsqueeze(1)) * 100) /
+                    100 < 0)
         mask = torch.ones(point_to_plane1.shape[0]) > 0
 
         # create a combined mask, which keeps only the points that lie on the correct side of each plane
@@ -213,7 +249,10 @@ class ProjectionHelper():
         normals = self.compute_frustum_normals(corner_coords)
 
         # check if points are in viewing frustum and only keep according indices
-        mask_frustum_bounds = self.points_in_frustum(corner_coords, normals, points, return_mask=True).cuda()
+        mask_frustum_bounds = self.points_in_frustum(corner_coords,
+                                                     normals,
+                                                     points,
+                                                     return_mask=True).cuda()
 
         if not mask_frustum_bounds.any():
             return None
@@ -224,33 +263,49 @@ class ProjectionHelper():
         camera = torch.mm(world_to_camera, coords)
 
         # project camera to image
-        camera[0] = (camera[0] * self.intrinsic[0][0]) / camera[2] + self.intrinsic[0][2]
-        camera[1] = (camera[1] * self.intrinsic[1][1]) / camera[2] + self.intrinsic[1][2]
+        camera[0] = (camera[0] *
+                     self.intrinsic[0][0]) / camera[2] + self.intrinsic[0][2]
+        camera[1] = (camera[1] *
+                     self.intrinsic[1][1]) / camera[2] + self.intrinsic[1][2]
         image = torch.round(camera).long()
 
         # keep points that are projected onto the image into the correct pixel range
-        valid_ind_mask = torch.ge(image[0], 0) * torch.ge(image[1], 0) * torch.lt(image[0], self.image_dims[0]) * torch.lt(image[1], self.image_dims[1])
+        valid_ind_mask = torch.ge(image[0], 0) * torch.ge(
+            image[1], 0) * torch.lt(image[0], self.image_dims[0]) * torch.lt(
+                image[1], self.image_dims[1])
         if not valid_ind_mask.any():
             return None
         valid_image_ind_x = image[0][valid_ind_mask]
         valid_image_ind_y = image[1][valid_ind_mask]
-        valid_image_ind = valid_image_ind_y * self.image_dims[0] + valid_image_ind_x
+        valid_image_ind = valid_image_ind_y * self.image_dims[
+            0] + valid_image_ind_x
 
         # keep only points that are in the correct depth ranges (self.depth_min - self.depth_max)
-        depth_vals = torch.index_select(depth.view(-1), 0, valid_image_ind.cuda())
-        depth_mask = depth_vals.ge(self.depth_min) * depth_vals.le(self.depth_max) * torch.abs(depth_vals - camera[2][valid_ind_mask]).le(self.accuracy)
+        depth_vals = torch.index_select(depth.view(-1), 0,
+                                        valid_image_ind.cuda())
+        depth_mask = depth_vals.ge(self.depth_min) * depth_vals.le(
+            self.depth_max) * torch.abs(depth_vals -
+                                        camera[2][valid_ind_mask]).le(
+                                            self.accuracy)
         if not depth_mask.any():
             return None
 
         # create two vectors for all considered points that establish 3d to 2d correspondence
         ind_update = ind_points[valid_ind_mask]
         ind_update = ind_update[depth_mask]
-        indices_3d = ind_update.new(num_points + 1).fill_(0) # needs to be same size for all in batch... (first element has size)
-        indices_2d = ind_update.new(num_points + 1).fill_(0) # needs to be same size for all in batch... (first element has size)
-        indices_3d[0] = ind_update.shape[0]  # first entry: number of relevant entries (of points)
+        indices_3d = ind_update.new(num_points + 1).fill_(
+            0
+        )  # needs to be same size for all in batch... (first element has size)
+        indices_2d = ind_update.new(num_points + 1).fill_(
+            0
+        )  # needs to be same size for all in batch... (first element has size)
+        indices_3d[0] = ind_update.shape[
+            0]  # first entry: number of relevant entries (of points)
         indices_2d[0] = ind_update.shape[0]
         indices_3d[1:1 + indices_3d[0]] = ind_update  # indices of points
-        indices_2d[1:1 + indices_2d[0]] = torch.index_select(valid_image_ind, 0, torch.nonzero(depth_mask)[:, 0])  # indices of corresponding pixels
+        indices_2d[1:1 + indices_2d[0]] = torch.index_select(
+            valid_image_ind, 0,
+            torch.nonzero(depth_mask)[:, 0])  # indices of corresponding pixels
 
         return indices_3d, indices_2d
 
@@ -264,16 +319,19 @@ class ProjectionHelper():
         :param num_points: number of points in one sample
         :return: array of points in sample with projected features (shape: (num_input_channels, num_points))
         """
-        
-        num_label_ft = 1 if len(label.shape) == 2 else label.shape[0] # = num_input_channels
+
+        num_label_ft = 1 if len(
+            label.shape) == 2 else label.shape[0]  # = num_input_channels
 
         output = label.new(num_label_ft, num_points).fill_(0)
         num_ind = lin_indices_3d[0]
         if num_ind > 0:
             # selects values from image_features at indices given by lin_indices_2d
-            vals = torch.index_select(label.view(num_label_ft, -1), 1, lin_indices_2d[1:1+num_ind])
-            output.view(num_label_ft, -1)[:, lin_indices_3d[1:1+num_ind]] = vals
-        
+            vals = torch.index_select(label.view(num_label_ft, -1), 1,
+                                      lin_indices_2d[1:1 + num_ind])
+            output.view(num_label_ft, -1)[:,
+                                          lin_indices_3d[1:1 + num_ind]] = vals
+
         return output
 
 
@@ -291,14 +349,17 @@ class Projection(Function):
         :return: array of points in sample with projected features (shape: (num_input_channels, num_points))
         """
         # ctx.save_for_backward(lin_indices_3d, lin_indices_2d)
-        num_label_ft = 1 if len(label.shape) == 2 else label.shape[0] # = num_input_channels
+        num_label_ft = 1 if len(
+            label.shape) == 2 else label.shape[0]  # = num_input_channels
 
         output = label.new(num_label_ft, num_points).fill_(0)
         num_ind = lin_indices_3d[0]
         if num_ind > 0:
             # selects values from image_features at indices given by lin_indices_2d
-            vals = torch.index_select(label.view(num_label_ft, -1), 1, lin_indices_2d[1:1+num_ind])
-            output.view(num_label_ft, -1)[:, lin_indices_3d[1:1+num_ind]] = vals
+            vals = torch.index_select(label.view(num_label_ft, -1), 1,
+                                      lin_indices_2d[1:1 + num_ind])
+            output.view(num_label_ft, -1)[:,
+                                          lin_indices_3d[1:1 + num_ind]] = vals
         return output
 
     @staticmethod
@@ -308,7 +369,10 @@ class Projection(Function):
         grad_label.resize_(num_ft, 32, 41)
         lin_indices_3d, lin_indices_2d = ctx.saved_variables
         num_ind = lin_indices_3d.data[0]
-        vals = torch.index_select(grad_output.data.contiguous().view(num_ft, -1), 1, lin_indices_3d.data[1:1+num_ind])
-        grad_label.data.view(num_ft, -1)[:, lin_indices_2d.data[1:1+num_ind]] = vals
-        
+        vals = torch.index_select(
+            grad_output.data.contiguous().view(num_ft, -1), 1,
+            lin_indices_3d.data[1:1 + num_ind])
+        grad_label.data.view(num_ft,
+                             -1)[:, lin_indices_2d.data[1:1 + num_ind]] = vals
+
         return grad_label, None, None, None

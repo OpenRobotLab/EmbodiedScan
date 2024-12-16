@@ -11,7 +11,7 @@ from mmscan.evaluator.metrics.box_metric import (get_average_precision,
 from mmscan.utils.box_utils import index_box, to_9dof_box
 
 
-class VG_Evaluator:
+class VisualGroundingEvaluator:
     """Evaluator for MMScan Visual Grounding benchmark. The evaluation metric
     includes "AP","AP_C","AR","gTop-k".
 

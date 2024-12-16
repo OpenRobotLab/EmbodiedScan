@@ -16,7 +16,7 @@ from utils.io import save_checkpoint
 from utils.misc import SmoothedValue
 from utils.proposal_parser import parse_predictions
 
-from mmscan import QA_Evaluator
+from mmscan import QuestionAnsweringEvaluator
 
 model_config = {
     'simcse': '/mnt/petrelfs/linjingli/mmscan_modelzoo-main/evaluation/pc',
@@ -48,7 +48,7 @@ def evaluate(
     # prepare ground truth caption labels
     print('preparing corpus...')
 
-    evaluator = QA_Evaluator(model_config)
+    evaluator = QuestionAnsweringEvaluator(model_config)
 
     annotations = dataset_loader.dataset.annotations
 

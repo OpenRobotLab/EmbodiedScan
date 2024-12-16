@@ -1,6 +1,7 @@
 import json
 import os
 from argparse import ArgumentParser
+from functools import wraps
 from typing import Dict, Tuple
 
 import mmengine
@@ -11,11 +12,20 @@ from tqdm import tqdm
 from utils.data_utils import read_annotation_pickle
 from utils.mp3d_process import process_mp3d
 from utils.pcd_utils import is_inside_box
-from utils.proc_utils import mmengine_track_func
 from utils.scannet_process import process_scannet
-from utils.trscan_process import process_trscan
+from utils.trscan_process import process_3rscan
 
 es_anno = {}
+
+
+def mmengine_track_func(func):
+
+    @wraps(func)
+    def wrapped_func(args):
+        result = func(*args)
+        return result
+
+    return wrapped_func
 
 
 def create_scene_pcd(es_anno: dict,
@@ -135,7 +145,7 @@ def process_one_scan(
                 return
             pcd_info = create_scene_pcd(
                 es_anno['3rscan/' + scan_id],
-                process_trscan(scan_id, trscan_root, trscan_matrix),
+                process_3rscan(scan_id, trscan_root, trscan_matrix),
             )
 
         save_path = f'{save_root}/{scan_id}.pth'

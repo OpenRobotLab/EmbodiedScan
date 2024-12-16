@@ -216,6 +216,7 @@ class MMScan(Dataset):
 
         Args:
             index_ (int): The index.
+
         Returns:
             dict: The sample item corresponding to the index.
         """
@@ -281,6 +282,7 @@ class MMScan(Dataset):
         Args:
             table_name (str): The ype of the expected data.
             scan_idx (str): The scan id to get the data.
+
         Returns:
             The data corresponding to the table_name and scan_idx.
         """
@@ -330,6 +332,7 @@ class MMScan(Dataset):
 
         Args:
             samples (list[dict]): The samples.
+
         Returns:
             list[dict] : The filtered results.
         """
@@ -348,6 +351,7 @@ class MMScan(Dataset):
 
         Args:
             sample (dict): The item from the samples.
+
         Returns:
             bool : Whether the item is valid or not.
         """
@@ -375,6 +379,7 @@ class MMScan(Dataset):
 
         Args:
             pkl_path (str): The path of the pkl.
+
         Returns:
             dict : The embodiedscan annotations of scans.
             (with scan_idx as keys)
@@ -388,6 +393,7 @@ class MMScan(Dataset):
 
         Args:
             scan_idx (str): ID of the scan.
+
         Returns:
             dict : The corresponding scan information.
         """
@@ -423,6 +429,7 @@ class MMScan(Dataset):
 
         Args:
             scan_idx (str): ID of the scan.
+
         Returns:
             dict : The corresponding bounding boxes information.
         """
@@ -447,6 +454,7 @@ class MMScan(Dataset):
 
         Args:
             scan_idx (str): ID of the scan.
+
         Returns:
             list[dict] :The corresponding bounding boxes information
                 for each camera.
@@ -487,6 +495,7 @@ class MMScan(Dataset):
                 the point clouds
             box_9DOF(np.ndarray / Tensor):
                 the 9DOF bounding box
+
         Returns:
             np.ndarray :
                 The transformed 6DOF bounding box.
@@ -501,6 +510,7 @@ class MMScan(Dataset):
         Args:
             annos (list[dict]): The original annotations.
             ratio (float): The ratio to downsample.
+
         Returns:
             list[dict] : The result.
         """

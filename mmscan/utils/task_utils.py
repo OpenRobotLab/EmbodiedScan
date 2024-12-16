@@ -10,6 +10,7 @@ def anno_token_flatten(samples: List[dict], keep_only_one: bool = True):
         keep_only_one (bool):
             Whether to keep only one positive token for each target.
             Defaults to True.
+
     Returns:
         List[dict] : The token-flattened samples.
     """

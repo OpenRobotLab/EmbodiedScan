@@ -109,8 +109,12 @@ import mmscan
 # (1) The dataset tool
 import mmscan.MMScan as MMScan_dataset
 
-# (2) The evaluator tool ('VG', 'QA', 'GPT')
-import mmscan.{}_Evaluator as MMScan_{}_evaluator
+# (2) The evaluator tool ('VisualGroundingEvaluator', 'QuestionAnsweringEvaluator', 'GPTEvaluator')
+import mmscan.VisualGroundingEvaluator as MMScan_VG_evaluator
+
+import mmscan.QuestionAnsweringEvaluator as MMScan_QA_evaluator
+
+import mmscan.GPTEvaluator as MMScan_GPT_evaluator
 ```
 
 ### MMScan Dataset
@@ -124,7 +128,7 @@ Initialize the dataset for a specific task with:
 ```bash
 my_dataset = MMScan_dataset(split='train', task="MMScan-QA", ratio=1.0)
 # Access a specific sample
-print(my_dataset[100])
+print(my_dataset[index])
 ```
 
 #### Data Access

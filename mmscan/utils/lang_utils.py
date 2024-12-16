@@ -10,6 +10,7 @@ def clean_answer(data):
 
     Args:
         data (str): the raw sentence.
+
     Returns:
         data (str): the processed sentence.
     """

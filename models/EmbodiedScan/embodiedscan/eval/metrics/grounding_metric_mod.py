@@ -13,7 +13,7 @@ from scipy.optimize import linear_sum_assignment
 from terminaltables import AsciiTable
 from tqdm import tqdm
 
-from mmscan import VG_Evaluator
+from mmscan import VisualGroundingEvaluator
 
 
 def abbr(sub_class):
@@ -62,7 +62,7 @@ class GroundingMetricMod(BaseMetric):
         self.prefix = prefix
         self.format_only = format_only
         self.result_dir = result_dir
-        self.mmscan_eval = VG_Evaluator(True)
+        self.mmscan_eval = VisualGroundingEvaluator(True)
 
     def to_mmscan_form(self, det_annos, gt_annos):
         batch_input = []

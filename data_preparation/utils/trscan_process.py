@@ -5,7 +5,7 @@ import torch
 from pytorch3d.io import load_obj
 
 
-def process_trscan(scan_id: str, data_root: str, axis_align: dict):
+def process_3rscan(scan_id: str, data_root: str, axis_align: dict):
     """Process 3rscan data.
 
     Args:

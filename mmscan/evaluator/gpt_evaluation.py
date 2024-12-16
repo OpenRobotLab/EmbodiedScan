@@ -9,7 +9,7 @@ from tqdm import tqdm
 from mmscan.utils.lang_utils import qa_metric_map, qa_prompt_define
 
 
-class GPT_Evaluator:
+class GPTEvaluator:
     """GPT metric, we set this for QA and Caption tasks.
 
     Args:
@@ -55,6 +55,7 @@ class GPT_Evaluator:
             user_content_grounps (list[str]) :
                 The user content inputted into GPT.
             max_tokens (int) : Max tokens. Defaults to 1000.
+
         Returns:
             dict : The json-format result.
         """
@@ -136,6 +137,7 @@ class GPT_Evaluator:
                 The number of threads used to evaluate the samples.
             tmp_path (str) :
                 The path to store the tmp-stored json files.
+
         Returns:
             dict : The evaluation result.
         """
@@ -181,6 +183,7 @@ class GPT_Evaluator:
             num_threads (int) : The number of the threadings.
                 Defaults to 1.
             tmp_path (str) : The temporay path to store the json files.
+
         Returns:
             dict : The evaluation result.
         """
