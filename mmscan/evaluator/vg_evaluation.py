@@ -6,7 +6,7 @@ from terminaltables import AsciiTable
 from tqdm import tqdm
 
 from mmscan.evaluator.metrics.box_metric import (get_average_precision,
-                                                 get_multi_topk_scores,
+                                                 get_general_topk_scores,
                                                  subset_get_average_precision)
 from mmscan.utils.box_utils import index_box, to_9dof_box
 
@@ -115,7 +115,7 @@ class VisualGroundingEvaluator:
 
                 # topk metric
                 metric_for_single.update(
-                    get_multi_topk_scores(iou_array, iou_thr))
+                    get_general_topk_scores(iou_array, iou_thr))
 
             data_item['num_gts'] = iou_array.shape[1]
             data_item.update(metric_for_single)
@@ -268,6 +268,7 @@ class VisualGroundingEvaluator:
 
         Args:
              data_item (dict): The subclass name in the original samples.
+
         Returns:
              np.ndarray, np.ndarray :
                 The iou array sorted by the confidence and the

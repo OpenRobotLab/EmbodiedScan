@@ -78,6 +78,7 @@ def normalize_answer(s):
 
     Args:
         s (str): the raw answer.
+
     Returns:
         str : the processed sentence.
     """
@@ -105,7 +106,6 @@ def exact_match_score(prediction, ground_truth):
     Args:
         prediction (str): thr predicted answer.
         ground_truth (str): the gt answer.
-
 
     Returns:
         float : the exact match score
@@ -221,6 +221,7 @@ def qa_metric_map(eval_type):
 
     Args:
         eval_type (str): the class name.
+
     Returns:
         str : the corresponding Abbrev.
     """

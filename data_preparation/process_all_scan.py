@@ -157,9 +157,9 @@ def process_one_scan(
 
 
 if __name__ == '__main__':
-    path_of_version1 = '../mmscan_data/embodiedscan-split/embodiedscan-v1'
+    path_of_version1 = '../mmscan_data/embodiedscan_split/embodiedscan-v1'
     parser = ArgumentParser()
-    parser.add_argument('--meta_path', type=str, default='./meta-data')
+    parser.add_argument('--meta_path', type=str, default='./meta_data')
     parser.add_argument(
         '--data_root',
         type=str,

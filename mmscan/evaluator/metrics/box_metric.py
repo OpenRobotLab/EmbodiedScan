@@ -222,22 +222,22 @@ def get_average_precision(iou_array: np.ndarray, iou_threshold: float) \
     return average_precision(recall, precision), np.max(recall)
 
 
-def get_multi_topk_scores(iou_array: Union[np.ndarray, torch.tensor],
-                          iou_threshold: float,
-                          mode: str = 'sigma') -> Dict[str, float]:
-    """
-    Compute the multi-topk metric, we provide two modes.
-    "simple": 1/N *Hit(min(N*k,len(pred)))
-    "sigma": 1/N * Sigma [Hit(min(n*k,len(pred)))>=n] n = 1~N
-        Hit(M) return the number of gtound truths hitted by the first
-        M predictions.
-        N = the number of gtound truths
+def get_general_topk_scores(iou_array: Union[np.ndarray, torch.tensor],
+                            iou_threshold: float,
+                            mode: str = 'sigma') -> Dict[str, float]:
+    """Compute the multi-topk metric, we provide two modes.
+
     Args:
         iou_array (ndarray/tensor):
             the iou matrix of the predictions and ground truths
             (shape len(preds)*len(gts))
         iou_threshold (float): 0.25/0.5
         mode (str): 'sigma'/'simple'
+                "simple": 1/N * Hit(min(N*k,len(pred)))
+                "sigma": 1/N * Sigma [Hit(min(n*k,len(pred)))>=n] n = 1~N
+                    Hit(M) return the number of gtound truths hitted by
+                    the first M predictions.
+                    N = the number of gtound truths
                 Default to 'sigma'.
 
     Returns:

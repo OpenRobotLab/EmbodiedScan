@@ -25,7 +25,7 @@ def to_coco(kvs, keys):
     return res
 
 
-def coco_evaluate(batch_input: List[dict]) -> Tuple[dict, dict]:
+def coco_evaluation(batch_input: List[dict]) -> Tuple[dict, dict]:
     """Calculate the extract matching score for each item.
     Args:
         batch_input(list[dict]):
@@ -60,6 +60,7 @@ def coco_evaluate(batch_input: List[dict]) -> Tuple[dict, dict]:
     final_list = {}
     ref_coco = tokenizer.tokenize(to_coco(ref_sent, ref_sent.keys()))
     hypo_coco = tokenizer.tokenize(to_coco(hypo_sent, ref_sent.keys()))
+
     for scorer, method in scorers:
         score, scores = scorer.compute_score(ref_coco, hypo_coco)
         if type(score) == list:
@@ -119,17 +120,18 @@ def em_evaluation(batch_input: List[dict]) -> Tuple[list, list]:
     return em_result, refine_em_result
 
 
-class simcse_evaluator:
-    """A class for calculating the simcse similarity score.
+class SimCSEEvaluator:
+    """A class for calculating the simcse similarity score. Using Sentence
+    Embeddings to calculate similarity between pred/gt。
 
     Args:
         model_path: path to the simcse pretrained model.
     """
 
     def __init__(self, model_path: str, eval_bs: int = 500) -> None:
-        self.eval_bs = eval_bs
         if len(model_path) == 0:
             model_path = 'princeton-nlp/sup-simcse-roberta-large'
+        self.eval_bs = eval_bs
         self.simcse_tokenizer = AutoTokenizer.from_pretrained(model_path)
         self.simcse_model = AutoModel.from_pretrained(model_path).to('cuda')
 
@@ -139,10 +141,10 @@ class simcse_evaluator:
         a batch.
 
         Args:
-            gt_count(list[int]):
-                stores number of possible answers to a question
             all_pred(list[str]): all prediction
             all_gt(list[str]): all ground truth
+            gt_count(list[int]):
+                stores number of possible answers to a question
             tips: len(all_gt)>=len(all_pred)
                 there may be multiple gt answers for a question.
 
@@ -214,17 +216,18 @@ class simcse_evaluator:
         return all_simcse_similarity
 
 
-class sbert_evaluator:
-    """A class for calculating the sbert similarity score.
+class SBERTEvaluator:
+    """A class for calculating the sbert similarity score. Using Sentence-BERT
+    to calculate similarity between pred/gt.
 
     Args:
         model_path: path to the sbert pretrained model.
     """
 
     def __init__(self, model_path: str, eval_bs: int = 500) -> None:
-        self.eval_bs = eval_bs
         if len(model_path) == 0:
             model_path = 'all-mpnet-base-v2'
+        self.eval_bs = eval_bs
         self.sbert_model = SentenceTransformer(model_path, device='cuda')
 
     def __batch_evaluation__(self, all_pred: List[str], all_gt: List[str],
@@ -233,10 +236,10 @@ class sbert_evaluator:
         batch.
 
         Args:
-            gt_count(list[int]): stores number of possible
-                answers to a question
             all_pred(list[str]): all prediction
             all_gt(list[str]): all ground truth
+            gt_count(list[int]): stores number of possible
+                answers to a question
             tips: len(all_gt)>=len(all_pred) because there may be multiple
                   gt answers for a question.
 

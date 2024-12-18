@@ -19,7 +19,7 @@ class GPTEvaluator:
         api_key (str) : The openai key.
         model (str) : The GPT model to use, default we use "gpt-4o-mini".
             Defaults to "gpt-4o-mini".
-        verbose (bool) : Whether to print the evaluation results or not.
+        show_progress (bool) : Whether to print the evaluation results or not.
             Defaults to False.
     """
 
@@ -74,12 +74,12 @@ class GPTEvaluator:
         response = json.loads(response.choices[0].message.content)
         return response
 
-    def qa_evaluation(self, QA_sample_dict: List[dict], thread_index: int,
+    def qa_evaluation(self, all_samples: dict, thread_index: int,
                       tmp_path: str) -> None:
         """Employ the GPT evaluator.
 
         Args:
-            QA_sample_dict (List[dict]) : The QA sample dict with
+            all_samples (dict) : The QA sample dict with QA_ID as keys and
                 [gt, pred, question] as values.
             thread_index (int) : The index of the thread.
             tmp_path (str) : The path to store the
@@ -92,11 +92,11 @@ class GPTEvaluator:
         MAXTRY = 3
         gpt_eval_results = {}
 
-        for QA_ID in tqdm(QA_sample_dict):
+        for sample_id in tqdm(all_samples):
             GPT_INTPUT = {
-                'Question': QA_sample_dict[QA_ID]['question'],
-                'Model Answer': QA_sample_dict[QA_ID]['pred'],
-                'Human Answer': QA_sample_dict[QA_ID]['gt'][0],
+                'Question': all_samples[sample_id]['question'],
+                'Model Answer': all_samples[sample_id]['pred'],
+                'Human Answer': all_samples[sample_id]['gt'][0],
             }
 
             for _ in range(MAXTRY):
@@ -116,10 +116,10 @@ class GPTEvaluator:
 
                     FLAG = True
                 except Exception:
-                    # print("error!")
+
                     continue
                 if FLAG:
-                    gpt_eval_results[QA_ID] = GPT_OUTPUT
+                    gpt_eval_results[sample_id] = GPT_OUTPUT
 
         with open(
                 tmp_path.replace('.json',
@@ -210,16 +210,17 @@ class GPTEvaluator:
 
         for thread_index in range(num_threads):
             # Create a sub-dictionary for each thread
-            QA_sample_dict = {
+            partial_samples = {
                 ID_: batch_result[ID_]
                 for ID_ in IDs_divide_index[thread_index]
             }
             if self.show_progress:
                 print(
-                    f'Thread {thread_index} processing {len(QA_sample_dict)}')
+                    f'Thread {thread_index} processing {len(partial_samples)}')
             thread = threading.Thread(
                 target=self.qa_evaluation,
-                args=(QA_sample_dict, thread_index, tmp_path + '/gpt_QA.json'),
+                args=(partial_samples, thread_index,
+                      tmp_path + '/gpt_QA.json'),
             )
             threads.append(thread)
 

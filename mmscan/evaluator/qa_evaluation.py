@@ -2,9 +2,10 @@ from typing import List
 
 import torch
 
-from mmscan.evaluator.metrics.lang_metric import (coco_evaluate, em_evaluation,
-                                                  sbert_evaluator,
-                                                  simcse_evaluator)
+from mmscan.evaluator.metrics.lang_metric import (SBERTEvaluator,
+                                                  SimCSEEvaluator,
+                                                  coco_evaluation,
+                                                  em_evaluation)
 from mmscan.utils.lang_utils import special_token_filter
 
 
@@ -39,12 +40,12 @@ class QuestionAnsweringEvaluator:
         self.special_metric = []
         if 'simcse' in model_config and torch.cuda.is_available():
             self.special_metric.append('simcse')
-            self.simcse_evaluator = simcse_evaluator(model_config['simcse'],
-                                                     eval_bs=self.eval_bs)
+            self.simcse_evaluator = SimCSEEvaluator(model_config['simcse'],
+                                                    eval_bs=self.eval_bs)
         if 'sbert' in model_config and torch.cuda.is_available():
             self.special_metric.append('sbert')
-            self.sbert_evaluator = sbert_evaluator(model_config['sbert'],
-                                                   eval_bs=self.eval_bs)
+            self.sbert_evaluator = SBERTEvaluator(model_config['sbert'],
+                                                  eval_bs=self.eval_bs)
 
         self.eval_metric = [
             'EM',
@@ -125,7 +126,7 @@ class QuestionAnsweringEvaluator:
         EM_, refine_EM_ = em_evaluation(self.save_buffer)
 
         # (2) coco metric evaluation
-        coco_scores, coco_scores_list = coco_evaluate(self.save_buffer)
+        coco_scores, coco_scores_list = coco_evaluation(self.save_buffer)
 
         # (3) special metric evaluation, forward one time each batch
         if 'simcse' in self.special_metric:

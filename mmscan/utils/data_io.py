@@ -59,12 +59,7 @@ def read_annotation_pickle(path: str, show_progress: bool = True):
     pbar = (tqdm(range(len(datalist))) if show_progress else range(
         len(datalist)))
     for scene_idx in pbar:
-        # print(datalist[scene_idx]['sample_idx'])
-        # if "matterport3d" not in datalist[scene_idx]['sample_idx']:
-        #     continue
-        # print(datalist[scene_idx].keys())
         images = datalist[scene_idx]['images']
-        # print(images[0].keys())
 
         intrinsic = datalist[scene_idx].get('cam2img', None)  # a 4x4 matrix
         missing_intrinsic = False

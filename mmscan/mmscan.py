@@ -73,17 +73,17 @@ class MMScan(Dataset):
         self.check_mode = check_mode
         if self.check_mode:
             print("embodiedscan's checking mode!!!")
-        self.pkl_name = f'{self.dataroot}/embodiedscan-split' +\
+        self.pkl_name = f'{self.dataroot}/embodiedscan_split' +\
             f'/embodiedscan-{self.version}' +\
             f'/embodiedscan_infos_{split}.pkl'
-        self.data_path = '{}/embodiedscan-split/data'.format(self.dataroot)
+        self.data_path = '{}/embodiedscan_split/data'.format(self.dataroot)
         self.lang_anno_path = '{}/MMScan-beta-release'.format(self.dataroot)
 
-        self.pcd_path = '{}/embodiedscan-split/process_pcd'.format(
+        self.pcd_path = '{}/embodiedscan_split/process_pcd'.format(
             self.dataroot)
 
         self.mapping_json_path = (
-            '{}/../data_preparation/meta-data/mp3d_mapping.json'.format(
+            '{}/../data_preparation/meta_data/mp3d_mapping.json'.format(
                 self.dataroot))
         self.id_mapping = id_mapping(self.mapping_json_path)
         self.table_names = [

@@ -81,13 +81,13 @@ existing benchmarks and in-the-wild evaluation.
 
 1. Download the Embodiedscan and MMScan annotation. (Fill in the [form](https://docs.google.com/forms/d/e/1FAIpQLScUXEDTksGiqHZp31j7Zp7zlCNV7p_08uViwP_Nbzfn3g6hhw/viewform) to apply for downloading)
 
-   Create a folder `mmscan_data/` and then unzip the files. For the first zip file, put `embodiedscan` under `mmscan_data/embodiedscan-split` and rename it to `embodiedscan-v1`. For the second zip file, put `MMScan-beta-release` under `mmscan_data/MMScan-beta-release` and `embodiedscan-v2` under `mmscan_data/embodiedscan-split`.
+   Create a folder `mmscan_data/` and then unzip the files. For the first zip file, put `embodiedscan` under `mmscan_data/embodiedscan_split` and rename it to `embodiedscan-v1`. For the second zip file, put `MMScan-beta-release` under `mmscan_data/MMScan-beta-release` and `embodiedscan-v2` under `mmscan_data/embodiedscan_split`.
 
    The directory structure should be as below:
 
    ```
    mmscan_data
-   ├── embodiedscan-split
+   ├── embodiedscan_split
    │   ├──embodiedscan-v1/   # EmbodiedScan v1 data in 'embodiedscan.zip'
    │   ├──embodiedscan-v2/   # EmbodiedScan v2 data in 'embodiedscan-v2-beta.zip'
    ├── MMScan-beta-release   # MMScan veta data in 'embodiedscan-v2-beta.zip'
@@ -146,37 +146,21 @@ Each dataset item is a dictionary containing key elements:
 (2)  Language Modality
 
 - **"sub_class"**: Sample category.
-
 - **"ID"**: Unique sample ID.
-
 - **"scan_id"**: Corresponding scan ID.
-
-  **VG Task:**
-
+- **--------------For Visual Grounding Task**
 - **"target_id"** (list\[int\]): IDs of target objects.
-
 - **"text"** (str): Grounding text.
-
 - **"target"** (list\[str\]): Types of target objects.
-
 - **"anchors"** (list\[str\]): Types of anchor objects.
-
 - **"anchor_ids"** (list\[int\]): IDs of anchor objects.
-
 - **"tokens_positive"** (dict): Position indices of mentioned objects in the text.
-
-  **QA Task:**
-
+- **--------------ForQuestion Answering Task**
 - **"question"** (str): The question text.
-
 - **"answers"** (list\[str\]): List of possible answers.
-
 - **"object_ids"** (list\[int\]): Object IDs referenced in the question.
-
 - **"object_names"** (list\[str\]): Types of referenced objects.
-
 - **"input_bboxes_id"** (list\[int\]): IDs of input bounding boxes.
-
 - **"input_bboxes"** (list\[np.ndarray\]): Input bounding boxes, 9 DoF.
 
 (3) 2D Modality
@@ -324,5 +308,4 @@ We have adapted the MMScan API for some [models](./models/README.md).
 ## 📝 TODO List
 
 - \[ \] More Visual Grounding baselines and Question Answering baselines.
-- \[ \] Captioning benchmark update
 - \[ \] Full release and further updates.

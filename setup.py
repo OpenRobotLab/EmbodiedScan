@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 if __name__ == '__main__':
     my_packages = find_packages()
-    print(my_packages)
+
     setup(
         name='mmscan',
         version='0.0.0',
