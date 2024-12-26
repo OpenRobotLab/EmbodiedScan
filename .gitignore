@@ -112,7 +112,6 @@ venv.bak/
 
 # demo
 *.jpg
-*.png
 *.obj
 *.ply
 demo/data/*
