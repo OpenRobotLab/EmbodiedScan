@@ -1,0 +1,9 @@
+net:
+  _target_: model.pointnetpp.pointnetpp.PointNetPP
+  sa_n_points: [32, 16, null]
+  sa_n_samples: [32, 32, null]
+  sa_radii: [0.2, 0.4, null]
+  sa_mlps: [[3, 64, 64, 128], [128, 128, 128, 256], [256, 256, 512, 768]]
+
+path: weights/pointbert_pointllm.pth
+freeze: True

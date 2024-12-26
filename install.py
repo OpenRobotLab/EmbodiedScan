@@ -6,10 +6,12 @@ import sys
 
 def run_subprocess(command):
     try:
-        process = subprocess.Popen(command,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE,
-                                   universal_newlines=True)
+        process = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+        )
 
         # Read output and error in real-time
         for line in process.stdout:
@@ -46,29 +48,12 @@ def pytorch3d_links():
     pyt_version_str = torch.__version__.split('+')[0].replace('.', '')
     cuda_version_str = torch.version.cuda.replace('.', '')
     version_str = ''.join([
-        f'py3{sys.version_info.minor}_cu', cuda_version_str,
-        f'_pyt{pyt_version_str}'
+        f'py3{sys.version_info.minor}_cu',
+        cuda_version_str,
+        f'_pyt{pyt_version_str}',
     ])
     pytorch3d_links = f'https://dl.fbaipublicfiles.com/pytorch3d/packaging/wheels/{version_str}/download.html'  # noqa: E501
     return pytorch3d_links
-
-
-def mmcv_links():
-    try:
-        import torch
-    except ImportError as e:
-        print('Pytorch is not installed.')
-        raise e
-    cuda_version = torch.version.cuda
-    if cuda_version is None:
-        print('Pytorch is cpu only.')
-        raise NotImplementedError
-
-    cuda_version_str = torch.version.cuda.replace('.', '')
-    pyt_version = torch.__version__.split('+')[0].split('.')
-    pyt_version_mmcv = pyt_version[0] + '.' + pyt_version[1]
-    mmcv_links = f'https://download.openmmlab.com/mmcv/dist/cu{cuda_version_str}/torch{pyt_version_mmcv}/index.html'  # noqa: E501
-    return mmcv_links
 
 
 def install_package(line):
@@ -80,16 +65,6 @@ def install_package(line):
         links = pytorch3d_links()
         run_subprocess(
             [sys.executable, '-m', 'pip', 'install', 'pytorch3d', '-f', links])
-    elif package_name == 'mmcv':
-        links = mmcv_links()
-        run_subprocess(
-            [sys.executable, '-m', 'pip', 'install', line, '-f', links])
-    elif package_name == 'MinkowskiEngine':
-        run_subprocess([sys.executable, '-m', 'pip', 'install', 'ninja'])
-        run_subprocess([
-            sys.executable, '-m', 'pip', 'install', '-U',
-            'git+https://github.com/NVIDIA/MinkowskiEngine', '--no-deps'
-        ])  # noqa: E501
     else:
         run_subprocess([sys.executable, '-m', 'pip', 'install', line])
 
@@ -109,10 +84,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     install_requires('requirements/base.txt')
-    if args.mode == 'visual' or args.mode == 'all':
-        install_requires('requirements/visual.txt')
+    if args.mode == 'VG' or args.mode == 'all':
+        install_requires('requirements/VG.txt')
 
-    if args.mode == 'run' or args.mode == 'all':
-        install_requires('requirements/run.txt')
+    if args.mode == 'QA' or args.mode == 'all':
+        install_requires('requirements/QA.txt')
 
     run_subprocess([sys.executable, '-m', 'pip', 'install', '-e', '.'])

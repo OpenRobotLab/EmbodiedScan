@@ -1,0 +1,8 @@
+easydict
+h5py
+matplotlib
+opencv-python
+plyfile
+tensorboardX
+tqdm
+trimesh==2.35.39

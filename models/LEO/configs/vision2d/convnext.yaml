@@ -1,0 +1,6 @@
+name: GridFeatureExtractor2D
+backbone_name: convnext_base
+backbone_pretrain_dataset: laion2b
+use_pretrain: True
+pooling: avg # null, avg, conv, attn
+freeze: True

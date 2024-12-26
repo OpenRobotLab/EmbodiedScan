@@ -1,5 +1,4 @@
-mmengine
-numpy==1.23.5
-opencv-python
+numpy
+plyfile
+pytorch3d
 torch
-tqdm

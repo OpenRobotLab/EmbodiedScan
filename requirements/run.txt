@@ -1,7 +1,0 @@
-MinkowskiEngine @ git+https://github.com/NVIDIA/MinkowskiEngine.git
-mmcv==2.0.0rc4
-mmdet
-mmengine
-ninja
-pytorch3d
-transformers

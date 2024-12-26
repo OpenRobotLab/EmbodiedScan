@@ -35,7 +35,7 @@ done
 if [ ! -z "${PY_FILES}" ]
 then
     if [ "$REUSE_COVERAGE_REPORT" == "0" ]; then
-        coverage run --branch --source embodiedscan -m pytest tests/
+        coverage run --branch --source mmscan -m pytest tests/
     fi
     coverage report --fail-under 80 -m $PY_FILES
     interrogate -v --ignore-init-method --ignore-module --ignore-nested-functions --ignore-magic --ignore-regex "__repr__" --fail-under 95 $PY_FILES

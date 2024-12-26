@@ -1,0 +1,11 @@
+name: OPT1.3B
+cfg_path: TBD
+truncation_side: right
+max_context_len: 256
+max_out_len: 256
+lora:
+  flag: True
+  rank: 16
+  alpha: 16
+  target_modules: [q_proj, k_proj, v_proj, out_proj]
+  dropout: 0.0
