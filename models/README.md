@@ -95,9 +95,9 @@ These are 3D question answering models adapted for the mmscan-devkit. Currently,
    ```
 #### ckpts & Logs
 
-| Detector  | Captioner | Iters |  GPT score overall  |                           Config                           |                                                                                                                                                                 Download                                                                                                                                                                 |
+| Detector  | Captioner | Iters |  GPT score overall  |                                                                                                                                                                       Download                                                                                                                                                                 |
 | :-------:  | :----: | :----: | :---------: | :--------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| detector_Vote2Cap_DETR   |  ll3da  |  100k |  45.7     |    [config](./centernet_r18_8xb16-crop512-140e_coco.py)    |             [model](https://download.openmmlab.com/mmdetection/v2.0/centernet/centernet_resnet18_140e_coco/centernet_resnet18_140e_coco_20210705_093630-bb5b3bf7.pth) \| [log](https://download.openmmlab.com/mmdetection/v2.0/centernet/centernet_resnet18_140e_coco/centernet_resnet18_140e_coco_20210705_093630.log.json)             |
+| detector_Vote2Cap_DETR   |  ll3da  |  100k |  45.7     |             [model](https://drive.google.com/file/d/1mcWNHdfrhdbtySBtmG-QRH1Y1y5U3PDQ/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1VHpcnO0QmAvMa0HuZa83TEjU6AiFrP42/view?usp=drive_link)             |
 
 
 
