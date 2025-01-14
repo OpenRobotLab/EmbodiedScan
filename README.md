@@ -21,12 +21,14 @@
 
 ## 📋 Contents
 
-1. [About](#-about)
-2. [Getting Started](#-getting-started)
-3. [Model and Benchmark](#-model-and-benchmark)
-4. [TODO List](#-todo-list)
-
+1. [About](#topic1)
+2. [Getting Started](#topic2)
+3. [MMScan API Tutorial](#-model-and-benchmark)
+4. [MMScan Leaderboard](#-model-and-benchmark)
+5. [TODO List](#-todo-list)
+<a href="## 🏠 About">跳转到更新</a>
 ## 🏠 About
+<span id='topic1'/>
 
 <!-- ![Teaser](assets/teaser.jpg) -->
 
@@ -56,7 +58,7 @@ grounding and LLMs and obtain remarkable performance improvement both on
 existing benchmarks and in-the-wild evaluation.
 
 ## 🚀 Getting Started:
-
+<span id='topic2'/>
 ### Installation
 
 1. Clone Github repo.
@@ -301,7 +303,28 @@ The input structure remains the same as for the question answering evaluator:
 ]
 ```
 
-### Models
+## 🏆 MMScan Leaderboard
+
+### MMScan Visual Grounding Benchmark
+
+| Methods | gTop-1 | gTop-3 | AP<sub>sample</sub> | AP<sub>box</sub> | AR | code/config | download |
+|---------|--------|--------|---------------------|------------------|----|------------------|----|
+| ScanRefer | 4.74 | 9.19 | 9.49 | 2.28 | 47.68 | ~ | ~ |
+| MVT | 7.94 | 13.07 | 13.67 | 2.50 | 86.86 | ~ | ~ |
+| BUTD-DETR  | 15.24 | 20.68 | 18.58 | 9.27 | 66.62 |  ~ | ~ |
+| ReGround3D  | 16.35 | 26.13 | 22.89 | 5.25 | 43.24 | ~ | ~ |
+| EmbodiedScan  | 19.66 | 34.00 | 29.30 | **15.18** | 59.96 |  ~ | ~ |
+| 3D-VisTA | 25.38 | 35.41 | 33.47 | 6.67 | 87.52 |  ~ | ~ |
+| ViL3DRef | **26.34** | **37.58** | **35.09** | 6.65 | 86.86 | ~ | ~ |
+
+### MMScan Question Answering Benchmark
+| Methods | Overall | ST-attr | ST-space | OO-attr | OO-space | OR|code/config | download |
+|---|--------|--------|--------|--------|--------|--------|------------------|----|
+| LL3DA | 45.7 | 39.1 | 58.5 | 43.6 | 55.9 | 37.1 | 24.0|~ | ~ |
+| LEO |54.6 | 48.9 | 62.7 | 50.8 | 64.7 | 50.4 | 45.9 |~ | ~ |
+| LLaVA-3D |**61.6** | 58.5 | 63.5 | 56.8 | 75.6 | 58.0 | 38.5|~ | ~ |
+
+*Note:* These two tables only show the results for main metrics; see the paper for complete results.
 
 We have released the codes of some models under [./models](./models/README.md).
 
