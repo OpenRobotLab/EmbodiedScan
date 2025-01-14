@@ -137,39 +137,39 @@ Each dataset item is a dictionary containing key elements:
 
 (1) 3D Modality
 
-- **"ori_pcds"** (tuple\[tensor\]): Raw point cloud data from the `.pth` file.
-- **"pcds"** (np.ndarray): Point cloud data, dimensions (\[n_points, 6(xyz+rgb)\]).
-- **"instance_labels"** (np.ndarray): Instance IDs for each point.
-- **"class_labels"** (np.ndarray): Class IDs for each point.
-- **"bboxes"** (dict): Bounding boxes in the scan.
+- **"ori_pcds"** (tuple\[tensor\]): Original point cloud data extracted from the .pth file.
+- **"pcds"** (np.ndarray): Point cloud data with dimensions [n_points, 6(xyz+rgb)], representing the coordinates and color of each point.
+- **"instance_labels"** (np.ndarray): Instance ID assigned to each point in the point cloud.
+- **"class_labels"** (np.ndarray): Class IDs assigned to each point in the point cloud.
+- **"bboxes"** (dict): Information about bounding boxes within the scan.
 
 (2)  Language Modality
 
-- **"sub_class"**: Sample category.
-- **"ID"**: Unique sample ID.
-- **"scan_id"**: Corresponding scan ID.
+- **"sub_class"**: The sample category of the sample.
+- **"ID"**: A unique identifier for the sample.
+- **"scan_id"**:Identifier corresponding to the related scan.
 - **--------------For Visual Grounding Task**
 - **"target_id"** (list\[int\]): IDs of target objects.
-- **"text"** (str): Grounding text.
+- **"text"** (str): Text used for grounding.
 - **"target"** (list\[str\]): Types of target objects.
 - **"anchors"** (list\[str\]): Types of anchor objects.
 - **"anchor_ids"** (list\[int\]): IDs of anchor objects.
-- **"tokens_positive"** (dict): Position indices of mentioned objects in the text.
+- **"tokens_positive"** (dict):  Indices of positions where mentioned objects appear in the text.
 - **--------------For Question Answering Task**
-- **"question"** (str): The question text.
+- **"question"** (str): The text of the question.
 - **"answers"** (list\[str\]): List of possible answers.
 - **"object_ids"** (list\[int\]): Object IDs referenced in the question.
 - **"object_names"** (list\[str\]): Types of referenced objects.
 - **"input_bboxes_id"** (list\[int\]): IDs of input bounding boxes.
-- **"input_bboxes"** (list\[np.ndarray\]): Input bounding boxes, 9 DoF.
+- **"input_bboxes"** (list\[np.ndarray\]): Input bounding box data, with 9 degrees of freedom.
 
 (3) 2D Modality
 
-- **'img_path'** (str): Path to RGB image.
-- **'depth_img_path'** (str): Path to depth image.
-- **'intrinsic'** (np.ndarray): Camera intrinsic parameters for RGB images.
-- **'depth_intrinsic'** (np.ndarray): Camera intrinsic parameters for depth images.
-- **'extrinsic'** (np.ndarray): Camera extrinsic parameters.
+- **'img_path'** (str): File path to the RGB image.
+- **'depth_img_path'** (str): File path to the depth image.
+- **'intrinsic'** (np.ndarray):  Intrinsic parameters of the camera for RGB images.
+- **'depth_intrinsic'** (np.ndarray):  Intrinsic parameters of the camera for Depth images.
+- **'extrinsic'** (np.ndarray): Extrinsic parameters of the camera.
 - **'visible_instance_id'** (list): IDs of visible objects in the image.
 
 ### MMScan  Evaluator
