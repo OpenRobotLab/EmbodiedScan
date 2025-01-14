@@ -155,7 +155,7 @@ Each dataset item is a dictionary containing key elements:
 - **"anchors"** (list\[str\]): Types of anchor objects.
 - **"anchor_ids"** (list\[int\]): IDs of anchor objects.
 - **"tokens_positive"** (dict): Position indices of mentioned objects in the text.
-- **--------------ForQuestion Answering Task**
+- **--------------For Question Answering Task**
 - **"question"** (str): The question text.
 - **"answers"** (list\[str\]): List of possible answers.
 - **"object_ids"** (list\[int\]): Object IDs referenced in the question.
@@ -182,7 +182,7 @@ For the visual grounding task, our evaluator computes multiple metrics including
 
 - **AP and AR**: These metrics calculate the precision and recall by considering each sample as an individual category.
 - **AP_C and AR_C**: These versions categorize samples belonging to the same subclass and calculate them together.
-- **gtop-k**: An expanded metric that generalizes the traditional top-k metric, offering insights into broader performance aspects.
+- **gTop-k**: An expanded metric that generalizes the traditional Top-k metric, offering insights into broader performance aspects.
 
 Below is an example of how to utilize the Visual Grounding Evaluator:
 
