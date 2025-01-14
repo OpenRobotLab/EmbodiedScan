@@ -303,7 +303,7 @@ The input structure remains the same as for the question answering evaluator:
 
 ### Models
 
-We have adapted the MMScan API for some [models](./models/README.md).
+We have released the codes of some models under [./models](./models/README.md).
 
 ## 📝 TODO List
 
