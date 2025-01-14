@@ -23,10 +23,10 @@
 
 1. [About](#topic1)
 2. [Getting Started](#topic2)
-3. [MMScan API Tutorial](#-model-and-benchmark)
-4. [MMScan Leaderboard](#-model-and-benchmark)
-5. [TODO List](#-todo-list)
-<a href="## 🏠 About">跳转到更新</a>
+3. [MMScan API Tutorial](#topic3)
+4. [MMScan Leaderboard](#topic4)
+5. [TODO List](#topic5)
+
 ## 🏠 About
 <span id='topic1'/>
 
@@ -59,6 +59,7 @@ existing benchmarks and in-the-wild evaluation.
 
 ## 🚀 Getting Started:
 <span id='topic2'/>
+
 ### Installation
 
 1. Clone Github repo.
@@ -100,6 +101,7 @@ existing benchmarks and in-the-wild evaluation.
    Please refer to the [guide](data_preparation/README.md) here.
 
 ## 👓 MMScan API Tutorial
+<span id='topic3'/>
 
 The **MMScan Toolkit** provides comprehensive tools for dataset handling and model evaluation in  tasks.
 
@@ -305,6 +307,8 @@ The input structure remains the same as for the question answering evaluator:
 
 ## 🏆 MMScan Leaderboard
 
+<span id='topic4'/>
+
 ### MMScan Visual Grounding Benchmark
 
 | Methods | gTop-1 | gTop-3 | AP<sub>sample</sub> | AP<sub>box</sub> | AR | code/config | download |
@@ -330,5 +334,9 @@ We have released the codes of some models under [./models](./models/README.md).
 
 ## 📝 TODO List
 
-- \[ \] More Visual Grounding baselines and Question Answering baselines.
+<span id='topic5'/>
+
+- \[ \] MMScan annotation and samples for ArkitScene.
+- \[ \] Online evaluation platform for the MMScan benchmark.
+- \[ \] Codes of more MMScan Visual Grounding baselines and Question Answering baselines.
 - \[ \] Full release and further updates.
