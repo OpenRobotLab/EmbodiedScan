@@ -187,6 +187,8 @@ For the visual grounding task, our evaluator computes multiple metrics including
 - **AP and AR**: These metrics calculate the precision and recall by considering each sample as an individual category.
 - **AP_C and AR_C**: These versions categorize samples belonging to the same subclass and calculate them together.
 - **gTop-k**: An expanded metric that generalizes the traditional Top-k metric, offering insights into broader performance aspects.
+  
+*Note:* Here, AP corresponds to  AP<sub>sample</sub> in the paper, and AP_C corresponds to  AP<sub>box</sub> in the paper.
 
 Below is an example of how to utilize the Visual Grounding Evaluator:
 
@@ -311,21 +313,21 @@ The input structure remains the same as for the question answering evaluator:
 
 ### MMScan Visual Grounding Benchmark
 
-| Methods | gTop-1 | gTop-3 | AP<sub>sample</sub> | AP<sub>box</sub> | AR | code/config | download |
-|---------|--------|--------|---------------------|------------------|----|------------------|----|
-| ScanRefer | 4.74 | 9.19 | 9.49 | 2.28 | 47.68 | ~ | ~ |
+| Methods | gTop-1 | gTop-3 | AP<sub>sample</sub> | AP<sub>box</sub> | AR | Release | Download |
+|---------|--------|--------|---------------------|------------------|----|-------|----|
+| ScanRefer | 4.74 | 9.19 | 9.49 | 2.28 | 47.68 | [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/Scanrefer) | [model](https://drive.google.com/file/d/1C0-AJweXEc-cHTe9tLJ3Shgqyd44tXqY/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1ENOS2FE7fkLPWjIf9J76VgiPrn6dGKvi/view?usp=drive_link) |
 | MVT | 7.94 | 13.07 | 13.67 | 2.50 | 86.86 | ~ | ~ |
 | BUTD-DETR  | 15.24 | 20.68 | 18.58 | 9.27 | 66.62 |  ~ | ~ |
 | ReGround3D  | 16.35 | 26.13 | 22.89 | 5.25 | 43.24 | ~ | ~ |
-| EmbodiedScan  | 19.66 | 34.00 | 29.30 | **15.18** | 59.96 |  ~ | ~ |
+| EmbodiedScan  | 19.66 | 34.00 | 29.30 | **15.18** | 59.96 | [code](https://github.com/OpenRobotLab/EmbodiedScan/tree/mmscan/models/EmbodiedScan) |  [model](https://drive.google.com/file/d/1F6cHY6-JVzAk6xg5s61aTT-vD-eu_4DD/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1Ua_-Z2G3g0CthbeBkrR1a7_sqg_Spd9s/view?usp=drive_link) |
 | 3D-VisTA | 25.38 | 35.41 | 33.47 | 6.67 | 87.52 |  ~ | ~ |
 | ViL3DRef | **26.34** | **37.58** | **35.09** | 6.65 | 86.86 | ~ | ~ |
 
 ### MMScan Question Answering Benchmark
-| Methods | Overall | ST-attr | ST-space | OO-attr | OO-space | OR|code/config | download |
-|---|--------|--------|--------|--------|--------|--------|------------------|----|
-| LL3DA | 45.7 | 39.1 | 58.5 | 43.6 | 55.9 | 37.1 | 24.0|~ | ~ |
-| LEO |54.6 | 48.9 | 62.7 | 50.8 | 64.7 | 50.4 | 45.9 |~ | ~ |
+| Methods | Overall | ST-attr | ST-space | OO-attr | OO-space | OR| Advanced | Release | Download |
+|---|--------|--------|--------|--------|--------|--------|-------|----|----|
+| LL3DA | 45.7 | 39.1 | 58.5 | 43.6 | 55.9 | 37.1 | 24.0| [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/LL3DA) | [model](https://drive.google.com/file/d/1mcWNHdfrhdbtySBtmG-QRH1Y1y5U3PDQ/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1VHpcnO0QmAvMa0HuZa83TEjU6AiFrP42/view?usp=drive_link) |
+| LEO |54.6 | 48.9 | 62.7 | 50.8 | 64.7 | 50.4 | 45.9 | [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/LEO) | [model](https://drive.google.com/drive/folders/1HZ38LwRe-1Q_VxlWy8vqvImFjtQ_b9iA?usp=drive_link)|
 | LLaVA-3D |**61.6** | 58.5 | 63.5 | 56.8 | 75.6 | 58.0 | 38.5|~ | ~ |
 
 *Note:* These two tables only show the results for main metrics; see the paper for complete results.
