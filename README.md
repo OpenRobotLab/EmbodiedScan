@@ -24,7 +24,7 @@
 1. [About](#topic1)
 2. [Getting Started](#topic2)
 3. [MMScan API Tutorial](#topic3)
-4. [MMScan Leaderboard](#topic4)
+4. [MMScan Benchmark](#topic4)
 5. [TODO List](#topic5)
 
 ## 🏠 About
@@ -307,7 +307,7 @@ The input structure remains the same as for the question answering evaluator:
 ]
 ```
 
-## 🏆 MMScan Leaderboard
+## 🏆 MMScan Benchmark
 
 <span id='topic4'/>
 
