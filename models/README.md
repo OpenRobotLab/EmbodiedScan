@@ -23,7 +23,7 @@ These are 3D visual grounding models adapted for the mmscan-devkit. Currently, t
    ```
 #### ckpts & Logs
 
-| Epoch |   gtop-1 @ 0.25/0.50  |                           Config                           |                                                                                                                                                                 Download                                                                                                                                                                 |
+| Epoch |   gTop-1 @ 0.25/0.50  |                           Config                           |                                                                                                                                                                 Download                                                                                                                                                                 |
 | :-------:   | :---------: | :--------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | 50 |  4.74 / 2.52    |    [config](https://drive.google.com/file/d/1iJtsjt4K8qhNikY8UmIfiQy1CzIaSgyU/view?usp=drive_link)    |             [model](https://drive.google.com/file/d/1C0-AJweXEc-cHTe9tLJ3Shgqyd44tXqY/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1ENOS2FE7fkLPWjIf9J76VgiPrn6dGKvi/view?usp=drive_link)  
 ### EmbodiedScan
@@ -53,7 +53,7 @@ These are 3D visual grounding models adapted for the mmscan-devkit. Currently, t
    ```
 #### ckpts & Logs
 
-| Input-modality  | Load pretrain | epoch |  gtop-1 @ 0.25/0.50  |                           Config                           |                                                                                                                                                                 Download                                                                                                                                                                 |
+| Input modality  | Load pretrain | Epoch |  gTop-1 @ 0.25/0.50  |                           Config                           |                                                                                                                                                                 Download                                                                                                                                                                 |
 | :-------:  | :----: | :----: | :---------: | :--------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | Point cloud   |  True  |  12 |  19.66 / 8.82     |    [config](https://github.com/rbler1234/EmbodiedScan/blob/mmscan-devkit/models/EmbodiedScan/configs/grounding/pcd_4xb24_mmscan_vg_num256.py)    |             [model](https://drive.google.com/file/d/1F6cHY6-JVzAk6xg5s61aTT-vD-eu_4DD/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1Ua_-Z2G3g0CthbeBkrR1a7_sqg_Spd9s/view?usp=drive_link)  
 
@@ -97,7 +97,7 @@ These are 3D question answering models adapted for the mmscan-devkit. Currently,
 
 | Detector  | Captioner | Iters |  GPT score overall  |                                                                                                                                                                       Download                                                                                                                                                                 |
 | :-------:  | :----: | :----: | :---------: |:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| detector_Vote2Cap_DETR   |  ll3da  |  100k |  45.7     |             [model](https://drive.google.com/file/d/1mcWNHdfrhdbtySBtmG-QRH1Y1y5U3PDQ/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1VHpcnO0QmAvMa0HuZa83TEjU6AiFrP42/view?usp=drive_link)             |
+| Vote2Cap-DETR   |  ll3da  |  100k |  45.7     |             [model](https://drive.google.com/file/d/1mcWNHdfrhdbtySBtmG-QRH1Y1y5U3PDQ/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1VHpcnO0QmAvMa0HuZa83TEjU6AiFrP42/view?usp=drive_link)             |
 
 
 
@@ -135,6 +135,6 @@ These are 3D question answering models adapted for the mmscan-devkit. Currently,
    ```
 #### ckpts & Logs
 
-| LLM  | Vision2d/3d | epoch |  GPT score overall  |                           Config                           |                                                                                                                                                                 Download                                                                                                                                                                 |
+| LLM  | 2d/3d backbones | epoch |  GPT score overall  |                           Config                           |                                                                                                                                                                 Download                                                                                                                                                                 |
 | :-------:  | :----: | :----: | :---------: | :--------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| vicuna7b   |  convnext / ose3d_pointnetpp  |  1 |  54.6     |    [config](https://drive.google.com/file/d/1CJccZd4TOaT_JdHj073UKwdA5PWUDtja/view?usp=drive_link)    |             [model](https://drive.google.com/drive/folders/1HZ38LwRe-1Q_VxlWy8vqvImFjtQ_b9iA?usp=drive_link)              |
+| Vicuna7b   |  ConvNeXt / PointNet++  |  1 |  54.6     |    [config](https://drive.google.com/file/d/1CJccZd4TOaT_JdHj073UKwdA5PWUDtja/view?usp=drive_link)    |             [model](https://drive.google.com/drive/folders/1HZ38LwRe-1Q_VxlWy8vqvImFjtQ_b9iA?usp=drive_link)              |
