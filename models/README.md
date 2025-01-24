@@ -21,7 +21,11 @@ These are 3D visual grounding models adapted for the mmscan-devkit. Currently, t
    ```bash
    python -u scripts/train.py --use_color --eval_only --use_checkpoint "path/to/pth"
    ```
+#### ckpts & Logs
 
+| Epoch |   gTop-1 @ 0.25/0.50  |                           Config                           |                                                                                                                                                                 Download                                                                                                                                                                 |
+| :-------:   | :---------: | :--------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| 50 |  4.74 / 2.52    |    [config](https://drive.google.com/file/d/1iJtsjt4K8qhNikY8UmIfiQy1CzIaSgyU/view?usp=drive_link)    |             [model](https://drive.google.com/file/d/1C0-AJweXEc-cHTe9tLJ3Shgqyd44tXqY/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1ENOS2FE7fkLPWjIf9J76VgiPrn6dGKvi/view?usp=drive_link)  
 ### EmbodiedScan
 
 1. Follow the [EmbodiedScan](https://github.com/OpenRobotLab/EmbodiedScan/blob/main/README.md) to setup the Env. Download the [Multi-View 3D Detection model's weights](https://download.openmmlab.com/mim-example/embodiedscan/mv-3ddet.pth) and change the "load_from" path in the config file under `configs/grounding` to the path where the weights are saved.
@@ -47,6 +51,11 @@ These are 3D visual grounding models adapted for the mmscan-devkit. Currently, t
    # Multiple GPU testing
    python tools/test.py configs/grounding/pcd_4xb24_mmscan_vg_num256.py path/to/load_pth --launcher="pytorch"
    ```
+#### ckpts & Logs
+
+| Input modality  | Load pretrain | Epoch |  gTop-1 @ 0.25/0.50  |                           Config                           |                                                                                                                                                                 Download                                                                                                                                                                 |
+| :-------:  | :----: | :----: | :---------: | :--------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| Point cloud   |  True  |  12 |  19.66 / 8.82     |    [config](https://github.com/rbler1234/EmbodiedScan/blob/mmscan-devkit/models/EmbodiedScan/configs/grounding/pcd_4xb24_mmscan_vg_num256.py)    |             [model](https://drive.google.com/file/d/1F6cHY6-JVzAk6xg5s61aTT-vD-eu_4DD/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1Ua_-Z2G3g0CthbeBkrR1a7_sqg_Spd9s/view?usp=drive_link)  
 
 ## 3D Question Answering Models
 
@@ -84,6 +93,13 @@ These are 3D question answering models adapted for the mmscan-devkit. Currently,
    --tmp_path path/to/tmp  --api_key your_api_key --eval_size -1
    --nproc 4
    ```
+#### ckpts & Logs
+
+| Detector  | Captioner | Iters |  GPT score overall  |                                                                                                                                                                       Download                                                                                                                                                                 |
+| :-------:  | :----: | :----: | :---------: |:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| Vote2Cap-DETR   |  ll3da  |  100k |  45.7     |             [model](https://drive.google.com/file/d/1mcWNHdfrhdbtySBtmG-QRH1Y1y5U3PDQ/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1VHpcnO0QmAvMa0HuZa83TEjU6AiFrP42/view?usp=drive_link)             |
+
+
 
 ### LEO
 
@@ -117,5 +133,8 @@ These are 3D question answering models adapted for the mmscan-devkit. Currently,
    --tmp_path path/to/tmp  --api_key your_api_key --eval_size -1
    --nproc 4
    ```
+#### ckpts & Logs
 
-PS : It is possible that LEO may encounter an "NaN" error in the MultiHeadAttentionSpatial module due to the training setup when training more epoches. ( no problem for 4GPU one epoch)
+| LLM  | 2d/3d backbones | epoch |  GPT score overall  |                           Config                           |                                                                                                                                                                 Download                                                                                                                                                                 |
+| :-------:  | :----: | :----: | :---------: | :--------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| Vicuna7b   |  ConvNeXt / PointNet++  |  1 |  54.6     |    [config](https://drive.google.com/file/d/1CJccZd4TOaT_JdHj073UKwdA5PWUDtja/view?usp=drive_link)    |             [model](https://drive.google.com/drive/folders/1HZ38LwRe-1Q_VxlWy8vqvImFjtQ_b9iA?usp=drive_link)              |
