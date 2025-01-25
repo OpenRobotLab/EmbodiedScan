@@ -22,10 +22,9 @@
 ## 📋 Contents
 
 1. [About](#topic1)
-2. [Getting Started](#topic2)
+2. [MMScan Benchmark](#topic2)
 3. [MMScan API Tutorial](#topic3)
-4. [MMScan Benchmark](#topic4)
-5. [TODO List](#topic5)
+4. [TODO List](#topic4)
 
 ## 🏠 About
 <span id='topic1'/>
@@ -57,10 +56,43 @@ Furthermore, we use this high-quality dataset to train state-of-the-art 3D visua
 grounding and LLMs and obtain remarkable performance improvement both on
 existing benchmarks and in-the-wild evaluation.
 
-## 🚀 Getting Started
+
+## 🏆 MMScan Benchmark
+
 <span id='topic2'/>
 
-### Installation
+### MMScan Visual Grounding Benchmark
+
+| Methods | gTop-1 | gTop-3 | AP<sub>sample</sub> | AP<sub>box</sub> | AR | Release | Download |
+|---------|--------|--------|---------------------|------------------|----|-------|----|
+| ScanRefer | 4.74 | 9.19 | 9.49 | 2.28 | 47.68 | [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/Scanrefer) | [model](https://drive.google.com/file/d/1C0-AJweXEc-cHTe9tLJ3Shgqyd44tXqY/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1ENOS2FE7fkLPWjIf9J76VgiPrn6dGKvi/view?usp=drive_link) |
+| MVT | 7.94 | 13.07 | 13.67 | 2.50 | 86.86 | - | - |
+| BUTD-DETR  | 15.24 | 20.68 | 18.58 | 9.27 | 66.62 |  - | - |
+| ReGround3D  | 16.35 | 26.13 | 22.89 | 5.25 | 43.24 | - | - |
+| EmbodiedScan  | 19.66 | 34.00 | 29.30 | **15.18** | 59.96 | [code](https://github.com/OpenRobotLab/EmbodiedScan/tree/mmscan/models/EmbodiedScan) |  [model](https://drive.google.com/file/d/1F6cHY6-JVzAk6xg5s61aTT-vD-eu_4DD/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1Ua_-Z2G3g0CthbeBkrR1a7_sqg_Spd9s/view?usp=drive_link) |
+| 3D-VisTA | 25.38 | 35.41 | 33.47 | 6.67 | 87.52 |  - | - |
+| ViL3DRef | **26.34** | **37.58** | **35.09** | 6.65 | 86.86 | - | - |
+
+### MMScan Question Answering Benchmark
+| Methods | Overall | ST-attr | ST-space | OO-attr | OO-space | OR| Advanced | Release | Download |
+|---|--------|--------|--------|--------|--------|--------|-------|----|----|
+| LL3DA | 45.7 | 39.1 | 58.5 | 43.6 | 55.9 | 37.1 | 24.0| [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/LL3DA) | [model](https://drive.google.com/file/d/1mcWNHdfrhdbtySBtmG-QRH1Y1y5U3PDQ/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1VHpcnO0QmAvMa0HuZa83TEjU6AiFrP42/view?usp=drive_link) |
+| LEO |54.6 | 48.9 | 62.7 | 50.8 | 64.7 | 50.4 | 45.9 | [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/LEO) | [model](https://drive.google.com/drive/folders/1HZ38LwRe-1Q_VxlWy8vqvImFjtQ_b9iA?usp=drive_link)|
+| LLaVA-3D |**61.6** | 58.5 | 63.5 | 56.8 | 75.6 | 58.0 | 38.5|- | - |
+
+*Note:* These two tables only show the results for main metrics; see the paper for complete results.
+
+We have released the codes of some models under [./models](./models/README.md).
+
+
+
+## 🚀 MMScan API Tutorial
+<span id='topic3'/>
+
+The **MMScan Toolkit** provides comprehensive tools for dataset handling and model evaluation in tasks.
+
+### Getting Started
+
 
 1. Clone Github repo.
 
@@ -80,13 +112,13 @@ existing benchmarks and in-the-wild evaluation.
 
    Use `"all"` to install all components and specify `"VG"` or `"QA"` if you only need to install the components for Visual Grounding or Question Answering, respectively.
 
-### Data Preparation
+3. Download and prepare the dataset.
 
-1. Download the Embodiedscan and MMScan annotation. (Fill in the [form](https://docs.google.com/forms/d/e/1FAIpQLScUXEDTksGiqHZp31j7Zp7zlCNV7p_08uViwP_Nbzfn3g6hhw/viewform) to apply for downloading)
+   a. Download the Embodiedscan and MMScan annotation. (Fill in the [form](https://docs.google.com/forms/d/e/1FAIpQLScUXEDTksGiqHZp31j7Zp7zlCNV7p_08uViwP_Nbzfn3g6hhw/viewform) to apply for downloading)
 
-   Create a folder `mmscan_data/` and then unzip the files. For the first zip file, put `embodiedscan` under `mmscan_data/embodiedscan_split` and rename it to `embodiedscan-v1`. For the second zip file, put `MMScan-beta-release` under `mmscan_data/MMScan-beta-release` and `embodiedscan-v2` under `mmscan_data/embodiedscan_split`.
+   b. Create a folder `mmscan_data/` and then unzip the files. For the first zip file, put `embodiedscan` under `mmscan_data/embodiedscan_split` and rename it to `embodiedscan-v1`. For the second zip file, put `MMScan-beta-release` under `mmscan_data/MMScan-beta-release` and `embodiedscan-v2` under `mmscan_data/embodiedscan_split`.
 
-   The directory structure should be as below:
+   The directory structure should be as below, after then, refer to the [guide](data_preparation/README.md) here.
 
    ```
    mmscan_data
@@ -96,14 +128,6 @@ existing benchmarks and in-the-wild evaluation.
    ├── MMScan-beta-release   # MMScan veta data in 'embodiedscan-v2-beta.zip'
    ```
 
-2. Prepare the point clouds files.
-
-   Please refer to the [guide](data_preparation/README.md) here.
-
-## 👓 MMScan API Tutorial
-<span id='topic3'/>
-
-The **MMScan Toolkit** provides comprehensive tools for dataset handling and model evaluation in  tasks.
 
 To import the MMScan API, you can use the following commands:
 
@@ -121,7 +145,7 @@ import mmscan.QuestionAnsweringEvaluator as MMScan_QA_evaluator
 import mmscan.GPTEvaluator as MMScan_GPT_evaluator
 ```
 
-### MMScan Dataset
+### MMScan Dataset Tool
 
 The dataset tool in MMScan allows seamless access to data required for various tasks within MMScan.
 
@@ -152,16 +176,14 @@ Each dataset item is a dictionary containing key elements:
 - **"sub_class"**: The sample category of the sample.
 - **"ID"**: A unique identifier for the sample.
 - **"scan_id"**:Identifier corresponding to the related scan.
-
-    *For Visual Grounding Task*
+-  *For Visual Grounding task*
 - **"target_id"** (list\[int\]): IDs of target objects. 
 - **"text"** (str): Text used for grounding.
 - **"target"** (list\[str\]): Types of target objects.
 - **"anchors"** (list\[str\]): Types of anchor objects.
 - **"anchor_ids"** (list\[int\]): IDs of anchor objects.
 - **"tokens_positive"** (dict):  Indices of positions where mentioned objects appear in the text.
-
-    *For Question Answering Task*
+-   *For Qusetion Answering task*
 - **"question"** (str): The text of the question.
 - **"answers"** (list\[str\]): List of possible answers.
 - **"object_ids"** (list\[int\]): Object IDs referenced in the question.
@@ -178,7 +200,7 @@ Each dataset item is a dictionary containing key elements:
 - **'extrinsic'** (np.ndarray): Extrinsic parameters of the camera.
 - **'visible_instance_id'** (list): IDs of visible objects in the image.
 
-### MMScan  Evaluator
+### MMScan Evaluator Tool
 
 Our evaluation tool is designed to streamline the assessment of model outputs for the MMScan task, providing essential metrics to gauge model performance effectively.
 
@@ -309,36 +331,11 @@ The input structure remains the same as for the question answering evaluator:
 ]
 ```
 
-## 🏆 MMScan Benchmark
 
-<span id='topic4'/>
-
-### MMScan Visual Grounding Benchmark
-
-| Methods | gTop-1 | gTop-3 | AP<sub>sample</sub> | AP<sub>box</sub> | AR | Release | Download |
-|---------|--------|--------|---------------------|------------------|----|-------|----|
-| ScanRefer | 4.74 | 9.19 | 9.49 | 2.28 | 47.68 | [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/Scanrefer) | [model](https://drive.google.com/file/d/1C0-AJweXEc-cHTe9tLJ3Shgqyd44tXqY/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1ENOS2FE7fkLPWjIf9J76VgiPrn6dGKvi/view?usp=drive_link) |
-| MVT | 7.94 | 13.07 | 13.67 | 2.50 | 86.86 | ~ | ~ |
-| BUTD-DETR  | 15.24 | 20.68 | 18.58 | 9.27 | 66.62 |  ~ | ~ |
-| ReGround3D  | 16.35 | 26.13 | 22.89 | 5.25 | 43.24 | ~ | ~ |
-| EmbodiedScan  | 19.66 | 34.00 | 29.30 | **15.18** | 59.96 | [code](https://github.com/OpenRobotLab/EmbodiedScan/tree/mmscan/models/EmbodiedScan) |  [model](https://drive.google.com/file/d/1F6cHY6-JVzAk6xg5s61aTT-vD-eu_4DD/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1Ua_-Z2G3g0CthbeBkrR1a7_sqg_Spd9s/view?usp=drive_link) |
-| 3D-VisTA | 25.38 | 35.41 | 33.47 | 6.67 | 87.52 |  ~ | ~ |
-| ViL3DRef | **26.34** | **37.58** | **35.09** | 6.65 | 86.86 | ~ | ~ |
-
-### MMScan Question Answering Benchmark
-| Methods | Overall | ST-attr | ST-space | OO-attr | OO-space | OR| Advanced | Release | Download |
-|---|--------|--------|--------|--------|--------|--------|-------|----|----|
-| LL3DA | 45.7 | 39.1 | 58.5 | 43.6 | 55.9 | 37.1 | 24.0| [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/LL3DA) | [model](https://drive.google.com/file/d/1mcWNHdfrhdbtySBtmG-QRH1Y1y5U3PDQ/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1VHpcnO0QmAvMa0HuZa83TEjU6AiFrP42/view?usp=drive_link) |
-| LEO |54.6 | 48.9 | 62.7 | 50.8 | 64.7 | 50.4 | 45.9 | [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/LEO) | [model](https://drive.google.com/drive/folders/1HZ38LwRe-1Q_VxlWy8vqvImFjtQ_b9iA?usp=drive_link)|
-| LLaVA-3D |**61.6** | 58.5 | 63.5 | 56.8 | 75.6 | 58.0 | 38.5|~ | ~ |
-
-*Note:* These two tables only show the results for main metrics; see the paper for complete results.
-
-We have released the codes of some models under [./models](./models/README.md).
 
 ## 📝 TODO List
 
-<span id='topic5'/>
+<span id='topic4'/>
 
 - \[ \] MMScan annotation and samples for ARKitScenes.
 - \[ \] Online evaluation platform for the MMScan benchmark.
