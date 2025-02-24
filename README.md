@@ -93,7 +93,7 @@ existing benchmarks and in-the-wild evaluation.
    ├── embodiedscan_split
    │   ├──embodiedscan-v1/   # EmbodiedScan v1 data in 'embodiedscan.zip'
    │   ├──embodiedscan-v2/   # EmbodiedScan v2 data in 'embodiedscan-v2-beta.zip'
-   ├── MMScan-beta-release   # MMScan veta data in 'embodiedscan-v2-beta.zip'
+   ├── MMScan-beta-release   # MMScan data in 'embodiedscan-v2-beta.zip'
    ```
 
 2. Prepare the point clouds files.
@@ -145,17 +145,21 @@ Each dataset item is a dictionary containing key elements:
 - **"pcds"** (np.ndarray): Point cloud data with dimensions [n_points, 6(xyz+rgb)], representing the coordinates and color of each point.
 - **"instance_labels"** (np.ndarray): Instance ID assigned to each point in the point cloud.
 - **"class_labels"** (np.ndarray): Class IDs assigned to each point in the point cloud.
-- **"bboxes"** (dict): Information about bounding boxes within the scan.
+- **"bboxes"** (dict): Information about bounding boxes within the scan, structured as { object ID:
+                    {
+                        "type": object type (str),
+                        "bbox": 9 DoF box (np.ndarray)
+                    }}
 
 (2)  Language Modality
 
-- **"sub_class"**: The sample category of the sample.
-- **"ID"**: A unique identifier for the sample.
-- **"scan_id"**:Identifier corresponding to the related scan.
+- **"sub_class"**: The category of the sample.
+- **"ID"**: The sample's ID.
+- **"scan_id"**: The scan's ID.
 -  *For Visual Grounding task*
-- **"target_id"** (list\[int\]): IDs of target objects. 
+- **"target_id"** (list\[int\]): IDs of target objects.
 - **"text"** (str): Text used for grounding.
-- **"target"** (list\[str\]): Types of target objects.
+- **"target"** (list\[str\]): Text prompt to specify the target grounding object.
 - **"anchors"** (list\[str\]): Types of anchor objects.
 - **"anchor_ids"** (list\[int\]): IDs of anchor objects.
 - **"tokens_positive"** (dict):  Indices of positions where mentioned objects appear in the text.
@@ -165,14 +169,14 @@ Each dataset item is a dictionary containing key elements:
 - **"object_ids"** (list\[int\]): Object IDs referenced in the question.
 - **"object_names"** (list\[str\]): Types of referenced objects.
 - **"input_bboxes_id"** (list\[int\]): IDs of input bounding boxes.
-- **"input_bboxes"** (list\[np.ndarray\]): Input bounding box data, with 9 degrees of freedom.
+- **"input_bboxes"** (list\[np.ndarray\]): Input 9-DoF bounding boxes.
 
 (3) 2D Modality
 
 - **'img_path'** (str): File path to the RGB image.
 - **'depth_img_path'** (str): File path to the depth image.
 - **'intrinsic'** (np.ndarray):  Intrinsic parameters of the camera for RGB images.
-- **'depth_intrinsic'** (np.ndarray):  Intrinsic parameters of the camera for Depth images.
+- **'depth_intrinsic'** (np.ndarray):  Intrinsic parameters of the camera for depth images.
 - **'extrinsic'** (np.ndarray): Extrinsic parameters of the camera.
 - **'visible_instance_id'** (list): IDs of visible objects in the image.
 
@@ -186,7 +190,7 @@ For the visual grounding task, our evaluator computes multiple metrics including
 
 - **AP and AR**: These metrics calculate the precision and recall by considering each sample as an individual category.
 - **AP_C and AR_C**: These versions categorize samples belonging to the same subclass and calculate them together.
-- **gTop-k**: An expanded metric that generalizes the traditional Top-k metric, offering insights into broader performance aspects.
+- **gTop-k**: An expanded metric that generalizes the traditional Top-k metric, offering superior flexibility and interpretability compared to traditional ones when oriented towards multi-target grounding.
   
 *Note:* Here, AP corresponds to  AP<sub>sample</sub> in the paper, and AP_C corresponds to  AP<sub>box</sub> in the paper.
 
@@ -310,7 +314,6 @@ The input structure remains the same as for the question answering evaluator:
 ## 🏆 MMScan Benchmark
 
 
-
 ### MMScan Visual Grounding Benchmark
 
 | Methods | gTop-1 | gTop-3 | AP<sub>sample</sub> | AP<sub>box</sub> | AR | Release | Download |
@@ -335,7 +338,6 @@ The input structure remains the same as for the question answering evaluator:
 We have released the codes of some models under [./models](./models/README.md).
 
 ## 📝 TODO List
-
 
 
 - \[ \] MMScan annotation and samples for ARKitScenes.
