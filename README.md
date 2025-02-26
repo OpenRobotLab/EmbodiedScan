@@ -23,10 +23,12 @@
 
 1. [About](#-about)
 2. [Getting Started](#-getting-started)
-3. [Model and Benchmark](#-model-and-benchmark)
-4. [TODO List](#-todo-list)
+3. [MMScan API Tutorial](#-mmscan-api-tutorial)
+4. [MMScan Benchmark](#-mmscan-benchmark)
+5. [TODO List](#-todo-list)
 
 ## 🏠 About
+
 
 <!-- ![Teaser](assets/teaser.jpg) -->
 
@@ -55,7 +57,8 @@ Furthermore, we use this high-quality dataset to train state-of-the-art 3D visua
 grounding and LLMs and obtain remarkable performance improvement both on
 existing benchmarks and in-the-wild evaluation.
 
-## 🚀 Getting Started:
+## 🚀 Getting Started
+
 
 ### Installation
 
@@ -90,7 +93,7 @@ existing benchmarks and in-the-wild evaluation.
    ├── embodiedscan_split
    │   ├──embodiedscan-v1/   # EmbodiedScan v1 data in 'embodiedscan.zip'
    │   ├──embodiedscan-v2/   # EmbodiedScan v2 data in 'embodiedscan-v2-beta.zip'
-   ├── MMScan-beta-release   # MMScan veta data in 'embodiedscan-v2-beta.zip'
+   ├── MMScan-beta-release   # MMScan data in 'embodiedscan-v2-beta.zip'
    ```
 
 2. Prepare the point clouds files.
@@ -98,6 +101,7 @@ existing benchmarks and in-the-wild evaluation.
    Please refer to the [guide](data_preparation/README.md) here.
 
 ## 👓 MMScan API Tutorial
+
 
 The **MMScan Toolkit** provides comprehensive tools for dataset handling and model evaluation in  tasks.
 
@@ -137,39 +141,43 @@ Each dataset item is a dictionary containing key elements:
 
 (1) 3D Modality
 
-- **"ori_pcds"** (tuple\[tensor\]): Raw point cloud data from the `.pth` file.
-- **"pcds"** (np.ndarray): Point cloud data, dimensions (\[n_points, 6(xyz+rgb)\]).
-- **"instance_labels"** (np.ndarray): Instance IDs for each point.
-- **"class_labels"** (np.ndarray): Class IDs for each point.
-- **"bboxes"** (dict): Bounding boxes in the scan.
+- **"ori_pcds"** (tuple\[tensor\]): Original point cloud data extracted from the .pth file.
+- **"pcds"** (np.ndarray): Point cloud data with dimensions [n_points, 6(xyz+rgb)], representing the coordinates and color of each point.
+- **"instance_labels"** (np.ndarray): Instance ID assigned to each point in the point cloud.
+- **"class_labels"** (np.ndarray): Class IDs assigned to each point in the point cloud.
+- **"bboxes"** (dict): Information about bounding boxes within the scan, structured as { object ID:
+                    {
+                        "type": object type (str),
+                        "bbox": 9 DoF box (np.ndarray)
+                    }}
 
 (2)  Language Modality
 
-- **"sub_class"**: Sample category.
-- **"ID"**: Unique sample ID.
-- **"scan_id"**: Corresponding scan ID.
-- **--------------For Visual Grounding Task**
+- **"sub_class"**: The category of the sample.
+- **"ID"**: The sample's ID.
+- **"scan_id"**: The scan's ID.
+-  *For Visual Grounding task*
 - **"target_id"** (list\[int\]): IDs of target objects.
-- **"text"** (str): Grounding text.
-- **"target"** (list\[str\]): Types of target objects.
+- **"text"** (str): Text used for grounding.
+- **"target"** (list\[str\]): Text prompt to specify the target grounding object.
 - **"anchors"** (list\[str\]): Types of anchor objects.
 - **"anchor_ids"** (list\[int\]): IDs of anchor objects.
-- **"tokens_positive"** (dict): Position indices of mentioned objects in the text.
-- **--------------ForQuestion Answering Task**
-- **"question"** (str): The question text.
+- **"tokens_positive"** (dict):  Indices of positions where mentioned objects appear in the text.
+-   *For Qusetion Answering task*
+- **"question"** (str): The text of the question.
 - **"answers"** (list\[str\]): List of possible answers.
 - **"object_ids"** (list\[int\]): Object IDs referenced in the question.
 - **"object_names"** (list\[str\]): Types of referenced objects.
 - **"input_bboxes_id"** (list\[int\]): IDs of input bounding boxes.
-- **"input_bboxes"** (list\[np.ndarray\]): Input bounding boxes, 9 DoF.
+- **"input_bboxes"** (list\[np.ndarray\]): Input 9-DoF bounding boxes.
 
 (3) 2D Modality
 
-- **'img_path'** (str): Path to RGB image.
-- **'depth_img_path'** (str): Path to depth image.
-- **'intrinsic'** (np.ndarray): Camera intrinsic parameters for RGB images.
-- **'depth_intrinsic'** (np.ndarray): Camera intrinsic parameters for depth images.
-- **'extrinsic'** (np.ndarray): Camera extrinsic parameters.
+- **'img_path'** (str): File path to the RGB image.
+- **'depth_img_path'** (str): File path to the depth image.
+- **'intrinsic'** (np.ndarray):  Intrinsic parameters of the camera for RGB images.
+- **'depth_intrinsic'** (np.ndarray):  Intrinsic parameters of the camera for depth images.
+- **'extrinsic'** (np.ndarray): Extrinsic parameters of the camera.
 - **'visible_instance_id'** (list): IDs of visible objects in the image.
 
 ### MMScan  Evaluator
@@ -182,7 +190,9 @@ For the visual grounding task, our evaluator computes multiple metrics including
 
 - **AP and AR**: These metrics calculate the precision and recall by considering each sample as an individual category.
 - **AP_C and AR_C**: These versions categorize samples belonging to the same subclass and calculate them together.
-- **gtop-k**: An expanded metric that generalizes the traditional top-k metric, offering insights into broader performance aspects.
+- **gTop-k**: An expanded metric that generalizes the traditional Top-k metric, offering superior flexibility and interpretability compared to traditional ones when oriented towards multi-target grounding.
+  
+*Note:* Here, AP corresponds to  AP<sub>sample</sub> in the paper, and AP_C corresponds to  AP<sub>box</sub> in the paper.
 
 Below is an example of how to utilize the Visual Grounding Evaluator:
 
@@ -301,11 +311,36 @@ The input structure remains the same as for the question answering evaluator:
 ]
 ```
 
-### Models
+## 🏆 MMScan Benchmark
 
-We have adapted the MMScan API for some [models](./models/README.md).
+
+### MMScan Visual Grounding Benchmark
+
+| Methods | gTop-1 | gTop-3 | AP<sub>sample</sub> | AP<sub>box</sub> | AR | Release | Download |
+|---------|--------|--------|---------------------|------------------|----|-------|----|
+| ScanRefer | 4.74 | 9.19 | 9.49 | 2.28 | 47.68 | [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/Scanrefer) | [model](https://drive.google.com/file/d/1C0-AJweXEc-cHTe9tLJ3Shgqyd44tXqY/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1ENOS2FE7fkLPWjIf9J76VgiPrn6dGKvi/view?usp=drive_link) |
+| MVT | 7.94 | 13.07 | 13.67 | 2.50 | 86.86 | - | - |
+| BUTD-DETR  | 15.24 | 20.68 | 18.58 | 9.27 | 66.62 |  - | - |
+| ReGround3D  | 16.35 | 26.13 | 22.89 | 5.25 | 43.24 | - | - |
+| EmbodiedScan  | 19.66 | 34.00 | 29.30 | **15.18** | 59.96 | [code](https://github.com/OpenRobotLab/EmbodiedScan/tree/mmscan/models/EmbodiedScan) |  [model](https://drive.google.com/file/d/1F6cHY6-JVzAk6xg5s61aTT-vD-eu_4DD/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1Ua_-Z2G3g0CthbeBkrR1a7_sqg_Spd9s/view?usp=drive_link) |
+| 3D-VisTA | 25.38 | 35.41 | 33.47 | 6.67 | 87.52 |  - | - |
+| ViL3DRef | **26.34** | **37.58** | **35.09** | 6.65 | 86.86 | - | - |
+
+### MMScan Question Answering Benchmark
+| Methods | Overall | ST-attr | ST-space | OO-attr | OO-space | OR| Advanced | Release | Download |
+|---|--------|--------|--------|--------|--------|--------|-------|----|----|
+| LL3DA | 45.7 | 39.1 | 58.5 | 43.6 | 55.9 | 37.1 | 24.0| [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/LL3DA) | [model](https://drive.google.com/file/d/1mcWNHdfrhdbtySBtmG-QRH1Y1y5U3PDQ/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1VHpcnO0QmAvMa0HuZa83TEjU6AiFrP42/view?usp=drive_link) |
+| LEO |54.6 | 48.9 | 62.7 | 50.8 | 64.7 | 50.4 | 45.9 | [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/LEO) | [model](https://drive.google.com/drive/folders/1HZ38LwRe-1Q_VxlWy8vqvImFjtQ_b9iA?usp=drive_link)|
+| LLaVA-3D |**61.6** | 58.5 | 63.5 | 56.8 | 75.6 | 58.0 | 38.5|- | - |
+
+*Note:* These two tables only show the results for main metrics; see the paper for complete results.
+
+We have released the codes of some models under [./models](./models/README.md).
 
 ## 📝 TODO List
 
-- \[ \] More Visual Grounding baselines and Question Answering baselines.
+
+- \[ \] MMScan annotation and samples for ARKitScenes.
+- \[ \] Online evaluation platform for the MMScan benchmark.
+- \[ \] Codes of more MMScan Visual Grounding baselines and Question Answering baselines.
 - \[ \] Full release and further updates.
