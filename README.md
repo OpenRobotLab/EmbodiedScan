@@ -21,11 +21,16 @@
 
 ## 📋 Contents
 
-1. [About](#-about)
-2. [Getting Started](#-getting-started)
-3. [MMScan API Tutorial](#-mmscan-api-tutorial)
-4. [MMScan Benchmark](#-mmscan-benchmark)
-5. [TODO List](#-todo-list)
+1. [News](#-news)
+2. [About](#-about)
+3. [Getting Started](#-getting-started)
+4. [MMScan Tutorial](#-mmscan-api-tutorial)
+5. [MMScan Benchmark](#-mmscan-benchmark)
+6. [TODO List](#-todo-list)
+
+## 🔥 News
+- \[2025-01\] We are delighted to present the official release of [MMScan-devkit](https://github.com/OpenRobotLab/EmbodiedScan/tree/mmscan), which encompasses a suite of data processing utilities, benchmark evaluation tools, and adaptations of some models for the MMScan benchmarks. We invite you to explore these resources and welcome any feedback or questions you may have!
+
 
 ## 🏠 About
 
@@ -60,7 +65,7 @@ existing benchmarks and in-the-wild evaluation.
 ## 🚀 Getting Started
 
 
-### Installation
+- ### Installation
 
 1. Clone Github repo.
 
@@ -80,7 +85,7 @@ existing benchmarks and in-the-wild evaluation.
 
    Use `"all"` to install all components and specify `"VG"` or `"QA"` if you only need to install the components for Visual Grounding or Question Answering, respectively.
 
-### Data Preparation
+- ### Data Preparation
 
 1. Download the Embodiedscan and MMScan annotation. (Fill in the [form](https://docs.google.com/forms/d/e/1FAIpQLScUXEDTksGiqHZp31j7Zp7zlCNV7p_08uViwP_Nbzfn3g6hhw/viewform) to apply for downloading)
 
@@ -100,242 +105,300 @@ existing benchmarks and in-the-wild evaluation.
 
    Please refer to the [guide](data_preparation/README.md) here.
 
-## 👓 MMScan API Tutorial
+## 👓 MMScan Tutorial
 
 
 The **MMScan Toolkit** provides comprehensive tools for dataset handling and model evaluation in  tasks.
 
-To import the MMScan API, you can use the following commands:
 
-```bash
-import mmscan
-
-# (1) The dataset tool
-import mmscan.MMScan as MMScan_dataset
-
-# (2) The evaluator tool ('VisualGroundingEvaluator', 'QuestionAnsweringEvaluator', 'GPTEvaluator')
-import mmscan.VisualGroundingEvaluator as MMScan_VG_evaluator
-
-import mmscan.QuestionAnsweringEvaluator as MMScan_QA_evaluator
-
-import mmscan.GPTEvaluator as MMScan_GPT_evaluator
-```
 
 ### MMScan Dataset
 
 The dataset tool in MMScan allows seamless access to data required for various tasks within MMScan.
 
-#### Usage
+- #### Usage
 
-Initialize the dataset for a specific task with:
+    Initialize the dataset for a specific task with:
 
-```bash
-my_dataset = MMScan_dataset(split='train', task="MMScan-QA", ratio=1.0)
-# Access a specific sample
-print(my_dataset[index])
-```
+    ```bash
+    from mmscan import MMScan
 
-#### Data Access
+    # (1) The dataset tool
+    my_dataset = MMScan(split='train'/'test'/'val', task='MMScan-VG'/'MMScan-QA')
+    # Access a specific sample
+    print(my_dataset[index])
+    ```
+    *Note:*  For the test split, we have only made the VG portion publicly available, while the QA portion has not been released.
 
-Each dataset item is a dictionary containing key elements:
+- #### Data Access
+  
+    Each dataset item is a dictionary containing key elements (**Bold text** represents key elements directly related to the task, while the rest represents auxiliary elements; **[TS-V]** indicates that the element is visible in the test set, while other elements are invalid/not visible in the test set.):
 
-(1) 3D Modality
+    <details>
+    <summary>(1) 3D Modality</summary>
 
-- **"ori_pcds"** (tuple\[tensor\]): Original point cloud data extracted from the .pth file.
-- **"pcds"** (np.ndarray): Point cloud data with dimensions [n_points, 6(xyz+rgb)], representing the coordinates and color of each point.
-- **"instance_labels"** (np.ndarray): Instance ID assigned to each point in the point cloud.
-- **"class_labels"** (np.ndarray): Class IDs assigned to each point in the point cloud.
-- **"bboxes"** (dict): Information about bounding boxes within the scan, structured as { object ID:
-                    {
-                        "type": object type (str),
-                        "bbox": 9 DoF box (np.ndarray)
-                    }}
 
-(2)  Language Modality
+    - **"pcds"** (**[TS-V]**, np.ndarray): Point cloud data with dimensions [n_points, 6(xyz+rgb)], representing the coordinates and color of each point.
+    - **"bboxes"** (dict): Information about bounding boxes within the scan, structured as { object ID:
+                        {
+                            "type": object type (str),
+                            "bbox": 9 DoF box (np.ndarray)
+                        }}
+    - "ori_pcds" (**[TS-V]**, tuple\[tensor\]): Original point cloud data extracted from the .pth file.
+    - "instance_labels" (np.ndarray): Instance ID assigned to each point in the point cloud.
+    - "class_labels" (np.ndarray): Class IDs assigned to each point in the point cloud.
+    </details>
+    <details>
+    <summary>(2) Language Modality</summary>
 
-- **"sub_class"**: The category of the sample.
-- **"ID"**: The sample's ID.
-- **"scan_id"**: The scan's ID.
--  *For Visual Grounding task*
-- **"target_id"** (list\[int\]): IDs of target objects.
-- **"text"** (str): Text used for grounding.
-- **"target"** (list\[str\]): Text prompt to specify the target grounding object.
-- **"anchors"** (list\[str\]): Types of anchor objects.
-- **"anchor_ids"** (list\[int\]): IDs of anchor objects.
-- **"tokens_positive"** (dict):  Indices of positions where mentioned objects appear in the text.
--   *For Qusetion Answering task*
-- **"question"** (str): The text of the question.
-- **"answers"** (list\[str\]): List of possible answers.
-- **"object_ids"** (list\[int\]): Object IDs referenced in the question.
-- **"object_names"** (list\[str\]): Types of referenced objects.
-- **"input_bboxes_id"** (list\[int\]): IDs of input bounding boxes.
-- **"input_bboxes"** (list\[np.ndarray\]): Input 9-DoF bounding boxes.
 
-(3) 2D Modality
 
-- **'img_path'** (str): File path to the RGB image.
-- **'depth_img_path'** (str): File path to the depth image.
-- **'intrinsic'** (np.ndarray):  Intrinsic parameters of the camera for RGB images.
-- **'depth_intrinsic'** (np.ndarray):  Intrinsic parameters of the camera for depth images.
-- **'extrinsic'** (np.ndarray): Extrinsic parameters of the camera.
-- **'visible_instance_id'** (list): IDs of visible objects in the image.
+    <details>
+    <summary>Category and ID info</summary>
+
+    - **"sub_class"**: The category of the sample.
+    - **"ID"**: The sample's ID.
+    - **"scan_id"**: The scan's ID.
+    </details>
+
+    <details>
+    <summary> For Visual Grounding task </summary>
+
+    - **"target_id"** (list\[int\]): IDs of target objects.
+    - **"text"** (**[TS-V]**, str): Text used for grounding.
+    - **"target"** (list\[str\]): Text prompt to specify the target grounding object.
+    - "anchors" (list\[str\]): Types of anchor objects.
+    - "anchor_ids" (list\[int\]): IDs of anchor objects.
+    - "tokens_positive" (dict):  Indices of positions where mentioned objects appear in the text.
+    </details>
+    <details>
+    <summary> For Question Answering task </summary>
+
+    - **"question"** (**[TS-V]**, str): The text of the question.
+    - **"answers"** (list\[str\]): List of possible answers.
+    - "object_ids" (list\[int\]): Object IDs referenced in the question.
+    - "object_names" (list\[str\]): Types of referenced objects.
+    - **"input_bboxes_id"** (**[TS-V]**, list\[int\]): IDs of input bounding boxes.
+    - **"input_bboxes"** (**[TS-V]**, list\[np.ndarray\]): Input 9-DoF bounding boxes.
+    </details>
+
+    </details>
+    <details>
+    <summary>(3) 2D Modality</summary>
+
+    - **'img_path'** (**[TS-V]**, str): File path to the RGB image.
+    - **'depth_img_path'** (**[TS-V]**, str): File path to the depth image.
+    - **'intrinsic'** (**[TS-V]**, np.ndarray):  Intrinsic parameters of the camera for RGB images.
+    - **'depth_intrinsic'** (**[TS-V]**, np.ndarray):  Intrinsic parameters of the camera for depth images.
+    - **'extrinsic'** (**[TS-V]**, np.ndarray): Extrinsic parameters of the camera.
+    - 'visible_instance_id' (list): IDs of visible objects in the image.
+
+    </details>
+
 
 ### MMScan  Evaluator
 
 Our evaluation tool is designed to streamline the assessment of model outputs for the MMScan task, providing essential metrics to gauge model performance effectively.
+```bash
+from mmscan import MMScan
 
-#### 1. Visual Grounding Evaluator
-
-For the visual grounding task, our evaluator computes multiple metrics including AP (Average Precision), AR (Average Recall), AP_C, AR_C, and gtop-k:
-
-- **AP and AR**: These metrics calculate the precision and recall by considering each sample as an individual category.
-- **AP_C and AR_C**: These versions categorize samples belonging to the same subclass and calculate them together.
-- **gTop-k**: An expanded metric that generalizes the traditional Top-k metric, offering superior flexibility and interpretability compared to traditional ones when oriented towards multi-target grounding.
-  
-*Note:* Here, AP corresponds to  AP<sub>sample</sub> in the paper, and AP_C corresponds to  AP<sub>box</sub> in the paper.
-
-Below is an example of how to utilize the Visual Grounding Evaluator:
-
-```python
-# Initialize the evaluator with show_results enabled to display results
-my_evaluator = MMScan_VG_evaluator(show_results=True)
-
-# Update the evaluator with the model's output
-my_evaluator.update(model_output)
-
-# Start the evaluation process and retrieve metric results
-metric_dict = my_evaluator.start_evaluation()
-
-# Optional: Retrieve detailed sample-level results
-print(my_evaluator.records)
-
-# Optional: Show the table of results
-print(my_evaluator.print_result())
-
-# Important: Reset the evaluator after use
-my_evaluator.reset()
+# (2) The evaluator tool ('VisualGroundingEvaluator', 'QuestionAnsweringEvaluator', 'GPTEvaluator')
+from mmscan import VisualGroundingEvaluator, QuestionAnsweringEvaluator, GPTEvaluator
 ```
 
-The evaluator expects input data in a specific format, structured as follows:
 
-```python
-[
-    {
-        "pred_scores" (tensor/ndarray): Confidence scores for each prediction. Shape: (num_pred, 1)
+- #### Visual Grounding Evaluator
+    <details>
+    <summary> Introduction </summary>
 
-        "pred_bboxes"/"gt_bboxes" (tensor/ndarray): List of 9 DoF bounding boxes.
-            Supports two input formats:
-            1. 9-dof box format: (num_pred/gt, 9)
-            2. center, size and rotation matrix:
-                "center": (num_pred/gt, 3),
-                "size"  : (num_pred/gt, 3),
-                "rot"   : (num_pred/gt, 3, 3)
+    For the visual grounding task, our evaluator computes multiple metrics including AP (Average Precision), AR (Average Recall), AP_C, AR_C, and gtop-k:
 
-        "subclass": The subclass of each VG sample.
-        "index": Index of the sample.
-    }
+    - **AP and AR**: These metrics calculate the precision and recall by considering each sample as an individual category.
+    - **AP_C and AR_C**: These versions categorize samples belonging to the same subclass and calculate them together.
+    - **gTop-k**: An expanded metric that generalizes the traditional Top-k metric, offering superior flexibility and interpretability compared to traditional ones when oriented towards multi-target grounding.
+    
+    *Note:* Here, AP corresponds to  AP<sub>sample</sub> in the paper, and AP_C corresponds to  AP<sub>box</sub> in the paper.
+
+    </details>
+
+    <details>
+    <summary> Details </summary>
+
+    Below is an example of how to utilize the Visual Grounding Evaluator:
+
+    ```python
+    # Initialize the evaluator with show_results enabled to display results
+    my_evaluator = VisualGroundingEvaluator(show_results=True)
+
+    # Update the evaluator with the model's output
+    my_evaluator.update(model_output)
+
+    # Start the evaluation process and retrieve metric results
+    metric_dict = my_evaluator.start_evaluation()
+
+    # Optional: Retrieve detailed sample-level results
+    print(my_evaluator.records)
+
+    # Optional: Show the table of results
+    print(my_evaluator.print_result())
+
+    # Important: Reset the evaluator after use
+    my_evaluator.reset()
+    ```
+
+    The evaluator expects input data in a specific format, structured as follows:
+
+    ```python
+    [
+        {
+            "pred_scores" (tensor/ndarray): Confidence scores for each prediction. Shape: (num_pred, 1)
+
+            "pred_bboxes"/"gt_bboxes" (tensor/ndarray): List of 9 DoF bounding boxes.
+                Supports two input formats:
+                1. 9-dof box format: (num_pred/gt, 9)
+                2. center, size and rotation matrix:
+                    "center": (num_pred/gt, 3),
+                    "size"  : (num_pred/gt, 3),
+                    "rot"   : (num_pred/gt, 3, 3)
+
+            "subclass": The subclass of each VG sample.
+            "index": Index of the sample.
+        }
+        ...
+    ]
+    ```
+
+    </details>
+
+- #### Question Answering Evaluator
+    <details>
+    <summary> Introduction </summary> 
+    The question answering evaluator measures performance using several established metrics:
+
+    - **Bleu-X**: Evaluates n-gram overlap between prediction and ground truths.
+    - **Meteor**: Focuses on precision, recall, and synonymy.
+    - **CIDEr**: Considers consensus-based agreement.
+    - **SPICE**: Used for semantic propositional content.
+    - **SimCSE/SBERT**: Semantic similarity measures using sentence embeddings.
+    - **EM (Exact Match) and Refine EM**: Compare exact matches between predictions and ground truths.
+    </details>
+
+    <details>
+    <summary> Details </summary>
+
+    ```python
+    # Initialize evaluator with pre-trained weights for SIMCSE and SBERT
+    my_evaluator = QuestionAnsweringEvaluator(model_config={}, show_results=True)
+
+    # Update evaluator with model output
+    my_evaluator.update(model_output)
+
+    # Start evaluation and obtain metrics
+    metric_dict = my_evaluator.start_evaluation()
+
+    # Optional: View detailed sample-level results
+    print(my_evaluator.records)
+
+    # Important: Reset evaluator after completion
+    my_evaluator.reset()
+    ```
+
+    The evaluator requires input data structured as follows:
+
+    ```python
+    [
+        {
+            "question" (str): The question text,
+            "pred" (list[str]): The predicted answer, single element list,
+            "gt" (list[str]): Ground truth answers, containing multiple elements,
+            "ID": Unique ID for each QA sample,
+            "index": Index of the sample,
+        }
+        ...
+    ]
+    ```
+    </details>
+
+- #### GPT Evaluator
+    <details>
+    In addition to classical QA metrics, the GPT evaluator offers a more advanced  evaluation process.
+
+    ```python
+    # Initialize GPT evaluator with an API key for access
+    my_evaluator = GPTEvaluator(API_key='XXX')
+
+    # Load, evaluate with multiprocessing, and store results in temporary path
+    metric_dict = my_evaluator.load_and_eval(model_output, num_threads=5, tmp_path='XXX')
+
+    # Important: Reset evaluator when finished
+    my_evaluator.reset()
+    ```
+
+    The input structure remains the same as for the question answering evaluator:
+
+    ```python
+    [
+        {
+            "question" (str): The question text,
+            "pred" (list[str]): The predicted answer, single element list,
+            "gt" (list[str]): Ground truth answers, containing multiple elements,
+            "ID": Unique ID for each QA sample,
+            "index": Index of the sample,
+        }
+        ...
+    ]
+    ```
+    </details>
+     
+### MMScan Workshop Submission
+
+   The result you submit must be a dictionary, where the key is the `sample ID` from the test split. For each sample, include your **predicted 100 bounding boxes** (which do not need to be sorted by confidence scores) along with their corresponding **confidence scores** as the values of keys {`pred_bboxes`, `scores`}. To reduce the time overhead during file transfer, all floating-point numbers in the data should be rounded to **two decimal places**.
+
+   An expected result is:
+
+   ```python
+    {'VG_Inter_Space_OO__1mp3d_0009_region0__55'(sample ID):
+        {
+            'pred_bboxes'(list, 100*9): [[...],...]
+            'scores'(list, 100): [...]
+        }
     ...
-]
-```
-
-#### 2. Question Answering Evaluator
-
-The question answering evaluator measures performance using several established metrics:
-
-- **Bleu-X**: Evaluates n-gram overlap between prediction and ground truths.
-- **Meteor**: Focuses on precision, recall, and synonymy.
-- **CIDEr**: Considers consensus-based agreement.
-- **SPICE**: Used for semantic propositional content.
-- **SimCSE/SBERT**: Semantic similarity measures using sentence embeddings.
-- **EM (Exact Match) and Refine EM**: Compare exact matches between predictions and ground truths.
-
-```python
-# Initialize evaluator with pre-trained weights for SIMCSE and SBERT
-my_evaluator = MMScan_QA_evaluator(model_config={}, show_results=True)
-
-# Update evaluator with model output
-my_evaluator.update(model_output)
-
-# Start evaluation and obtain metrics
-metric_dict = my_evaluator.start_evaluation()
-
-# Optional: View detailed sample-level results
-print(my_evaluator.records)
-
-# Important: Reset evaluator after completion
-my_evaluator.reset()
-```
-
-The evaluator requires input data structured as follows:
-
-```python
-[
-    {
-        "question" (str): The question text,
-        "pred" (list[str]): The predicted answer, single element list,
-        "gt" (list[str]): Ground truth answers, containing multiple elements,
-        "ID": Unique ID for each QA sample,
-        "index": Index of the sample,
     }
-    ...
-]
-```
+   ```
 
-#### 3. GPT Evaluator
+   *Note:* For submission results that exceed the bounding box limit or the floating-point precision limit, we will **truncate them** during evaluation to ensure fairness.
 
-In addition to classical QA metrics, the GPT evaluator offers a more advanced  evaluation process.
-
-```python
-# Initialize GPT evaluator with an API key for access
-my_evaluator = MMScan_GPT_Evaluator(API_key='XXX')
-
-# Load, evaluate with multiprocessing, and store results in temporary path
-metric_dict = my_evaluator.load_and_eval(model_output, num_threads=5, tmp_path='XXX')
-
-# Important: Reset evaluator when finished
-my_evaluator.reset()
-```
-
-The input structure remains the same as for the question answering evaluator:
-
-```python
-[
-    {
-        "question" (str): The question text,
-        "pred" (list[str]): The predicted answer, single element list,
-        "gt" (list[str]): Ground truth answers, containing multiple elements,
-        "ID": Unique ID for each QA sample,
-        "index": Index of the sample,
-    }
-    ...
-]
-```
 
 ## 🏆 MMScan Benchmark
 
+<div align=center>
+<img src="assets/mix.png" width=95%>
+</div>
 
 ### MMScan Visual Grounding Benchmark
 
 | Methods | gTop-1 | gTop-3 | AP<sub>sample</sub> | AP<sub>box</sub> | AR | Release | Download |
-|---------|--------|--------|---------------------|------------------|----|-------|----|
-| ScanRefer | 4.74 | 9.19 | 9.49 | 2.28 | 47.68 | [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/Scanrefer) | [model](https://drive.google.com/file/d/1C0-AJweXEc-cHTe9tLJ3Shgqyd44tXqY/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1ENOS2FE7fkLPWjIf9J76VgiPrn6dGKvi/view?usp=drive_link) |
+|---------|----------------|-----------|---------------------|------------------|----|-------|----|
+| ScanRefer | 4.74 | 9.19 | 9.49 | 2.28 | 47.68 | [code](./models/Scanrefer/README.md) | [model](https://drive.google.com/file/d/1C0-AJweXEc-cHTe9tLJ3Shgqyd44tXqY/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1ENOS2FE7fkLPWjIf9J76VgiPrn6dGKvi/view?usp=drive_link) |
 | MVT | 7.94 | 13.07 | 13.67 | 2.50 | 86.86 | - | - |
 | BUTD-DETR  | 15.24 | 20.68 | 18.58 | 9.27 | 66.62 |  - | - |
 | ReGround3D  | 16.35 | 26.13 | 22.89 | 5.25 | 43.24 | - | - |
-| EmbodiedScan  | 19.66 | 34.00 | 29.30 | **15.18** | 59.96 | [code](https://github.com/OpenRobotLab/EmbodiedScan/tree/mmscan/models/EmbodiedScan) |  [model](https://drive.google.com/file/d/1F6cHY6-JVzAk6xg5s61aTT-vD-eu_4DD/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1Ua_-Z2G3g0CthbeBkrR1a7_sqg_Spd9s/view?usp=drive_link) |
+| EmbodiedScan  | 19.66 | 34.00 | 29.30 | **15.18** | 59.96 | [code](./models/EmbodiedScan/README.md) |  [model](https://drive.google.com/file/d/1F6cHY6-JVzAk6xg5s61aTT-vD-eu_4DD/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1Ua_-Z2G3g0CthbeBkrR1a7_sqg_Spd9s/view?usp=drive_link) |
 | 3D-VisTA | 25.38 | 35.41 | 33.47 | 6.67 | 87.52 |  - | - |
 | ViL3DRef | **26.34** | **37.58** | **35.09** | 6.65 | 86.86 | - | - |
 
 ### MMScan Question Answering Benchmark
 | Methods | Overall | ST-attr | ST-space | OO-attr | OO-space | OR| Advanced | Release | Download |
 |---|--------|--------|--------|--------|--------|--------|-------|----|----|
-| LL3DA | 45.7 | 39.1 | 58.5 | 43.6 | 55.9 | 37.1 | 24.0| [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/LL3DA) | [model](https://drive.google.com/file/d/1mcWNHdfrhdbtySBtmG-QRH1Y1y5U3PDQ/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1VHpcnO0QmAvMa0HuZa83TEjU6AiFrP42/view?usp=drive_link) |
-| LEO |54.6 | 48.9 | 62.7 | 50.8 | 64.7 | 50.4 | 45.9 | [code](https://github.com/rbler1234/EmbodiedScan/tree/mmscan-devkit/models/LEO) | [model](https://drive.google.com/drive/folders/1HZ38LwRe-1Q_VxlWy8vqvImFjtQ_b9iA?usp=drive_link)|
+| LL3DA | 45.7 | 39.1 | 58.5 | 43.6 | 55.9 | 37.1 | 24.0| [code](./models/LL3DA/README.md) | [model](https://drive.google.com/file/d/1mcWNHdfrhdbtySBtmG-QRH1Y1y5U3PDQ/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1VHpcnO0QmAvMa0HuZa83TEjU6AiFrP42/view?usp=drive_link) |
+| LEO |54.6 | 48.9 | 62.7 | 50.8 | 64.7 | 50.4 | 45.9 | [code](./models/LEO/README.md) | [model](https://drive.google.com/drive/folders/1HZ38LwRe-1Q_VxlWy8vqvImFjtQ_b9iA?usp=drive_link)|
 | LLaVA-3D |**61.6** | 58.5 | 63.5 | 56.8 | 75.6 | 58.0 | 38.5|- | - |
 
 *Note:* These two tables only show the results for main metrics; see the paper for complete results.
 
 We have released the codes of some models under [./models](./models/README.md).
+
+
 
 ## 📝 TODO List
 

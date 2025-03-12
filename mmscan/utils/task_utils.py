@@ -17,6 +17,8 @@ def anno_token_flatten(samples: List[dict], keep_only_one: bool = True):
 
     marked_indices = []
     for i, d in enumerate(samples):
+        if 'target_id' not in d:
+            continue
         target_ids = d['target_id']
         ret_target_ids = []
         ret_target = []

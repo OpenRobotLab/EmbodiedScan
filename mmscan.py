@@ -58,28 +58,30 @@ class MMScan(Dataset):
     ) -> None:
         """Initialize the database, prepare the embodeidscan annotation."""
         super(MMScan, self).__init__()
+        print("mmscan 310!!!!!")
         self.version = version
         if len(dataroot) > 0:
             self.dataroot = dataroot
         else:
-            self.dataroot = os.path.join(
-                os.path.dirname(os.path.dirname(ENV_PATH)), 'mmscan_data')
+           self.dataroot = '/mnt/petrelfs/linjingli/mmscan_db/mmscan_data'
         self.verbose = verbose
+
+        # now we skip the test split because we don not provide ground truth.
         self.split = split
         self.check_mode = check_mode
         if self.check_mode:
-            print("embodiedscan's checking mode")
-        self.pkl_name = f'{self.dataroot}/embodiedscan_split' +\
+            print("embodiedscan's checking mode!!!")
+        self.pkl_name = f'{self.dataroot}/embodiedscan-split' +\
             f'/embodiedscan-{self.version}' +\
             f'/embodiedscan_infos_{split}.pkl'
-        self.data_path = '{}/embodiedscan_split/data'.format(self.dataroot)
+        self.data_path = '{}/embodiedscan-split/data'.format(self.dataroot)
         self.lang_anno_path = '{}/MMScan-beta-release'.format(self.dataroot)
 
-        self.pcd_path = '{}/embodiedscan_split/process_pcd'.format(
+        self.pcd_path = '{}/embodiedscan-split/process_pcd'.format(
             self.dataroot)
 
         self.mapping_json_path = (
-            '{}/../data_preparation/meta_data/mp3d_mapping.json'.format(
+            '{}/embodiedscan-split/data_info/mp3d_mapping.json'.format(
                 self.dataroot))
         self.id_mapping = id_mapping(self.mapping_json_path)
         self.table_names = [
@@ -212,7 +214,6 @@ class MMScan(Dataset):
 
         Args:
             index_ (int): The index.
-
         Returns:
             dict: The sample item corresponding to the index.
         """
@@ -511,4 +512,4 @@ class MMScan(Dataset):
         for index in range(len(annos)):
             if index % int(1 / ratio) == 0:
                 d_annos.append(annos[index])
-        return d_annos     
+        return d_annos

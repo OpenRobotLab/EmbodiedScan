@@ -11,22 +11,15 @@ def read_annotation_pickle(path: str, show_progress: bool = True):
         show_progress (bool): whether showing the progress.
     Returns:
         dict: A dictionary.
-            scene_id : (bboxes, object_ids, object_types, visible_dict,
-                extrinsics_c2w, axis_align_matrix, intrinsics, image_paths)
-            bboxes: numpy array of bounding boxes,
-                shape (N, 9): xyz, lwh, ypr
+            scene_id : (bboxes, object_ids, object_types, visible_view_object_dict, extrinsics_c2w, axis_align_matrix, intrinsics, image_paths)
+            bboxes: numpy array of bounding boxes, shape (N, 9): xyz, lwh, ypr
             object_ids: numpy array of obj ids, shape (N,)
             object_types: list of strings, each string is a type of object
-            visible_view_object_dict: a dictionary {view_id:
-                visible_instance_ids}
-            extrinsics_c2w: a list of 4x4 matrices, each matrix is the
-                extrinsic matrix of a view
-            axis_align_matrix: a 4x4 matrix, the axis-aligned matrix
-                of the scene
-            intrinsics: a list of 4x4 matrices, each matrix is the
-                intrinsic matrix of a view
-            image_paths: a list of strings, each string is the path
-                of an image in the scene
+            visible_view_object_dict: a dictionary {view_id: visible_instance_ids}
+            extrinsics_c2w: a list of 4x4 matrices, each matrix is the extrinsic matrix of a view
+            axis_align_matrix: a 4x4 matrix, the axis-aligned matrix of the scene
+            intrinsics: a list of 4x4 matrices, each matrix is the intrinsic matrix of a view
+            image_paths: a list of strings, each string is the path of an image in the scene
     """
     with open(path, 'rb') as f:
         data = np.load(f, allow_pickle=True)
@@ -39,12 +32,8 @@ def read_annotation_pickle(path: str, show_progress: bool = True):
     pbar = (tqdm(range(len(datalist))) if show_progress else range(
         len(datalist)))
     for scene_idx in pbar:
-        # print(datalist[scene_idx]['sample_idx'])
-        # if "matterport3d" not in datalist[scene_idx]['sample_idx']:
-        #     continue
-        # print(datalist[scene_idx].keys())
+      
         images = datalist[scene_idx]['images']
-        # print(images[0].keys())
 
         intrinsic = datalist[scene_idx].get('cam2img', None)  # a 4x4 matrix
         missing_intrinsic = False
@@ -61,25 +50,25 @@ def read_annotation_pickle(path: str, show_progress: bool = True):
             'axis_align_matrix']  # a 4x4 matrix
 
         scene_id = datalist[scene_idx]['sample_idx']
+        if 'instances' in datalist[scene_idx]:
+            instances = datalist[scene_idx]['instances']
+            bboxes = []
+            object_ids = []
+            object_types = []
+            object_type_ints = []
+            for object_idx in range(len(instances)):
+                bbox_3d = instances[object_idx]['bbox_3d']  # list of 9 values
+                bbox_label_3d = instances[object_idx]['bbox_label_3d']  # int
+                bbox_id = instances[object_idx]['bbox_id']  # int
+                object_type = object_int_to_type[bbox_label_3d]
 
-        instances = datalist[scene_idx]['instances']
-        bboxes = []
-        object_ids = []
-        object_types = []
-        object_type_ints = []
-        for object_idx in range(len(instances)):
-            bbox_3d = instances[object_idx]['bbox_3d']  # list of 9 values
-            bbox_label_3d = instances[object_idx]['bbox_label_3d']  # int
-            bbox_id = instances[object_idx]['bbox_id']  # int
-            object_type = object_int_to_type[bbox_label_3d]
-
-            object_type_ints.append(bbox_label_3d)
-            object_types.append(object_type)
-            bboxes.append(bbox_3d)
-            object_ids.append(bbox_id)
-        bboxes = np.array(bboxes)
-        object_ids = np.array(object_ids)
-        object_type_ints = np.array(object_type_ints)
+                object_type_ints.append(bbox_label_3d)
+                object_types.append(object_type)
+                bboxes.append(bbox_3d)
+                object_ids.append(bbox_id)
+            bboxes = np.array(bboxes)
+            object_ids = np.array(object_ids)
+            object_type_ints = np.array(object_type_ints)
 
         visible_view_object_dict = {}
         visible_view_object_list = []
@@ -99,11 +88,12 @@ def read_annotation_pickle(path: str, show_progress: bool = True):
                 intrinsic = images[image_idx]['cam2img']
 
                 depth_intrinsic = images[image_idx]['cam2img']
-            visible_instance_indices = images[image_idx][
-                'visible_instance_ids']  # numpy array of int
-            visible_instance_ids = object_ids[visible_instance_indices]
-            visible_view_object_dict[extrinsic_id] = visible_instance_ids
-            visible_view_object_list.append(visible_instance_ids)
+            if 'instances' in datalist[scene_idx]:
+                visible_instance_indices = images[image_idx][
+                    'visible_instance_ids']  # numpy array of int
+                visible_instance_ids = object_ids[visible_instance_indices]
+                visible_view_object_dict[extrinsic_id] = visible_instance_ids
+                visible_view_object_list.append(visible_instance_ids)
             extrinsics_c2w.append(cam2global)
             intrinsics.append(intrinsic)
             depth_intrinsics.append(depth_intrinsic)
@@ -112,14 +102,7 @@ def read_annotation_pickle(path: str, show_progress: bool = True):
         if show_progress:
             pbar.set_description(f'Processing scene {scene_id}')
         output_data[scene_id] = {
-            # object level
-            'bboxes': bboxes,
-            'object_ids': object_ids,
-            'object_types': object_types,
-            'object_type_ints': object_type_ints,
             # image level
-            'visible_instance_ids': visible_view_object_list,
-            'visible_view_object_dict': visible_view_object_dict,
             'extrinsics_c2w': extrinsics_c2w,
             'axis_align_matrix': axis_align_matrix,
             'intrinsics': intrinsics,
@@ -127,4 +110,14 @@ def read_annotation_pickle(path: str, show_progress: bool = True):
             'image_paths': image_paths,
             'depth_image_paths': depth_image_paths,
         }
+        if 'instances' in datalist[scene_idx]:
+            output_data[scene_id].update({
+            # object level
+            'bboxes': bboxes,
+            'object_ids': object_ids,
+            'object_types': object_types,
+            'object_type_ints': object_type_ints,
+            # image level
+            'visible_instance_ids': visible_view_object_list,
+            'visible_view_object_dict': visible_view_object_dict})
     return output_data
