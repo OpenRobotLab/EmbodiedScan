@@ -1,19 +1,21 @@
 # LL3DA For MMScan Question Answering
+
 [LL3DA](https://arxiv.org/abs/2311.18651)
+
 ## Introduction
 
 (a) The overall pipeline of LL3DA first extracts interaction-aware 3D scene
- embeddings, which are later projected to the prefix of textual instructions as the input of a frozen LLM. 
+embeddings, which are later projected to the prefix of textual instructions as the input of a frozen LLM.
 (b)The detailed design of the
- Interactor3D, which aggregates visual prompts, textual instructions, and 3D scene embeddings into a fixed length querying tokens. (c) The
- prompt encoder encodes the user clicks and box coordinates with the positional embeddings and ROI features, respectively.
-
+Interactor3D, which aggregates visual prompts, textual instructions, and 3D scene embeddings into a fixed length querying tokens. (c) The
+prompt encoder encodes the user clicks and box coordinates with the positional embeddings and ROI features, respectively.
 
 <div align=center>
 <img src="../../assets/LL3DA.png" width=85%>
 </div>
 
 ## Tutorial
+
 1. Follow the [LL3DA](https://github.com/Open3DA/LL3DA/blob/main/README.md) to setup the environment. For data preparation, you need not load the datasets, only need to:
 
    (1) download the [release pre-trained weights.](https://huggingface.co/CH3COOK/LL3DA-weight-release/blob/main/ll3da-opt-1.3b.pth) and put them under `./pretrained`
@@ -44,10 +46,9 @@
    --tmp_path path/to/tmp  --api_key your_api_key --eval_size -1
    --nproc 4
    ```
+
 ## Results and Models
 
 | Detector  | Captioner | Iters |  Overall GPT Score  |                                                                                                                                                                       Download                                                                                                                                                                 |
 | :-------:  | :----: | :----: | :---------: |:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| Vote2Cap-DETR   |  LL3DA  |  100k |  45.7     |             [model](https://drive.google.com/file/d/1mcWNHdfrhdbtySBtmG-QRH1Y1y5U3PDQ/view?usp=drive_link) \| [log](https://drive.google.com/file/d/1VHpcnO0QmAvMa0HuZa83TEjU6AiFrP42/view?usp=drive_link)             |
-
-
+| Vote2Cap-DETR   |  LL3DA  |  100k |  45.7     |             [model](https://drive.google.com/file/d/1mcWNHdfrhdbtySBtmG-QRH1Y1y5U3PDQ/view?usp=drive_link) | [log](https://drive.google.com/file/d/1VHpcnO0QmAvMa0HuZa83TEjU6AiFrP42/view?usp=drive_link)             |

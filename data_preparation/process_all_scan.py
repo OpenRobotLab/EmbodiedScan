@@ -54,7 +54,7 @@ def create_scene_pcd(es_anno: dict,
     pc, color, label = pcd_result
     label = np.ones_like(label) * -100
     instance_ids = np.ones(pc.shape[0], dtype=np.int16) * (-100)
-    if "bboxes" in es_anno:
+    if 'bboxes' in es_anno:
         bboxes = es_anno['bboxes'].reshape(-1, 9)
         bboxes[:, 3:6] = np.clip(bboxes[:, 3:6], a_min=1e-2, a_max=None)
         object_ids = es_anno['object_ids']
@@ -74,7 +74,7 @@ def create_scene_pcd(es_anno: dict,
 
             orientation = np.array(
                 euler_angles_to_matrix(torch.tensor(box[np.newaxis, 6:]),
-                                    convention='ZXY')[0])
+                                       convention='ZXY')[0])
 
             box_pc_mask = is_inside_box(pc, center, size, orientation)
 

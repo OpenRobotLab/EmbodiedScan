@@ -226,7 +226,6 @@ class MMScan(Dataset):
         scan_idx = self.mmscan_collect['anno'][index_]['scan_id']
         pcd_info = self.__process_pcd_info__(scan_idx)
         images_info = self.__process_img_info__(scan_idx)
-        
 
         data_dict['ori_pcds'] = pcd_info['ori_pcds']
         data_dict['pcds'] = pcd_info['pcds']
@@ -234,8 +233,8 @@ class MMScan(Dataset):
         data_dict['instance_labels'] = pcd_info['instance_labels']
         data_dict['class_labels'] = pcd_info['class_labels']
         data_dict['images'] = images_info
-        
-        if self.split!='test':
+
+        if self.split != 'test':
             box_info = self.__process_box_info__(scan_idx)
             data_dict['bboxes'] = box_info
 
@@ -352,7 +351,7 @@ class MMScan(Dataset):
             bool : Whether the item is valid or not.
         """
         # fix little typo
-        if self.split=='test':
+        if self.split == 'test':
             return True
         anno_obj_ids = self.embodiedscan_anno[sample['scan_id']]['object_ids']
         if self.task == 'MMScan-VG':
@@ -467,7 +466,7 @@ class MMScan(Dataset):
             self.get_possess('depth_intrinsics', scan_idx))
         img_info['extrinsic'] = deepcopy(
             self.get_possess('extrinsics_c2w', scan_idx))
-        if self.split!='test':
+        if self.split != 'test':
             img_info['visible_instance_id'] = deepcopy(
                 self.get_possess('visible_instance_ids', scan_idx))
 
@@ -511,4 +510,4 @@ class MMScan(Dataset):
         for index in range(len(annos)):
             if index % int(1 / ratio) == 0:
                 d_annos.append(annos[index])
-        return d_annos     
+        return d_annos

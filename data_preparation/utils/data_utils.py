@@ -11,15 +11,29 @@ def read_annotation_pickle(path: str, show_progress: bool = True):
         show_progress (bool): whether showing the progress.
     Returns:
         dict: A dictionary.
-            scene_id : (bboxes, object_ids, object_types, visible_view_object_dict, extrinsics_c2w, axis_align_matrix, intrinsics, image_paths)
-            bboxes: numpy array of bounding boxes, shape (N, 9): xyz, lwh, ypr
-            object_ids: numpy array of obj ids, shape (N,)
-            object_types: list of strings, each string is a type of object
-            visible_view_object_dict: a dictionary {view_id: visible_instance_ids}
-            extrinsics_c2w: a list of 4x4 matrices, each matrix is the extrinsic matrix of a view
-            axis_align_matrix: a 4x4 matrix, the axis-aligned matrix of the scene
-            intrinsics: a list of 4x4 matrices, each matrix is the intrinsic matrix of a view
-            image_paths: a list of strings, each string is the path of an image in the scene
+            scene_id : (bboxes, object_ids, object_types,
+                visible_view_object_dict, extrinsics_c2w,
+                axis_align_matrix, intrinsics, image_paths)
+            bboxes:
+                numpy array of bounding boxes,
+                shape (N, 9): xyz, lwh, ypr
+            object_ids:
+                numpy array of obj ids, shape (N,)
+            object_types:
+                list of strings, each string is a type of object
+            visible_view_object_dict:
+                a dictionary {view_id: visible_instance_ids}
+            extrinsics_c2w:
+                a list of 4x4 matrices, each matrix is the extrinsic
+                matrix of a view
+            axis_align_matrix:
+                a 4x4 matrix, the axis-aligned matrix of the scene
+            intrinsics:
+                a list of 4x4 matrices, each matrix is the intrinsic
+                matrix of a view
+            image_paths:
+                a list of strings, each string is the path of an image
+                in the scene
     """
     with open(path, 'rb') as f:
         data = np.load(f, allow_pickle=True)
@@ -32,7 +46,7 @@ def read_annotation_pickle(path: str, show_progress: bool = True):
     pbar = (tqdm(range(len(datalist))) if show_progress else range(
         len(datalist)))
     for scene_idx in pbar:
-      
+
         images = datalist[scene_idx]['images']
 
         intrinsic = datalist[scene_idx].get('cam2img', None)  # a 4x4 matrix
@@ -112,12 +126,19 @@ def read_annotation_pickle(path: str, show_progress: bool = True):
         }
         if 'instances' in datalist[scene_idx]:
             output_data[scene_id].update({
-            # object level
-            'bboxes': bboxes,
-            'object_ids': object_ids,
-            'object_types': object_types,
-            'object_type_ints': object_type_ints,
-            # image level
-            'visible_instance_ids': visible_view_object_list,
-            'visible_view_object_dict': visible_view_object_dict})
+                # object level
+                'bboxes':
+                bboxes,
+                'object_ids':
+                object_ids,
+                'object_types':
+                object_types,
+                'object_type_ints':
+                object_type_ints,
+                # image level
+                'visible_instance_ids':
+                visible_view_object_list,
+                'visible_view_object_dict':
+                visible_view_object_dict
+            })
     return output_data
