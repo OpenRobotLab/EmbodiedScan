@@ -8,7 +8,7 @@ import mmengine
 import numpy as np
 from embodiedscan.registry import DATASETS
 from embodiedscan.structures import get_box_type
-from lry_utils.utils_read import to_sample_idx
+from mm_utils.utils_read import to_sample_idx
 from mmengine.dataset import BaseDataset
 from mmengine.fileio import load
 from scipy.spatial.transform import Rotation as R

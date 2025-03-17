@@ -1,6 +1,6 @@
-# EmbodiedScan For MMScan Visual Grounding
+# [EmbodiedScan](https://arxiv.org/abs/2312.16170) For MMScan Visual Grounding
 
-[EmbodiedScan](https://arxiv.org/abs/2312.16170)
+
 
 ## Introduction
 

@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from embodiedscan.registry import TRANSFORMS
 from embodiedscan.structures.points import DepthPoints, get_points_type
-from lry_utils.utils_read import NUM2RAW_3RSCAN, to_sample_idx, to_scene_id
+from mm_utils.utils_read import NUM2RAW_3RSCAN, to_sample_idx, to_scene_id
 from mmcv.transforms import BaseTransform, Compose
 
 

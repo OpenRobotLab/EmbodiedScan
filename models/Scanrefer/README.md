@@ -1,6 +1,6 @@
-# ScanRefer for MMScan Visual Grounding
+# [ScanRefer](https://arxiv.org/abs/1912.08830) for MMScan Visual Grounding
 
-[ScanRefer](https://arxiv.org/abs/1912.08830)
+
 
 ## Introduction
 
