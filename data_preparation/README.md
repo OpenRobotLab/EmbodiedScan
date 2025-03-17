@@ -1,4 +1,4 @@
-### Prepare MMscan info files.
+### MMScan Dataset Preparation
 
 Given the licenses of respective raw datasets, we recommend users download the raw data from their official websites and then organize them following the below guide.
 Detailed steps are shown as follows.
