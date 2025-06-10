@@ -130,8 +130,6 @@ def read_annotation_pickle(path: str, show_progress: bool = True):
             depth_image_paths.append(depth_image)
         if show_progress:
             pbar.set_description(f'Processing scene {scene_id}')
-        extrinsics_c2w = [(axis_align_matrix @ extrinsic) for extrinsic in
-                                                            extrinsics_c2w]
         output_data[scene_id] = {
             # image level
             'extrinsics_c2w': extrinsics_c2w,
