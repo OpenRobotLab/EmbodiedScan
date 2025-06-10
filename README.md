@@ -66,7 +66,7 @@ existing benchmarks and in-the-wild evaluation.
 
 ## 🚀 Getting Started
 
-- ### Installation
+### Installation
 
 1. Clone Github repo.
 
@@ -86,7 +86,7 @@ existing benchmarks and in-the-wild evaluation.
 
    Use `"all"` to install all components and specify `"VG"` or `"QA"` if you only need to install the components for Visual Grounding or Question Answering, respectively.
 
-- ### Data Preparation
+### Data Preparation
 
 1. Download the Embodiedscan and MMScan annotation. (Fill in the [form](https://docs.google.com/forms/d/e/1FAIpQLScUXEDTksGiqHZp31j7Zp7zlCNV7p_08uViwP_Nbzfn3g6hhw/viewform) to apply for downloading)
 
