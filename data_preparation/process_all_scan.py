@@ -54,31 +54,32 @@ def create_scene_pcd(es_anno: dict,
     pc, color, label = pcd_result
     label = np.ones_like(label) * -100
     instance_ids = np.ones(pc.shape[0], dtype=np.int16) * (-100)
-    bboxes = es_anno['bboxes'].reshape(-1, 9)
-    bboxes[:, 3:6] = np.clip(bboxes[:, 3:6], a_min=1e-2, a_max=None)
-    object_ids = es_anno['object_ids']
-    object_types = es_anno['object_types']  # str
-    sorted_indices = sorted(enumerate(bboxes),
-                            key=lambda x: -np.prod(x[1][3:6]))
-    # the larger the box, the smaller the index
-    sorted_indices_list = [index for index, value in sorted_indices]
+    if 'bboxes' in es_anno:
+        bboxes = es_anno['bboxes'].reshape(-1, 9)
+        bboxes[:, 3:6] = np.clip(bboxes[:, 3:6], a_min=1e-2, a_max=None)
+        object_ids = es_anno['object_ids']
+        object_types = es_anno['object_types']  # str
+        sorted_indices = sorted(enumerate(bboxes),
+                                key=lambda x: -np.prod(x[1][3:6]))
+        # the larger the box, the smaller the index
+        sorted_indices_list = [index for index, value in sorted_indices]
 
-    bboxes = [bboxes[index] for index in sorted_indices_list]
-    object_ids = [object_ids[index] for index in sorted_indices_list]
-    object_types = [object_types[index] for index in sorted_indices_list]
+        bboxes = [bboxes[index] for index in sorted_indices_list]
+        object_ids = [object_ids[index] for index in sorted_indices_list]
+        object_types = [object_types[index] for index in sorted_indices_list]
 
-    for box, obj_id, obj_type in zip(bboxes, object_ids, object_types):
-        obj_type_id = TYPE2INT.get(obj_type, -1)
-        center, size = box[:3], box[3:6]
+        for box, obj_id, obj_type in zip(bboxes, object_ids, object_types):
+            obj_type_id = TYPE2INT.get(obj_type, -1)
+            center, size = box[:3], box[3:6]
 
-        orientation = np.array(
-            euler_angles_to_matrix(torch.tensor(box[np.newaxis, 6:]),
-                                   convention='ZXY')[0])
+            orientation = np.array(
+                euler_angles_to_matrix(torch.tensor(box[np.newaxis, 6:]),
+                                       convention='ZXY')[0])
 
-        box_pc_mask = is_inside_box(pc, center, size, orientation)
+            box_pc_mask = is_inside_box(pc, center, size, orientation)
 
-        instance_ids[box_pc_mask] = obj_id
-        label[box_pc_mask] = obj_type_id
+            instance_ids[box_pc_mask] = obj_id
+            label[box_pc_mask] = obj_type_id
     return pc, color, label, instance_ids
 
 
@@ -180,6 +181,11 @@ if __name__ == '__main__':
         type=str,
         default=f'{path_of_version1}/embodiedscan_infos_val.pkl',
     )
+    parser.add_argument(
+        '--test_pkl_path',
+        type=str,
+        default=f'{path_of_version1}/embodiedscan_infos_test.pkl',
+    )
     parser.add_argument('--nproc', type=int, default=8)
     args = parser.parse_args()
 
@@ -198,7 +204,7 @@ if __name__ == '__main__':
                        allow_pickle=True)['metainfo']['categories']
     es_anno.update(read_annotation_pickle(args.train_pkl_path))
     es_anno.update(read_annotation_pickle(args.val_pkl_path))
-
+    es_anno.update(read_annotation_pickle(args.test_pkl_path))
     # loading the required scan id
     with open(f'{args.meta_path}/all_scan.json', 'r') as f:
         scan_id_list = json.load(f)
