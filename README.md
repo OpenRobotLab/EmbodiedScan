@@ -133,22 +133,30 @@ The dataset tool in MMScan allows seamless access to data required for various t
 
   Each dataset item is a dictionary containing data information from three modalities: language, 2D, and 3D.（[Details](https://rbler1234.gitbook.io/mmscan-devkit-tutorial#data-access)）
 
-### MMScan  Evaluator
+### MMScan  Evaluation
 
-Our evaluation tool is designed to streamline the assessment of model outputs for the MMScan task, providing essential metrics to gauge model performance effectively. We provide three evaluation tools: `VisualGroundingEvaluator`, `QuestionAnsweringEvaluator`, and `GPTEvaluator`. ([Details](https://rbler1234.gitbook.io/mmscan-devkit-tutorial/evaluator))
+Our evaluation tool is designed to streamline the assessment of model outputs for the MMScan task, providing essential metrics to gauge model performance effectively. We provide three evaluation tools: `VisualGroundingEvaluator`, `QuestionAnsweringEvaluator`, and `GPTEvaluator`. For more details, please refer to the [documentation](https://rbler1234.gitbook.io/mmscan-devkit-tutorial/evaluator).
 
 ```bash
 from mmscan import MMScan
 
 # (2) The evaluator tool ('VisualGroundingEvaluator', 'QuestionAnsweringEvaluator', 'GPTEvaluator')
 from mmscan import VisualGroundingEvaluator, QuestionAnsweringEvaluator, GPTEvaluator
+
+# For VisualGroundingEvaluator and QuestionAnsweringEvaluator, initialize the evaluator in the following way, update the model output to the evaluator, and finally perform the evaluation and save the final results.
+my_evaluator = VisualGroundingEvaluator(show_results=True) / QuestionAnsweringEvaluaton(show_results=True)
+my_evaluator.update(model_output)
+metric_dict = my_evaluator.start_evaluation()
+
+# For GPTEvaluator, initialize the Evaluator in the following way, and evaluate the model's output using multithreading, finally saving the results to the specified path (tmp_path).
+gpt_evaluator = GPTEvaluator(API_key='XXX')
+metric_dict = gpt_evaluator.load_and_eval(model_output, num_threads=1, tmp_path='XXX')
+
 ```
 
 
 ### MMScan HVG Challenge Submission
-
-To participate and submit your results in our MMScan Visual Grounding challenge, please refer to the instructions provided on our [test server](https://huggingface.co/spaces/rbler/3d-iou-challenge).
-We welcome any feedback — feel free to contact us via [Google email](linjingli@166.com).
+To participate in the MMScan Visual Grounding Challenge and submit your results, please follow the instructions available on our [test server](https://huggingface.co/spaces/rbler/3d-iou-challenge). We welcome your feedback and inquiries—please feel free to contact us at linjingli@166.com.
 
 ## 🏆 MMScan Benchmark
 

@@ -68,7 +68,7 @@ class MMScan(Dataset):
         self.split = split
         self.check_mode = check_mode
         if self.check_mode:
-            print("embodiedscan's checking mode")
+            print("MMScan's checking mode")
         self.pkl_name = f'{self.dataroot}/embodiedscan_split' +\
             f'/embodiedscan-{self.version}' +\
             f'/embodiedscan_infos_{split}.pkl'

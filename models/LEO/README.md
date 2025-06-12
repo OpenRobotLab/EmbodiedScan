@@ -4,8 +4,7 @@
 ## Introduction
 
 LEO takes egocentric 2D images, 3D point clouds, and texts as input and
-formulates comprehensive 3D tasks as autoregressive sequence prediction. By instruction-tuning LEO, it extends the capability of LLMs
-to multi-modal vision-language-action tasks with a unified model.
+formulates comprehensive 3D tasks as autoregressive sequence prediction. Through instruction tuning, LEO extends the capabilities of large language models to unified multi-modal vision-language-action tasks.
 
 <div align=center>
 <img src="../../assets/LEO.png" width=75%>
