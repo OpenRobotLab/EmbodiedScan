@@ -1,4 +1,4 @@
-# [LL3DA](https://arxiv.org/abs/2311.18651) For MMScan Question Answering
+# [LL3DA](https://arxiv.org/abs/2311.18651) for MMScan Question Answering
 
 
 

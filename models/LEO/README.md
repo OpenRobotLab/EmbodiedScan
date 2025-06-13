@@ -1,4 +1,4 @@
-# [LEO](https://arxiv.org/abs/2311.12871) For MMScan Question Answering
+# [LEO](https://arxiv.org/abs/2311.12871) for MMScan Question Answering
 
 
 ## Introduction
