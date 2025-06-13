@@ -65,14 +65,10 @@ class MMScan(Dataset):
             self.dataroot = os.path.join(
                 os.path.dirname(os.path.dirname(ENV_PATH)), 'mmscan_data')
         self.verbose = verbose
-
-        # now we skip the test split because we don not provide ground truth.
-        if split == 'test':
-            split = 'val'
         self.split = split
         self.check_mode = check_mode
         if self.check_mode:
-            print("embodiedscan's checking mode!!!")
+            print("MMScan's checking mode")
         self.pkl_name = f'{self.dataroot}/embodiedscan_split' +\
             f'/embodiedscan-{self.version}' +\
             f'/embodiedscan_infos_{split}.pkl'
@@ -230,15 +226,17 @@ class MMScan(Dataset):
         scan_idx = self.mmscan_collect['anno'][index_]['scan_id']
         pcd_info = self.__process_pcd_info__(scan_idx)
         images_info = self.__process_img_info__(scan_idx)
-        box_info = self.__process_box_info__(scan_idx)
 
         data_dict['ori_pcds'] = pcd_info['ori_pcds']
         data_dict['pcds'] = pcd_info['pcds']
         data_dict['obj_pcds'] = pcd_info['obj_pcds']
         data_dict['instance_labels'] = pcd_info['instance_labels']
         data_dict['class_labels'] = pcd_info['class_labels']
-        data_dict['bboxes'] = box_info
         data_dict['images'] = images_info
+
+        if self.split != 'test':
+            box_info = self.__process_box_info__(scan_idx)
+            data_dict['bboxes'] = box_info
 
         # (3) loading the data from the collection
         # necessary to use deepcopy?
@@ -282,7 +280,6 @@ class MMScan(Dataset):
         Args:
             table_name (str): The ype of the expected data.
             scan_idx (str): The scan id to get the data.
-
         Returns:
             The data corresponding to the table_name and scan_idx.
         """
@@ -332,7 +329,6 @@ class MMScan(Dataset):
 
         Args:
             samples (list[dict]): The samples.
-
         Returns:
             list[dict] : The filtered results.
         """
@@ -351,11 +347,12 @@ class MMScan(Dataset):
 
         Args:
             sample (dict): The item from the samples.
-
         Returns:
             bool : Whether the item is valid or not.
         """
         # fix little typo
+        if self.split == 'test':
+            return True
         anno_obj_ids = self.embodiedscan_anno[sample['scan_id']]['object_ids']
         if self.task == 'MMScan-VG':
             if (len(sample['target']) != len(sample['target_id'])
@@ -379,7 +376,6 @@ class MMScan(Dataset):
 
         Args:
             pkl_path (str): The path of the pkl.
-
         Returns:
             dict : The embodiedscan annotations of scans.
             (with scan_idx as keys)
@@ -393,7 +389,6 @@ class MMScan(Dataset):
 
         Args:
             scan_idx (str): ID of the scan.
-
         Returns:
             dict : The corresponding scan information.
         """
@@ -429,7 +424,6 @@ class MMScan(Dataset):
 
         Args:
             scan_idx (str): ID of the scan.
-
         Returns:
             dict : The corresponding bounding boxes information.
         """
@@ -454,7 +448,6 @@ class MMScan(Dataset):
 
         Args:
             scan_idx (str): ID of the scan.
-
         Returns:
             list[dict] :The corresponding bounding boxes information
                 for each camera.
@@ -473,8 +466,9 @@ class MMScan(Dataset):
             self.get_possess('depth_intrinsics', scan_idx))
         img_info['extrinsic'] = deepcopy(
             self.get_possess('extrinsics_c2w', scan_idx))
-        img_info['visible_instance_id'] = deepcopy(
-            self.get_possess('visible_instance_ids', scan_idx))
+        if self.split != 'test':
+            img_info['visible_instance_id'] = deepcopy(
+                self.get_possess('visible_instance_ids', scan_idx))
 
         img_info_list = []
         for camera_index in range(len(img_info['img_path'])):
@@ -495,7 +489,6 @@ class MMScan(Dataset):
                 the point clouds
             box_9DOF(np.ndarray / Tensor):
                 the 9DOF bounding box
-
         Returns:
             np.ndarray :
                 The transformed 6DOF bounding box.
@@ -510,7 +503,6 @@ class MMScan(Dataset):
         Args:
             annos (list[dict]): The original annotations.
             ratio (float): The ratio to downsample.
-
         Returns:
             list[dict] : The result.
         """
